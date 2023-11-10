@@ -28,11 +28,13 @@ canvas.addEventListener('click', () => {
 animator.postMessage({ type: 'context', canvas: main_offscreen }, [main_offscreen]);
 //console.log('> Contexto enviado al animador.');
 
-// Argumentos para el conteo de tiempo en segundos
-var seconds = 0;
-var time;
-var pre = '0';
-var second;
+// Argumentos para el conteo de tiempo
+var time; // Reloj universal
+var second; // Segundero universal
+var seconds = 0; // Reloj local
+var pre = '0'; // Segundero local
+var s_seconds = 0; // Tiempo simulado
+var frac = 60; // Fracción de segundo para el loop
 
 // Parámetro gravitacional terrestre (kilómetros ^ 3 / segundo ^ 2)
 const u = 3.986e5;
@@ -40,8 +42,14 @@ const u = 3.986e5;
 // Radio terrestre (kilómetros)
 const re = 6.37812e3;
 
-// Escala del gráfico (kilómetros por unidad de lienzo)
-const scale = .125 * re;
+// Día terrestre (segundos)
+const eday = 8.64e4;
+
+// Escala del gráfico (kilómetros por pixel de lienzo)
+const scale = .25 * re;
+
+// Escala de tiempo (Segundos simulados por segundo real)
+const t_scale = .1 * eday;
 
 // Punto de referencia (kilómetros)
 const center = {
@@ -55,13 +63,22 @@ var pos = {
 	y: 0
 };
 
+// Anomalía real simulada
+var s_f = 0;
+
+// Radio simulado
+var s_r = {
+	x: 0,
+	y: 0
+};
+
 // Radius (kilómetros)
 var r = 0;
 
-// Vector velocidad (kilómetros / segundo)indes.js
+// Vector velocidad (kilómetros / segundo)
 var vel = {
-	x: 0,
-	y: -1
+	x: -4,
+	y: 0
 };
 
 // Velocity (kilómetros / segundo)
@@ -125,21 +142,32 @@ var fo = 0;
 var delta_angle = 0;
 
 // Comenzar loop del Juego
-setInterval(orbitLoop, 16.6);
+setInterval(orbitLoop, 1000 / frac);
 
 //--------- LOOP DE SIMULACIÓN ------------
 function orbitLoop(){
 	
-	// Construir pedido para el animador
-	var request = [];
+	// ------------ CONTEO DEL TIEMPO ------------
 	
-	// Contar segundos
+	// Agregar la fracción de tiempo simulado que corresponde
+	s_seconds += t_scale / frac;
+	
+	// Verificar el segundero del reloj universal
 	time = Date.now().toString();
 	second = time.substr(-4).charAt(0);
+	
+	// Hacer un ajuste cada segundo
 	if(second != pre){
+		
+		// El segundero local se sincroniza con el reloj universal
 		seconds++;
+		
+		// El tiempo simulado se sincroniza con el reloj local
+		s_seconds = t_scale * seconds;
+		
+		// Preparar el parámetro para el siguiente ajuste
 		pre = second;
-	}
+	};
 	
 	// ------------ CÁLCULO DE ÓRBITA ------------
 	
@@ -147,6 +175,14 @@ function orbitLoop(){
 	pos = {
 		x: scale * mousePos.x - center.x,
 		y: scale * mousePos.y - center.y
+	}
+	
+	// Calcular velocidad del satélite
+	vel = {
+		//x: 5e-2 * pos.x / scale,
+		//y: 5e-2 * -pos.y / scale
+		x: 1,
+		y: 4
 	}
 	
 	// Calcular radio
@@ -271,13 +307,25 @@ function orbitLoop(){
 	// Calcular apoapse
 	ra = p / (1 - e);
 		
-	// Calcular excess velocity
+	// Calcular excess velocity (Vis-viva relation)
 	vx = Math.sqrt( - u / a );
 	
-	// Calcular period
+	// Calcular period (Kepler's third law)
 	T = 2 * Math.PI * Math.sqrt( Math.pow( a, 3 ) / u );
 	
+	// Calcular anomalía real simulada (Media vuelta por día terrestre)
+	s_f = Math.PI * s_seconds / eday;
+	
+	// Calcular radio simulado
+	s_r = {
+		r: orbital_r(p, e, s_f),
+		theta: s_f
+	};
+	
 	// -------------- DEBUG -----------------
+	
+	// Construir pedido para el animador
+	var request = [];
 	
 	// Establecer límites de la gráfica
 	var plot_inf_lim = 0;
@@ -290,7 +338,7 @@ function orbitLoop(){
 	// Debug: Órbita
 	orbit = cartesian_from_polar_curve(curve(
 		(f) => {
-			return ( p / ( 1 + e * Math.cos( f ) ) ) / scale;
+			return orbital_r(p, e, f) / scale;
 		},
 		(f) => {
 			return f;
@@ -377,12 +425,49 @@ function orbitLoop(){
 		true
 	]);
 	
+	// Vector r simulado
+	var cart_s_r = cartesian_from_polar_point([
+		s_r.r,
+		s_r.theta
+	]);
+	request.push([
+		'line', 
+		center.x / scale,
+		center.y / scale,  
+		( center.x + cart_s_r[0] ) / scale,
+		( center.y + cart_s_r[1] ) / scale
+	]);
+	
 	// Debug: Tiempo real transcurrido en segundos
 	request.push([
 		'debug', 
 		"real elapsed = " + seconds.toString() + "s",
 		10, 
 		canvas.height - 10
+	]);
+	
+	// Debug: Tiempo simulado transcurrido en días terrestres
+	request.push([
+		'debug', 
+		"simul elapsed = " + (s_seconds / eday).toString() + " eday",
+		10, 
+		canvas.height - 20
+	]);
+	
+	// Debug: Anomalía real simulada en radianes
+	request.push([
+		'debug', 
+		"simul f = " + s_f.toString() + " rad",
+		10, 
+		canvas.height - 30
+	]);
+	
+	// Debug: Radio simulado en radios terrestres
+	request.push([
+		'debug', 
+		"simul r = " + ( s_r.r / re ).toString() + " er",
+		10, 
+		canvas.height - 40
 	]);
 	
 	// Debug: Origen de coordenadas en radios terrestres
@@ -500,10 +585,10 @@ function orbitLoop(){
 		canvas.height - 50
 	]);
 	
-	// Debug: Angulo alpha en radianes
+	// Debug: Angulo del periapse con la horizontal en radianes
 	request.push([
 		'debug', 
-		"alpha = " + alpha.toString() + " rad",
+		"alpha_rp = " + ( 2 * Math.PI - angle_vec( rp_vec ) ).toString() + " rad",
 		canvas.width * .5, 
 		canvas.height - 60
 	]);
@@ -540,10 +625,10 @@ function orbitLoop(){
 		canvas.height - 100
 	]);
 	
-	// Debug: Period en segundos
+	// Debug: Period en días terrestres
 	request.push([
 		'debug', 
-		"T = " + T.toString() + " s",
+		"T = " + ( T / eday ).toString() + " eday",
 		canvas.width * .5, 
 		canvas.height - 110
 	]);

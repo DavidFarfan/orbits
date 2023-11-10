@@ -149,8 +149,13 @@ function vec_ort(v){
 	return normalize_vec(vec_aux);
 }
 
-// ANOMALÍA EXCÉNTRICA
-function ecc_anomaly(M, e){
+// RADIO ORBITAL
+function orbital_r(p, e, f){
+	return p / ( 1 + e * Math.cos( f ) );
+}
+
+// ANOMALÍA EXCÉNTRICA DE LA TRAYECTORIA ELÍPTICA (POR BISECCIÓN)
+function bis_elliptic_ecc_anomaly(M, e){
 	
 	// Lado derecho
 	let side_r = e * Math.sin(M);
