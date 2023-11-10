@@ -60,8 +60,8 @@ var r = 0;
 
 // Vector velocidad (kilómetros / segundo)indes.js
 var vel = {
-	x: 2,
-	y: -3
+	x: 0,
+	y: -1
 };
 
 // Velocity (kilómetros / segundo)
@@ -84,6 +84,9 @@ var contradiction = false;
 
 // Semi-latus rectum
 var p = 0;
+
+// Vector eje vertical
+var axis = null;
 
 // Periapse
 var rp = 0;
@@ -140,9 +143,6 @@ function orbitLoop(){
 	
 	// ------------ CÁLCULO DE ÓRBITA ------------
 	
-	// Comenzar la evaluación del caso
-	contradiction = false;
-	
 	// Calcular posición del satélite
 	pos = {
 		x: scale * mousePos.x - center.x,
@@ -189,30 +189,39 @@ function orbitLoop(){
 		var cos_f = ( 1 / e ) * ( p / r - 1 );
 		if(cos_f > 1){
 			f = 0;
+		}else if(cos_f < -1){
+			f = Math.PI;
 		}else{
 			f = Math.acos(cos_f);
 		}
 	}
 	
 	// Corregir true anomaly según el punto inicial de la trayectoria
-	if( pos.y > 0 ){
+	if( alpha > .5 * Math.PI ){
 		f *= -1;
 	}
+	
+	// Calcular vector eje vertical
+	axis = rot_vec(
+		pos,
+		-angle_vec(vel),
+		true
+	);
 	
 	// Calcular periapse
 	rp = p / (1 + e);
 	
-	// Corregir el vector periapse
-	if( pos.x < 0 ){
+	// Corregir el vector periapse según el lado del eje en que está el satélite
+	if( axis.y > 0 ){
 		rp_vec = rot_vec(
 			pos,
-			-f,
+			f,
 			true
 		);
 	}else{
 		rp_vec = rot_vec(
 			pos,
-			f,
+			-f,
 			true
 		);
 	}
@@ -223,8 +232,8 @@ function orbitLoop(){
 		y: rp * rp_vec.y,
 	};
 	
-	// Corregir el vector semi-latus
-	if( pos.x < 0 ){
+	// Corregir el vector semi-latus  según el lado del eje en que está el satélite
+	if( axis.y < 0 ){
 		p_vec = rot_vec(
 			rp_vec,
 			.5 * Math.PI,
@@ -279,44 +288,33 @@ function orbitLoop(){
 	};
 	
 	// Debug: Órbita
-	if(!contradiction){
-		orbit = cartesian_from_polar_curve(curve(
-			(f) => {
-				return ( p / ( 1 + e * Math.cos( f ) ) ) / scale;
-			},
-			(f) => {
-				return f;
-			},
-			plot_inf_lim,
-			plot_sup_lim,
-			.1
-		));
-		
-		// Gráfica ajustada a la situación
-		request.push([
-			'plot',
-			orbit,
-			[center.x / scale, center.y / scale],
-			angle_vec(rp_vec)
-		]);
-		
-		// Debug: Tipo de órbita
-		request.push([
-			'debug', 
-			type,
-			center.x / scale,
-			center.y / scale
-		]);
-	}else{
-		
-		// Debug: Avisar de la contradicción
-		request.push([
-			'debug', 
-			"Free fall.",
-			center.x / scale,
-			center.y / scale
-		]);
-	}
+	orbit = cartesian_from_polar_curve(curve(
+		(f) => {
+			return ( p / ( 1 + e * Math.cos( f ) ) ) / scale;
+		},
+		(f) => {
+			return f;
+		},
+		plot_inf_lim,
+		plot_sup_lim,
+		.05
+	));
+	
+	// Gráfica ajustada a la situación
+	request.push([
+		'plot',
+		orbit,
+		[center.x / scale, center.y / scale],
+		angle_vec(rp_vec)
+	]);
+	
+	// Debug: Tipo de órbita
+	request.push([
+		'debug', 
+		type,
+		10,
+		100
+	]);
 	
 	// Tierra
 	var draw_radius = re / scale;
