@@ -502,7 +502,7 @@ class Satellite{
 //---------CONEXIÓN CON EL ANIMADOR------------
 
 // Lienzo
-const canvas = document.getElementById('draw');
+const canvas = document.getElementById('view1');
 
 // Se corre una instancia de Worker (hilo) con el código animador
 const animator = new Worker("/scripts/animador.js");

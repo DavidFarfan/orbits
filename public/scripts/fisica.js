@@ -236,11 +236,20 @@ function rot_vec(v, a, normal){
 
 // NORMALIZAR UN VECTOR (Bidimensional)
 function normalize_vec(v){
+	
+	// Norma del vector
 	var norm = norm_vec(v);
+	
+	// Descartar el vector cero
+	if(norm == 0){
+		return v;
+	};
+	
+	// Multiplicar  escalarmente por el inverso de la norma
 	return {
 		x: v.x / norm,
 		y: v.y / norm
-	}
+	};
 };
 
 // VECTOR ORTONORMAL (Bidimensional)
