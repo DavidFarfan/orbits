@@ -15,8 +15,38 @@
 	<!-- Contenedor de los gráficos -->
 	<div class="flex-container">
 		<div class="col">
-			<canvas id='view1' width="450" height="450"></canvas>
-			<canvas id='view2' width="450" height="450"></canvas>
+			<canvas id='view1' width="400" height="400"></canvas>
+		</div>
+		<div class="col">
+			<canvas id='view2' width="400" height="400"></canvas>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col" align="center">
+			<div class="slidecontainer">
+				<label>pos x</label>
+				<input type="range" min="0" max="0" value="0" class="slider" id="posx">
+			</div>
+			<div class="slidecontainer">
+				<label>pos y</label>
+				<input type="range" min="0" max="0" value="0" class="slider" id="posy">
+			</div>
+			<div class="slidecontainer">
+				<label>pos z</label>
+				<input type="range" min="0" max="0" value="0" class="slider" id="posz">
+			</div>
+			<div class="slidecontainer">
+				<label>vel x</label>
+				<input type="range" min="-500" max="500" value="0" class="slider" id="velx">
+			</div>
+			<div class="slidecontainer">
+				<label>vel y</label>
+				<input type="range" min="-500" max="500" value="0" class="slider" id="vely">
+			</div>
+			<div class="slidecontainer">
+				<label>vel z</label>
+				<input type="range" min="-500" max="500" value="0" class="slider" id="velz">
+			</div>
 		</div>
 	</div>
 	
@@ -25,6 +55,18 @@
 	
 	<!-- Fisica -->
 	<script src="/scripts/fisica.js" crossorigin="anonymous"></script>
+	
+	<!-- Óribta -->
+	<script src="/scripts/orbit.js" crossorigin="anonymous"></script>
+	
+	<!-- Satélite -->
+	<script src="/scripts/satellite.js" crossorigin="anonymous"></script>
+	
+	<!-- Vista 1 -->
+	<script src="/scripts/view1.js" crossorigin="anonymous"></script>
+	
+	<!-- Vista 2 -->
+	<script src="/scripts/view2.js" crossorigin="anonymous"></script>
 	
 	<!-- App -->
 	<script src="/scripts/main.js" crossorigin="anonymous"></script>

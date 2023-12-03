@@ -31,7 +31,7 @@ function line(x1, y1, x2, y2, c){
 }
 
 // CURVA
-function plot(points, center, angle, color){
+function plot(points, center, angle, color, axis1, axis2){
 	
 	// Verificar que hay puntos
 	if(points == null){
@@ -46,7 +46,7 @@ function plot(points, center, angle, color){
 	
 	// Rotar el lienzo
 	ctx.save();
-	ctx.translate(center[0], center[1]);
+	ctx.translate(center[axis1], center[axis2]);
 	ctx.rotate(angle);
 	
 	// Dibujar segmentos iterativamente
@@ -57,10 +57,10 @@ function plot(points, center, angle, color){
 		
 		// Trazar línea
 		line(
-			start[0],
-			start[1],
-			end[0],
-			end[1],
+			start[axis1],
+			start[axis2],
+			end[axis1],
+			end[axis2],
 			color
 		);
 		
@@ -141,7 +141,7 @@ function animate(){
 function solve(req){
 	switch(req[0]){
 		case 'plot':
-			plot(req[1], req[2], req[3], req[4]);
+			plot(req[1], req[2], req[3], req[4], req[5], req[6]);
 		case 'line':
 			line(req[1], req[2], req[3], req[4], req[5]);
 			break;
