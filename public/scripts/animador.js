@@ -83,9 +83,17 @@ function ellipse(cx, cy, rx, ry, c){
 
 // TEXTO
 function print(txt, x, y, c){
+	
+	// Reflejar texto (está al revés)
+	ctx.save();
+	ctx.scale(1, -1);
+	
+	// Imprimir texto en la posición correcta
+	ctx.translate(x, -y);
 	ctx.font = "10px Arial";
 	ctx.fillStyle = colors[c];
-	ctx.fillText(txt, x, y);
+	ctx.fillText(txt, 0, 0);
+	ctx.restore();
 }
 
 //-----COMUNICACIÓN--------
@@ -128,10 +136,16 @@ function animate(){
 	// Limpiar canvas
 	erase();
 	
+	// Corrección de la dirección del eje vertical
+	ctx.save();
+	ctx.scale(1, -1);
+	ctx.translate(0, -ctx.canvas.height);
+	
 	// Resolver la lista de ítems
 	reqs.forEach(function(value, index, array){
 		solve(value);
 	});
+	ctx.restore();
 	
 	// Enviar frame
 	requestAnimationFrame(animate);

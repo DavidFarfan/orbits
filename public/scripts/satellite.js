@@ -45,6 +45,76 @@ class Satellite{
 		};
 	};
 	
+	// Satélite a partir de la órbita
+	static sat_from_orbit(name, u, a, e, rp, i, omega, upper_omega, f0){
+		
+		// Construir el satélite según r y v en el tiempo t0
+		let p = semi_latus_rectum_from_periapse(rp, e);
+		let fo;
+		let T;
+		let t0;
+		let sat_at_t0;
+		if(e >= 1){
+			fo = outgoing_angle(e);
+			t0 = ht_from_M(
+				M_from_H(
+					H_from_f(
+						f0, 
+						e
+					),
+					e
+				),
+				u,
+				a
+			);
+			sat_at_t0 = r_v_vecs(
+				'hyperbolic',
+				t0,
+				a,
+				e,
+				u,
+				p,
+				fo,
+				T,
+				i,
+				omega,
+				upper_omega
+			);
+		}else{
+			T = period(a, u);
+			t0 = t_from_M(
+				M_from_E(
+					E_from_f(
+						f0, 
+						e
+					),
+					e
+				),
+				e,
+				T
+			);
+			sat_at_t0 = r_v_vecs(
+				'elliptic',
+				t0,
+				a,
+				e,
+				u,
+				p,
+				fo,
+				T,
+				i,
+				omega,
+				upper_omega
+			);
+		};
+		let sat = new Satellite(
+			name,
+			sat_at_t0.r,
+			sat_at_t0.v,
+			true
+		);
+	};
+	
 	// Nombre del satélite
 	name_set(name){
 		this.name = name;
@@ -172,8 +242,8 @@ class Satellite{
 		request.push([
 			'print', 
 			this.name,
-			to_px( this.pos_get().x ), 
-			to_px( this.pos_get().y ) - 20,
+			to_px( center.x + this.orbit.r.x ) - 10, 
+			to_px( center.y + this.orbit.r.y ) + 10,
 			color
 		]);
 	};
@@ -239,8 +309,8 @@ class Satellite{
 		request.push([
 			'print', 
 			this.name,
-			to_px( this.pos_get().y ), 
-			to_px( this.pos_get().z ) - 20,
+			to_px( center.y + this.orbit.r.y ) - 10, 
+			to_px( center.z + this.orbit.r.z ) + 10,
 			color
 		]);
 	};

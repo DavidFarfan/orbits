@@ -2,17 +2,33 @@
 //------CONSTANTES--------
 
 // Números
-const PI = Math.PI;
-const euler = Math.E;
+const PI = Math.PI; // Pi
+const euler = Math.E; // Euler
+const AU = 1.495978707e8; // Unidad astronómica (km)
 
-// Parámetros terrestres
-const e_u = 3.986e5; // Parámetro gravitacional (km^3/s^2)
-const er = 6.37812e3; // Radio (km)
-const eday = 8.64e4; // Día (s)
+// Parámetros de La Tierra
+const e_u = 3.9860e5; // Parámetro gravitacional (km^3/s^2)
+const er = 6.371e3; // Radio (km)
+const eday = 24 * 3600; // Día (s)
 
-// parámetros solares
-const sun_u = 1.327e11; // Parámetro gravitacional (km^3/s^2)
-const sunr = 109 * er; // Radio
+// Parámetros de Venus
+const v_u = 3.2486e5; // Parámetro gravitacional (km^3/s^2)
+const vr = 6.0518e3; // Radio (km)
+const vday = 2802.0 * 3600; // Día (s)
+
+// Parámetros de Marte
+const m_u = 4.2828e4; // Parámetro gravitacional (km^3/s^2)
+const mr = 3.3895e3; // Radio (km)
+const mday = 24.6597 * 3600; // Día (s)
+
+// Parámetros de Ceres
+const c_u = 62.62736; // Parámetro gravitacional (km^3/s^2)
+const cr = 476; // Radio (km)
+const cday = 9 * 3600; // Día (s)
+
+// Parámetros del Sol
+const sun_u = 1.32712e11; // Parámetro gravitacional (km^3/s^2)
+const sunr = 6.95700e5; // Radio (km)
 
 //------BÁSICAS-------------
 
@@ -195,7 +211,10 @@ function norm_vec(v){
 
 // DISTANCIA ENTRE DOS PUNTOS
 function distance(x1, y1, x2, y2){
-	return norm_vec( x2 - x1, y2 - y1 );
+	return norm_vec({ 
+		x: x2 - x1, 
+		y: y2 - y1 
+	});
 };
 
 // HIPOTENUSA
@@ -420,51 +439,6 @@ function cof_cross_prod(u, v){
 	};
 };
 
-// VECTOR ROTACIÓN DE OTRO VECTOR (Bidimensional)
-function rot_vec(v, a, normal){
-	
-	// Vector rotado normalizado
-	const norm = norm_vec(v);
-	const angle = angle_vec(v);
-	var vec_aux = {
-		x: cos(angle + a),
-		y: sin(angle + a)
-	}
-	
-	// Ajustar la norma
-	if(normal){
-		return vec_aux;
-	}else{
-		return {
-			x: norm * vec_aux.x,
-			y: norm * vec_aux.y
-		}
-	};
-};
-
-// VECTOR ORTONORMAL (Bidimensional)
-function vec_ort(v){
-	
-	// Calcular un vector ortogonal particular
-	var vec_aux;
-	if(v.x != 0){
-		vec_aux = {
-			x: - v.y / v.x,
-			y: 1
-		}
-	}else if(v.y != 0){
-		vec_aux = {
-			x: 1,
-			y: - v.x / v.y
-		}
-	}else{
-		return v;
-	};
-	
-	// Normalizarlo
-	return normalize_vec(vec_aux);
-};
-
 //---------ÓRBITAS EN GENERAL---------------
 
 // ANGULAR MOMENTUM
@@ -497,6 +471,11 @@ function ecc_vector(u, v, h, r){
 // SEMI-LATUS RECTUM
 function semi_latus_rectum(h, u){
 	return pow( h, 2 ) / u;
+};
+
+// SEMI-LATUS RECTUM FROM PERIAPSE
+function semi_latus_rectum_from_periapse(rp, e){
+	return rp * ( 1 + e );
 };
 
 // SEMI-MAJOR AXIS
@@ -698,48 +677,21 @@ function f_from_r(r, p, e){
 	};
 };
 
-// VELOCIDAD TANGENCIAL
-function tan_vel(a, b, px, py, vt, type, clockwise){
-	let dir;
-	let x;
-	let v;
+// RIGHT ASCENSION AND DECLINATION
+function pointing_coordiantes(r1, r2){
 	
-	// Corrección para la mitad inferior
-	if(py < 0){
-		x = -px;
-		v = -vt;
-	}else{
-		x = px;
-		v = vt;
-	};
-	
-	// Corrección según el sentido de la órbita
-	if(clockwise){
-		v *= -1;
-	};
-	
-	// Corrección para trayectoria hiperbólica
-	if(type != 'elliptic'){
-		x *= -1;
-	};
-	
-	// Normalizar un vector tangente particular
-	if(type != 'elliptic'){
-		dir = normalize_vec({
-			x: 1,
-			y: ( b * x ) / ( pow( a, 2 ) * sqrt( pow( x / a, 2 ) - 1 ) )
-		});
-	}else{
-		dir = normalize_vec({
-			x: 1,
-			y: ( -b * x ) / ( pow( a, 2 ) * sqrt( 1 - pow( x / a, 2 ) ) )
-		});
-	};
-	
-	// Ajustar norma a la velocidad
+	// Posición relativa
+	let r3 = sum_vec( r2, prod_by_sc( -1, r1 ) );
 	return {
-		x: v * dir.x,
-		y: v * dir.y
+		
+		// La ascención recta va de 0 a 2pi 
+		alpha: angle_vec({
+			x: r3.x,
+			y: r3.y
+		}),
+		
+		// La declinación va de -pi/2 a pi/2
+		delta: atan( r3.z / hipo( r3.x, r3.y ) ) 
 	};
 };
 

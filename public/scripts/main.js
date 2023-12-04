@@ -1,18 +1,15 @@
-//---------ANIMADORES------------
+//---------ANIMADOR------------
 
-// Lienzos
+// Lienzo
 const canvas1 = document.getElementById('view1');
-const canvas2 = document.getElementById('view2');
+var show = false;
 
-// Animadores
+// Animador
 const animator1 = new Worker("/scripts/animador.js");
-const animator2 = new Worker("/scripts/animador.js");
 const main_offscreen_1 = canvas1.transferControlToOffscreen();
-const main_offscreen_2 = canvas2.transferControlToOffscreen();
 
-// Puesta en marcha de los animadores
+// Puesta en marcha del animador
 animator1.postMessage({ type: 'context', canvas: main_offscreen_1 }, [main_offscreen_1]);
-animator2.postMessage({ type: 'context', canvas: main_offscreen_2 }, [main_offscreen_2]);
 
 //-------PARÁMETROS DE LA SIMULACIÓN-----------
 
@@ -48,13 +45,13 @@ var ts = 0; // Tiempo actual de la simulación
 var frac = 60; // Fracción de segundo para el loop
 
 // Parámetros de escala de la simulación
-const s_scale = .6 * sunr; // Escala del espacio (kilómetros por pixel de lienzo)
+const s_scale = 3.5 * sunr; // Escala del espacio (kilómetros por pixel de lienzo)
 const t_scale = 10.0 * eday; // Escala del tiempo (Segundos simulados por segundo real)
-const center = { // Punto de referencia (kilómetros)
+var center = { // Punto de referencia (kilómetros)
 	x: to_km( width_p( .5 ) ),
 	y: to_km( height_p( .5 ) ),
 	z: to_km( height_p( .5 ) )
-}
+};
 
 //--------UNIDADES DE SIMULACIÓN------------
 
@@ -117,18 +114,32 @@ function orbitLoop(){
 	ts = s_time - ts0;
 	
 	//------------CONTROL MANUAL---------
-	Satellite.ctrl_rutine();
+	//Satellite.ctrl_rutine();
 	
 	//------------SIMULACIÓN------------
 	
+	
+	// Centro
+	if(Satellite.list[0].orbit.r != undefined){
+		center = {
+			x: to_km( width_p( .5 ) ) - Satellite.list[0].orbit.r.x,
+			y: to_km( width_p( .5 ) ) - Satellite.list[0].orbit.r.y,
+			z: to_km( width_p( .5 ) ) - Satellite.list[0].orbit.r.z
+		};
+	};
+	
+
 	// Simular todas las trayectorias
 	Satellite.list.forEach(function(value, index, array){
 		value.orbit.set_sim( ts, Satellite.u );
 	});
 	
 	//------------DIBUJO EN PANTALLA-----------
-	view1(animator1);
-	view2(animator2);
+	if(show){
+		view1(animator1);
+	}else{
+		view2(animator1);
+	};
 };
 
 //------I/O-------------
@@ -148,9 +159,6 @@ function getMousePos(canvas, evt) {
 };
 canvas1.addEventListener('mousemove', evt => {
 	mousePos1 = getMousePos(canvas1, evt);
-}, false);
-canvas2.addEventListener('mousemove', evt => {
-	mousePos2 = getMousePos(canvas2, evt);
 }, false);
 
 // Captura de parámetros del satélite controlado
@@ -190,20 +198,62 @@ velz_slider.oninput = () => {
 
 // Reiniciar el programa con un click
 canvas1.addEventListener('click', () => {
-	location.reload();
-}, false);
-canvas2.addEventListener('click', () => {
-	location.reload();
+	show = !show;
 }, false);
 
 //------OBJETOS A SIMULAR--------------
 
-// Satélite ctrl
-sat_ctrl = new Satellite(
-	'sat',
-	{x: 0, y: 0, z: 0},
-	{x: 0, y: 0, z: 0},
-	true
+
+// Tierra (SE J2000)
+Satellite.sat_from_orbit(
+	'earth',
+	sun_u,
+	149.598e6,
+	0.0167,
+	147.095e6,
+	8.7266462599716478846184538424431e-7,
+	1.9933026650579555328527279826012,
+	6.0866500632978122028543868744063,
+	0
+);
+
+// Venus
+Satellite.sat_from_orbit(
+	'venus',
+	sun_u,
+	108.210e6,
+	0.00677323,
+	107.480e6,
+	0.05924886665037670558078622288696,
+	0.95790650666456784499879844137729,
+	1.3383305132010906804591668547434,
+	0
+);
+
+// Marte
+Satellite.sat_from_orbit(
+	'mars',
+	sun_u,
+	227.956e6,
+	0.0935,
+	206.650e6,
+	0.03225368457685521058154980540167,
+	5.0003683069637542378863740517199,
+	0.86530876133170948702694279713143,
+	0
+);
+
+// Ceres
+Satellite.sat_from_orbit(
+	'ceres',
+	sun_u,
+	2.77 * AU,
+	0.0785,
+	2.55 * AU,
+	0.18500490071139893515391122145979,
+	1.2845623294678265686158364056076,
+	1.3962634015954636615389526147909,
+	0
 );
 
 // Comenzar loop del programa

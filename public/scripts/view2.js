@@ -220,6 +220,45 @@ function view2(animator){
 		'WHITE'
 	]);
 	
+	//----------COORDENADAS ECUATORIALES------------
+	
+	// Pointing Coordinates (rad)
+	if(Satellite.list[0].orbit.r != undefined){
+		let p_q = pointing_coordiantes(
+			Satellite.list[0].orbit.r,
+			{
+				x: 0,
+				y: 0,
+				z: 0
+			}
+		);
+		request.push([
+			'print', 
+			"earth_sun_pointing_coordinates ^^",
+			width_p( .01 ), 
+			10,
+			'WHITE'
+		]);
+		
+		// Right ascension
+		request.push([
+			'print', 
+			"alpha = " + str( p_q.alpha ) + " rad",
+			width_p( .01 ), 
+			20,
+			'WHITE'
+		]);
+		
+		// Declination
+		request.push([
+			'print', 
+			"delta = " + str( p_q.delta ) + " rad",
+			width_p( .01 ), 
+			30,
+			'WHITE'
+		]);
+	};
+	
 	// Enviar pedido al animador
 	animator.postMessage({
 		type: 'request',
