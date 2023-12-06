@@ -112,6 +112,46 @@ function view1(animator){
 		'WHITE'
 	]);
 	
+	// Pointing Coordinates to the sun (rad)
+	if(Satellite.list[0].orbit.r != undefined){
+		let p_q = pointing_coordiantes(
+			Satellite.list[0].orbit.r,
+			{
+				x: 0,
+				y: 0,
+				z: 0
+			},
+			Satellite.list[0].orbit.i,
+			Satellite.list[0].axial_tilt,
+			Satellite.list[0].orbit.upper_omega
+		);
+		request.push([
+			'print', 
+			"pointing_coordinates ^^",
+			10, 
+			100,
+			'WHITE'
+		]);
+		
+		// Right ascension
+		request.push([
+			'print', 
+			"RA = " + str( p_q.alpha ) + " rad",
+			10, 
+			110,
+			'WHITE'
+		]);
+		
+		// Declination
+		request.push([
+			'print', 
+			"D = " + str( p_q.delta ) + " rad",
+			10,
+			120,
+			'WHITE'
+		]);
+	};
+	
 	//-------INFO. DE SIMULACIÓN-------------
 	
 	// Sistema de coordenadas

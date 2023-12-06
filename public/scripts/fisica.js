@@ -9,22 +9,26 @@ const AU = 1.495978707e8; // Unidad astronómica (km)
 // Parámetros de La Tierra
 const e_u = 3.9860e5; // Parámetro gravitacional (km^3/s^2)
 const er = 6.371e3; // Radio (km)
-const eday = 24 * 3600; // Día (s)
+const eday = 24 * 3600; // Día solar (s)
+const e_axial_tilt = 0.40910517666747085283091311613373; // Oblicuidad de la órbita (rad)
 
 // Parámetros de Venus
 const v_u = 3.2486e5; // Parámetro gravitacional (km^3/s^2)
 const vr = 6.0518e3; // Radio (km)
-const vday = 2802.0 * 3600; // Día (s)
+const vday = 2802.0 * 3600; // Día solar (s)
+const v_axial_tilt = 3.0955159613371429376318579469914; // Oblicuidad de la órbita (rad)
 
 // Parámetros de Marte
 const m_u = 4.2828e4; // Parámetro gravitacional (km^3/s^2)
 const mr = 3.3895e3; // Radio (km)
-const mday = 24.6597 * 3600; // Día (s)
+const mday = 24.6597 * 3600; // Día solar (s)
+const m_axial_tilt = 0.43964843857737162042707770458228; // Oblicuidad de la órbita (rad)
 
 // Parámetros de Ceres
 const c_u = 62.62736; // Parámetro gravitacional (km^3/s^2)
 const cr = 476; // Radio (km)
-const cday = 9 * 3600; // Día (s)
+const cday = 9 * 3600; // Día solar (s)
+const c_axial_tilt = 0.06981317007977318307694763073954; // Oblicuidad de la órbita (rad)
 
 // Parámetros del Sol
 const sun_u = 1.32712e11; // Parámetro gravitacional (km^3/s^2)
@@ -549,6 +553,20 @@ function argument_of_periapse_f(e, r, upper_omega, i){
 	};
 };
 
+// ROTATION AXIS
+function rotation_axis(h, axial_tilt, upper_omega){
+	
+	// Llevar el nodo ascendente a x
+	let rot_axis = z_rot( h, -upper_omega );
+	
+	// Aplicar el ángulo de oblicuidad en el plano generado por el nodo ascendente
+	rot_axis = x_rot( rot_axis, axial_tilt );
+	
+	// Dejar el nodo ascendente en su sitio
+	rot_axis = z_rot( rot_axis, upper_omega );
+	return rot_axis;
+};
+
 // ORBITAL PLANAR POINT TO SPACE POINT
 function orbit_planar_point_to_space_point(point, i, omega, upper_omega){
 	
@@ -678,20 +696,24 @@ function f_from_r(r, p, e){
 };
 
 // RIGHT ASCENSION AND DECLINATION
-function pointing_coordiantes(r1, r2){
+function pointing_coordiantes(r1, r2, i, axial_tilt, upper_omega){
 	
-	// Posición relativa
+	// Posición de r2 desde r1 en coordenadas eclípticas
 	let r3 = sum_vec( r2, prod_by_sc( -1, r1 ) );
+	
+	// Pasar a coordenadas ecuatoriales
+	r3 = z_rot( r3, -upper_omega ); // Poner el nodo ascendente en x
+	r3 = x_rot( r3, -( i + axial_tilt ) ); // hacer del plano ecuatorial, el plano de referencia
 	return {
 		
 		// La ascención recta va de 0 a 2pi 
-		alpha: angle_vec({
+		alpha: angle_vec({ // Ángulo con el FPOA de la proyección en el plano de ref.
 			x: r3.x,
 			y: r3.y
 		}),
 		
 		// La declinación va de -pi/2 a pi/2
-		delta: atan( r3.z / hipo( r3.x, r3.y ) ) 
+		delta: atan( r3.z / hipo( r3.x, r3.y ) )
 	};
 };
 

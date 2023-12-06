@@ -46,7 +46,7 @@ class Satellite{
 	};
 	
 	// Satélite a partir de la órbita
-	static sat_from_orbit(name, u, a, e, rp, i, omega, upper_omega, f0){
+	static sat_from_orbit(name, u, a, e, rp, i, omega, upper_omega, tilt, f0){
 		
 		// Construir el satélite según r y v en el tiempo t0
 		let p = semi_latus_rectum_from_periapse(rp, e);
@@ -111,6 +111,7 @@ class Satellite{
 			name,
 			sat_at_t0.r,
 			sat_at_t0.v,
+			tilt,
 			true
 		);
 	};
@@ -156,6 +157,11 @@ class Satellite{
 		this.v = norm_vec(this.vel);
 	};
 	
+	// Oblicuidad de la órbita
+	tilt_set(tilt){
+		this.axial_tilt = tilt;
+	};
+	
 	// Magnitudes físicas
 	physics(){
 		
@@ -177,7 +183,8 @@ class Satellite{
 			this.E,
 			Satellite.u,
 			this.vel,
-			this.pos
+			this.pos,
+			this.axial_tilt
 		);
 	};
 	
@@ -235,6 +242,18 @@ class Satellite{
 			// La longitud del vector se dibuja sin tener en cuenta la escala
 			to_px( center.x ) + this.h_vec.x * 1e-5,
 			to_px( center.y ) + this.h_vec.y * 1e-5,
+			"CYAN"
+		]);
+		
+		// Eje de rotación
+		request.push([
+			'line',
+			to_px( center.x + this.orbit.r.x ),
+			to_px( center.y + this.orbit.r.y ),
+			
+			// La longitud del vector se dibuja sin tener en cuenta la escala
+			to_px( center.x + this.orbit.r.x ) + this.orbit.rot_axis.x * 1e-5,
+			to_px( center.y + this.orbit.r.y ) + this.orbit.rot_axis.y * 1e-5,
 			"CYAN"
 		]);
 		
@@ -305,6 +324,18 @@ class Satellite{
 			"CYAN"
 		]);
 		
+		// Eje de rotación
+		request.push([
+			'line',
+			to_px( center.y + this.orbit.r.y ),
+			to_px( center.z + this.orbit.r.z ),
+			
+			// La longitud del vector se dibuja sin tener en cuenta la escala
+			to_px( center.y + this.orbit.r.y ) + this.orbit.rot_axis.y * 1e-5,
+			to_px( center.z + this.orbit.r.z ) + this.orbit.rot_axis.z * 1e-5,
+			"CYAN"
+		]);
+		
 		// Nombre 
 		request.push([
 			'print', 
@@ -316,11 +347,12 @@ class Satellite{
 	};
 	
 	// Variables del satélite
-	constructor(name, pos, vel, ctrl){
+	constructor(name, pos, vel, tilt, ctrl){
 		this.name_set(name);
 		this.ctrl_set(ctrl);
 		this.pos_set(pos);
 		this.vel_set(vel);
+		this.tilt_set(tilt);
 		this.physics();
 		Satellite.list.push(this);
 	};

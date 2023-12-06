@@ -5,6 +5,7 @@ var request = []; // Último pedido
 const colors = { // Paleta
 	WHITE: '#FFFFFF',
 	BLACK: '#000000',
+	GREY: '#888888',
 	RED: '#FF0000',
 	GREEN: '#00FF00',
 	BLUE: '#0000FF',

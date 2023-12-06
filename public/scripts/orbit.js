@@ -62,8 +62,13 @@ class Orbit{
 	};
 	
 	// Longitude of the ascending node
-	set_upper_omega(){
+	set_upper_omega(h, axial_tilt){
 		this.upper_omega = longitude_ascending_node( this.n );
+		this.rot_axis = rotation_axis(
+			h,
+			axial_tilt,
+			this.upper_omega
+		);
 	};
 	
 	// Argument of periapse and initial true anomaly
@@ -259,7 +264,7 @@ class Orbit{
 			to_px( center.y ),
 			to_px( center.x + this.semi_latus_rectum.x ),
 			to_px( center.y + this.semi_latus_rectum.y ),
-			'BLUE'
+			'GREY'
 		]);
 		
 		// Curva de la órbita
@@ -268,7 +273,7 @@ class Orbit{
 			this.curve,
 			[ to_px( center.x ), to_px( center.y ), to_px( center.z ) ],
 			0,
-			'RED',
+			'GREY',
 			0,
 			1
 		]);
@@ -280,7 +285,7 @@ class Orbit{
 			to_px( center.y ),
 			to_px( center.x + this.r.x ),
 			to_px( center.y + this.r.y ),
-			'RED'
+			'GREY'
 		]);
 		
 		// Velocidad simulada
@@ -326,7 +331,7 @@ class Orbit{
 			to_px( center.z ),
 			to_px( center.y + this.semi_latus_rectum.y ),
 			to_px( center.z + this.semi_latus_rectum.z ),
-			'BLUE'
+			'GREY'
 		]);
 		
 		// Curva de la órbita
@@ -335,7 +340,7 @@ class Orbit{
 			this.curve,
 			[ to_px( center.x ), to_px( center.y ), to_px( center.z ) ],
 			0,
-			'RED',
+			'GREY',
 			1,
 			2
 		]);
@@ -347,7 +352,7 @@ class Orbit{
 			to_px( center.z ),
 			to_px( center.y + this.r.y ),
 			to_px( center.z + this.r.z ),
-			'RED'
+			'GREY'
 		]);
 		
 		// Velocidad simulada
@@ -364,7 +369,7 @@ class Orbit{
 	};
 	
 	// Variables de la órbita (a partir del satélite que la recorre)
-	constructor(h, E, u, v, r){
+	constructor(h, E, u, v, r, axial_tilt){
 		this.set_type(E);
 		this.set_line_of_nodes(h);
 		this.set_eccentricity(u, v, h, r);
@@ -374,7 +379,7 @@ class Orbit{
 		this.set_b();
 		this.set_rp();
 		this.set_i(h);
-		this.set_upper_omega();
+		this.set_upper_omega(h, axial_tilt);
 		this.set_omega_f0(r);
 		this.structure();
 		this.set_curve_fo(r);
