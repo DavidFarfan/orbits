@@ -46,7 +46,7 @@ class Satellite{
 	};
 	
 	// Satélite a partir de la órbita
-	static sat_from_orbit(name, u, a, e, rp, i, omega, upper_omega, tilt, f0){
+	static sat_from_orbit(name, u, a, e, rp, i, omega, upper_omega, rot, f0){
 		
 		// Construir el satélite según r y v en el tiempo t0
 		let p = semi_latus_rectum_from_periapse(rp, e);
@@ -111,7 +111,7 @@ class Satellite{
 			name,
 			sat_at_t0.r,
 			sat_at_t0.v,
-			tilt,
+			rot,
 			true
 		);
 	};
@@ -157,9 +157,17 @@ class Satellite{
 		this.v = norm_vec(this.vel);
 	};
 	
-	// Oblicuidad de la órbita
-	tilt_set(tilt){
-		this.axial_tilt = tilt;
+	// Rotación
+	rotation_set(rot){
+		
+		// Periodo de rotación sideral
+		this.sidereal_rotation_period = rot.T;
+		
+		// Ascensión recta incial del meridiano cero
+		this.GST0 = rot.t0;
+		
+		// Oblicuidad de la órbita
+		this.axial_tilt = rot.tilt;
 	};
 	
 	// Magnitudes físicas
@@ -185,6 +193,17 @@ class Satellite{
 			this.vel,
 			this.pos,
 			this.axial_tilt
+		);
+	};
+	
+	// Rotación simulada
+	rotate(ts){
+		
+		// Ascensión recta del meridiano cero
+		this.GST = GST(
+			this.sidereal_rotation_period,
+			ts,
+			this.GST0
 		);
 	};
 	
@@ -347,12 +366,12 @@ class Satellite{
 	};
 	
 	// Variables del satélite
-	constructor(name, pos, vel, tilt, ctrl){
+	constructor(name, pos, vel, rot, ctrl){
 		this.name_set(name);
 		this.ctrl_set(ctrl);
 		this.pos_set(pos);
 		this.vel_set(vel);
-		this.tilt_set(tilt);
+		this.rotation_set(rot);
 		this.physics();
 		Satellite.list.push(this);
 	};

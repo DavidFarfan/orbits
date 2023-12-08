@@ -2,7 +2,7 @@
 
 // Lienzo
 const canvas1 = document.getElementById('view1');
-var show = false;
+var view = 1;
 
 // Animador
 const animator1 = new Worker("/scripts/animador.js");
@@ -46,12 +46,14 @@ var frac = 60; // Fracción de segundo para el loop
 
 // Parámetros de escala de la simulación
 const s_scale = 3.5 * sunr; // Escala del espacio (kilómetros por pixel de lienzo)
-const t_scale = 10.0 * eday; // Escala del tiempo (Segundos simulados por segundo real)
+const t_scale = 1.0 * eday; // Escala del tiempo (Segundos simulados por segundo real)
 var center = { // Punto de referencia (kilómetros)
 	x: to_km( width_p( .5 ) ),
 	y: to_km( height_p( .5 ) ),
 	z: to_km( height_p( .5 ) )
 };
+var PHI = deg_to_rad( 35.6 ); // Latitud sobre el satélite
+var LAMBDA = deg_to_rad( 139.6 ); // Longitud sobre el satélite
 
 //--------UNIDADES DE SIMULACIÓN------------
 
@@ -118,8 +120,7 @@ function orbitLoop(){
 	
 	//------------SIMULACIÓN------------
 	
-	
-	// Centro
+	// Centrar en el recorrido simulado del satélite controlado
 	if(Satellite.list[0].orbit.r != undefined){
 		center = {
 			x: to_km( width_p( .5 ) ) - Satellite.list[0].orbit.r.x,
@@ -128,17 +129,31 @@ function orbitLoop(){
 		};
 	};
 	
-
-	// Simular todas las trayectorias
+	// Simular movimiento de los satélites
 	Satellite.list.forEach(function(value, index, array){
-		value.orbit.set_sim( ts, Satellite.u );
+		value.rotate(ts); // Rotación
+		value.orbit.set_sim( ts, Satellite.u ); // Traslación
 	});
 	
 	//------------DIBUJO EN PANTALLA-----------
-	if(show){
-		view1(animator1);
-	}else{
-		view2(animator1);
+	switch(view){
+		case 1:
+			view1(animator1);
+			break;
+		case 2:
+			view2(animator1);
+			break;
+		case 3:
+			view3(
+				animator1, 
+				{
+					x: width_p( .5 ),
+					y: height_p( .5 )
+				},
+				PHI,
+				LAMBDA
+			);
+			break;
 	};
 };
 
@@ -196,9 +211,19 @@ velz_slider.oninput = () => {
 	sat.vz = -velz_slider.value * .1;
 };
 
+// Captura de parámetros del punto sobre la superficie del satélite controlado
+const lat_slider = document.getElementById("lat");
+lat_slider.oninput = () => {
+	PHI = lat_slider.value * PI / ( 2 * 500 );
+};
+const long_slider = document.getElementById("long");
+long_slider.oninput = () => {
+	LAMBDA = long_slider.value * PI / 500;
+};
+
 // Reiniciar el programa con un click
 canvas1.addEventListener('click', () => {
-	show = !show;
+	view = ( view + 1 ) % 3 + 1;
 }, false);
 
 //------OBJETOS A SIMULAR--------------
@@ -214,11 +239,15 @@ Satellite.sat_from_orbit(
 	8.7266462599716478846184538424431e-7,
 	1.9933026650579555328527279826012,
 	6.0866500632978122028543868744063,
-	e_axial_tilt,
+	{
+		T: e_sidereal_rotation_period,
+		t0: 0,
+		tilt: e_axial_tilt
+	},
 	0
 );
 
-// Venus
+/*/ Venus
 Satellite.sat_from_orbit(
 	'venus',
 	sun_u,
@@ -258,7 +287,7 @@ Satellite.sat_from_orbit(
 	1.3962634015954636615389526147909,
 	c_axial_tilt,
 	0
-);
+);*/
 
 // Comenzar loop del programa
 setInterval(orbitLoop, s_to_ms( 1 / frac ) );

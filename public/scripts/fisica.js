@@ -9,8 +9,9 @@ const AU = 1.495978707e8; // Unidad astronómica (km)
 // Parámetros de La Tierra
 const e_u = 3.9860e5; // Parámetro gravitacional (km^3/s^2)
 const er = 6.371e3; // Radio (km)
-const eday = 24 * 3600; // Día solar (s)
+const eday = h_to_s( 24 ); // Día solar (s)
 const e_axial_tilt = 0.40910517666747085283091311613373; // Oblicuidad de la órbita (rad)
+const e_sidereal_rotation_period = h_to_s( 23.9345 ); // Periodo de rotación sideral (s)
 
 // Parámetros de Venus
 const v_u = 3.2486e5; // Parámetro gravitacional (km^3/s^2)
@@ -121,6 +122,21 @@ function atanh(x){
 };
 
 //------CONVERSIONES---------------
+
+// RADIANES A GRADOS
+function rad_to_deg(rad){
+	return rad * 180 / PI;
+};
+
+// GRADOS A RADIANES
+function deg_to_rad(deg){
+	return deg * PI / 180;
+};
+
+// HORAS A SEGUNDOS
+function h_to_s(h){
+	return h * 3600;
+};
 
 // SEGUNDOS A MILISEGUNDOS
 function s_to_ms(s){
@@ -888,4 +904,48 @@ function H_from_M(M0, e, fo){
 // ANOMALÍA VERDADERA DADA LA ANOMALÍA HIPERBÓLICA
 function f_from_H(H, e){
 	return 2 * atan( sqrt( ( e + 1 ) / ( e - 1 ) ) * tanh( H / 2 ) );
+};
+
+//-------ROTACIÓN------------------
+
+// TIEMPO SIDERAL DEL MERIDIANO CERO
+function GST(T, t, t0){
+	
+	// Los objetos en la esfera celeste van quedando atrás
+	return 2 * PI - M_from_t(T, t + t0);
+};
+
+// TIEMPO SIDERAL LOCAL
+function LST(GST, longitude){
+	return GST + longitude;
+};
+
+// POSICIÓN EN LA ESFERA CELESTE
+function celestial_sphere_pos(ra, d, longitude, latitude, GST){
+	
+	// Punto más alto del ecuador
+	let ref = -1;	// Hacia el sur en latitud norte
+	if(latitude < 0){
+		ref = 1;	// Hacia el norte en latitud sur
+	};
+	let pos = x_rot(	// Ecuador
+		z_rot(		// Dirección sur
+			x_rot(	// Altura
+				{
+					x: 0,
+					y: ref,
+					z: 0
+				},
+				ref * d
+			),
+			ref * ( ra - LST(GST, longitude) )
+		),
+		ref * ( PI / 2 - latitude )
+	);
+	
+	// Orientar el norte hacia arriba
+	if(latitude < 0){
+		pos.y *= -1;
+	};
+	return pos;
 };

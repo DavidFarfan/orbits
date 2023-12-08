@@ -204,7 +204,7 @@ class Orbit{
 		};
 	};
 	
-	// Simulation point
+	// Simulated run
 	set_sim(ts, u){
 		
 		// Tiempo de órbita
