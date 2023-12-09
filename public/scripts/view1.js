@@ -1,5 +1,5 @@
 //---------VISTA 1: SATÉLITE Y SIMULACIÓN------------------
-function view1(animator){
+function view1(animator, ephemeris){
 	
 	// Construir pedido para el animador
 	var request = [];
@@ -20,6 +20,45 @@ function view1(animator){
 	Satellite.list.forEach(function(value, index, array){
 		value.view1(request);
 	});
+	
+	//------EFEMÉRIDES----------------
+	
+	// Dibujar efemérides si está disponible
+	if(ephemeris != null){
+		ephemeris.forEach(function(value, index, array){
+			
+			// Posición absoluta
+			request.push([
+				'circle',
+				to_px( center.x + value[0] ),
+				to_px( center.y + value[1] ),
+				1,
+				'YELLOW'
+			]);
+			
+			// Vector r
+			request.push([
+				'line', 
+				to_px( center.x ),
+				to_px( center.y ),  
+				to_px( center.x + value[0] ),
+				to_px( center.y + value[1] ),
+				'YELLOW'
+			]);
+			
+			// Vector v
+			request.push([
+				'line',
+				to_px( center.x + value[0] ),
+				to_px( center.y + value[1] ),
+				
+				// La longitud del vector se dibuja sin tener en cuenta la escala
+				to_px( center.x + value[0] ) + value[3] * 1e0,
+				to_px( center.y + value[1] ) + value[4] * 1e0,
+				'YELLOW'
+			]);
+		});
+	};
 	
 	//------INFO DEL SATÉLITE CONTROLADO----------
 	

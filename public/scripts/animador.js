@@ -108,11 +108,12 @@ self.onmessage = (e) => {
 			
 			// Adoptar contexto
 			ctx = e.data.canvas.getContext('2d');
+			self.postMessage('contexto recibido.');
 			
 			// Comenzar loop de animación
 			animate();
 			break;
-		
+
 		// Recibir un pedido
 		case 'request':
 			

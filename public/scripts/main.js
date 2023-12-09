@@ -57,6 +57,9 @@ var center = { // Punto de referencia (kilómetros)
 var PHI = deg_to_rad( 35.6 ); // Latitud sobre el satélite
 var LAMBDA = deg_to_rad( 139.6 ); // Longitud sobre el satélite
 
+// Recursos de Horizons system
+var ephemeris = null; // Efemérides
+
 //--------UNIDADES DE SIMULACIÓN------------
 
 // PORCENTAJE DE ANCHO DEL LIENZO
@@ -137,13 +140,13 @@ function orbitLoop(){
 		value.orbit.set_sim( ts, Satellite.u ); // Traslación
 	});
 	
-	//------------DIBUJO EN PANTALLA-----------
+	//------------SELECCIÓN DE VISTA-----------
 	switch(view){
 		case 1:
-			view1(animator1);
+			view1(animator1, ephemeris);
 			break;
 		case 2:
-			view2(animator1);
+			view2(animator1, ephemeris);
 			break;
 		case 3:
 			view3(
@@ -160,6 +163,47 @@ function orbitLoop(){
 };
 
 //------I/O-------------
+
+// Recibir confirmación del animador
+animator1.addEventListener("message", (msg) => {
+  log( msg.data );
+});
+
+// Recibir efemérides de la NASA
+self.onmessage = (e) => {
+	switch (e.data.type) {
+		case 'ephemeris':
+			ephemeris = e.data.eph;
+			break;
+	};
+};
+
+// Comunicación con Horizons system
+$(document).ready((data, status) => {
+	
+	// Efemérides de la tierra (01-01-2000 a 01-01-2001)
+	$.get(
+		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='2000-01-01'&STOP_TIME='2001-01-01'&STEP_SIZE='1mo'",
+		(data, status) => {
+			let aux1 = data.split( 'TDB' ).slice( 4, 17 );
+			let aux2 = [];
+			let vectors = [];
+			aux1.forEach(function(value, index, array){
+				aux2.push( value.split( '=' ).slice( 1, 7 ) );
+			});
+			aux2.forEach(function(value, index, array){
+				let vector = [];
+				value.forEach(function(value2, index2, array2){
+					vector.push(Number(
+						value2.split('E')[0] + 'e' + value2.split('E')[1].substr( 0, 3 )
+					));
+				});
+				vectors.push( vector );
+			});
+			self.postMessage({ type: 'ephemeris', eph: vectors });
+		}
+	);
+});
 
 // Captura de posición del mouse
 function getMousePos(canvas, evt) {
