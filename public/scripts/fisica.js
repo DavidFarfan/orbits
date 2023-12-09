@@ -10,6 +10,7 @@ const AU = 1.495978707e8; // Unidad astronómica (km)
 const e_u = 3.9860e5; // Parámetro gravitacional (km^3/s^2)
 const er = 6.371e3; // Radio (km)
 const eday = h_to_s( 24 ); // Día solar (s)
+const e_a = 149.598e6; // Semi-eje mayor (km)
 const e_axial_tilt = 0.40910517666747085283091311613373; // Oblicuidad de la órbita (rad)
 const e_sidereal_rotation_period = h_to_s( 23.9345 ); // Periodo de rotación sideral (s)
 
@@ -18,18 +19,21 @@ const v_u = 3.2486e5; // Parámetro gravitacional (km^3/s^2)
 const vr = 6.0518e3; // Radio (km)
 const vday = 2802.0 * 3600; // Día solar (s)
 const v_axial_tilt = 3.0955159613371429376318579469914; // Oblicuidad de la órbita (rad)
+const v_sidereal_rotation_period = h_to_s( 5832.6 ); // Periodo de rotación sideral (s)
 
 // Parámetros de Marte
 const m_u = 4.2828e4; // Parámetro gravitacional (km^3/s^2)
 const mr = 3.3895e3; // Radio (km)
 const mday = 24.6597 * 3600; // Día solar (s)
 const m_axial_tilt = 0.43964843857737162042707770458228; // Oblicuidad de la órbita (rad)
+const m_sidereal_rotation_period = h_to_s( 24.6229 ); // Periodo de rotación sideral (s)
 
 // Parámetros de Ceres
 const c_u = 62.62736; // Parámetro gravitacional (km^3/s^2)
 const cr = 476; // Radio (km)
 const cday = 9 * 3600; // Día solar (s)
 const c_axial_tilt = 0.06981317007977318307694763073954; // Oblicuidad de la órbita (rad)
+const c_sidereal_rotation_period = h_to_s( 9.07 ); // Periodo de rotación sideral (s)
 
 // Parámetros del Sol
 const sun_u = 1.32712e11; // Parámetro gravitacional (km^3/s^2)

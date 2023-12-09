@@ -56,7 +56,7 @@ function view3(animator, origin, PHI, LAMBDA){
 	// Coordenadas (deg)
 	request.push([
 		'print', 
-		"Point coordinates of sun from " + Satellite.list[0].name + 
+		"Point coordinates of sun from " + Satellite.ctrl.name + 
 		" -> lat: " + str( significant( rad_to_deg( PHI ), 3 ) ) + 
 		"° lon: " + str( significant( rad_to_deg( LAMBDA ), 3 ) ) + "°",
 		10, 
@@ -66,19 +66,19 @@ function view3(animator, origin, PHI, LAMBDA){
 	
 	//--------DATOS DEL PUNTO MONITOREADO-----------
 	
-	// Pointing Coordinates of the sun from earth (rad)
+	// Pointing Coordinates of the sun from ctrl (rad)
 	let p_q;
-	if(Satellite.list[0].orbit.r != undefined){
+	if(Satellite.ctrl.orbit.r != undefined){
 		p_q = pointing_coordiantes(
-			Satellite.list[0].orbit.r,
+			Satellite.ctrl.orbit.r,
 			{	// Sun
 				x: 0,
 				y: 0,
 				z: 0
 			},
-			Satellite.list[0].orbit.i,
-			Satellite.list[0].axial_tilt,
-			Satellite.list[0].orbit.upper_omega
+			Satellite.ctrl.orbit.i,
+			Satellite.ctrl.axial_tilt,
+			Satellite.ctrl.orbit.upper_omega
 		);
 		
 		// Right ascension

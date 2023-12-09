@@ -46,7 +46,7 @@ var frac = 60; // Fracción de segundo para el loop
 
 // Parámetros de escala de la simulación
 const s_scale = 3.5 * sunr; // Escala del espacio (kilómetros por pixel de lienzo)
-const t_scale = 1.0 * eday; // Escala del tiempo (Segundos simulados por segundo real)
+const t_scale = 100.0 * eday; // Escala del tiempo (Segundos simulados por segundo real)
 var center = { // Punto de referencia (kilómetros)
 	x: to_km( width_p( .5 ) ),
 	y: to_km( height_p( .5 ) ),
@@ -121,11 +121,11 @@ function orbitLoop(){
 	//------------SIMULACIÓN------------
 	
 	// Centrar en el recorrido simulado del satélite controlado
-	if(Satellite.list[0].orbit.r != undefined){
+	if(Satellite.ctrl.orbit.r != undefined){
 		center = {
-			x: to_km( width_p( .5 ) ) - Satellite.list[0].orbit.r.x,
-			y: to_km( width_p( .5 ) ) - Satellite.list[0].orbit.r.y,
-			z: to_km( width_p( .5 ) ) - Satellite.list[0].orbit.r.z
+			x: to_km( width_p( .5 ) ) - Satellite.ctrl.orbit.r.x,
+			y: to_km( width_p( .5 ) ) - Satellite.ctrl.orbit.r.y,
+			z: to_km( width_p( .5 ) ) - Satellite.ctrl.orbit.r.z
 		};
 	};
 	
@@ -228,26 +228,7 @@ canvas1.addEventListener('click', () => {
 
 //------OBJETOS A SIMULAR--------------
 
-
-// Tierra (SE J2000)
-Satellite.sat_from_orbit(
-	'earth',
-	sun_u,
-	149.598e6,
-	0.0167,
-	147.095e6,
-	8.7266462599716478846184538424431e-7,
-	1.9933026650579555328527279826012,
-	6.0866500632978122028543868744063,
-	{
-		T: e_sidereal_rotation_period,
-		t0: 0,
-		tilt: e_axial_tilt
-	},
-	0
-);
-
-/*/ Venus
+// Venus
 Satellite.sat_from_orbit(
 	'venus',
 	sun_u,
@@ -257,7 +238,11 @@ Satellite.sat_from_orbit(
 	0.05924886665037670558078622288696,
 	0.95790650666456784499879844137729,
 	1.3383305132010906804591668547434,
-	v_axial_tilt,
+	{
+		T: v_sidereal_rotation_period,
+		t0: 0,
+		tilt: v_axial_tilt
+	},
 	0
 );
 
@@ -271,7 +256,11 @@ Satellite.sat_from_orbit(
 	0.03225368457685521058154980540167,
 	5.0003683069637542378863740517199,
 	0.86530876133170948702694279713143,
-	m_axial_tilt,
+	{
+		T: m_sidereal_rotation_period,
+		t0: 0,
+		tilt: m_axial_tilt
+	},
 	0
 );
 
@@ -285,9 +274,31 @@ Satellite.sat_from_orbit(
 	0.18500490071139893515391122145979,
 	1.2845623294678265686158364056076,
 	1.3962634015954636615389526147909,
-	c_axial_tilt,
+	{
+		T: c_sidereal_rotation_period,
+		t0: 0,
+		tilt: c_axial_tilt
+	},
 	0
-);*/
+);
+
+// Tierra (SE J2000)
+Satellite.sat_from_orbit(
+	'earth',
+	sun_u,
+	e_a,
+	0.0167,
+	147.095e6,
+	8.7266462599716478846184538424431e-7,
+	1.9933026650579555328527279826012,
+	6.0866500632978122028543868744063,
+	{
+		T: e_sidereal_rotation_period,
+		t0: 0,
+		tilt: e_axial_tilt
+	},
+	0
+);
 
 // Comenzar loop del programa
 setInterval(orbitLoop, s_to_ms( 1 / frac ) );
