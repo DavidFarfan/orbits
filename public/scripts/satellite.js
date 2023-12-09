@@ -207,6 +207,11 @@ class Satellite{
 		);
 	};
 	
+	// Redibujar curva escalada de la órbita
+	redraw_orbit(){
+		this.orbit.set_curve_fo( this.pos );
+	};
+	
 	// Vista 1
 	view1(request){
 		

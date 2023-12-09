@@ -10,7 +10,12 @@ const AU = 1.495978707e8; // Unidad astronómica (km)
 const e_u = 3.9860e5; // Parámetro gravitacional (km^3/s^2)
 const er = 6.371e3; // Radio (km)
 const eday = h_to_s( 24 ); // Día solar (s)
-const e_a = 149.598e6; // Semi-eje mayor (km)
+const E_SEMI_MAJOR_AXIS = 149.598e6; // Semi-eje mayor (km)
+const E_ECCENTRICITY = 0.0167; // Excentricidad
+const E_PERIAPSE = 147.095e6; // Periapsis (km)
+const E_INCLINATION = 8.7266462599716478846184538424431e-7; // Inclinación (rad)
+const E_ARGUMENT_OF_PERIHELION = 1.99330266505795553285272798; // Arg. de perihelio (rad)
+const E_LONGITUDE_OF_ASCENDING_NODE = 6.0866500632978122028; // Long. del nodo asc. (rad)
 const e_axial_tilt = 0.40910517666747085283091311613373; // Oblicuidad de la órbita (rad)
 const e_sidereal_rotation_period = h_to_s( 23.9345 ); // Periodo de rotación sideral (s)
 
@@ -140,6 +145,11 @@ function deg_to_rad(deg){
 // HORAS A SEGUNDOS
 function h_to_s(h){
 	return h * 3600;
+};
+
+// DÍAS A SEGUNDOS
+function eday_to_s(d){
+	return d * h_to_s( 24 );
 };
 
 // SEGUNDOS A MILISEGUNDOS

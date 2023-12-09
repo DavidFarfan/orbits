@@ -42,11 +42,13 @@ var l_seconds = '0'; // Segundero local
 var s_time = 0; // Tiempo absoluto simulado
 var ts0 = 0; // Tiempo inicial de la simulación
 var ts = 0; // Tiempo actual de la simulación
-var frac = 60; // Fracción de segundo para el loop
+var carried_time = 0; // Tiempo acarreado desde el último cambio de escala
+var carried_seconds = 0; // Segundos del tiempo acarreado
+var frac = 60; // Fracción de segundo real para el loop
 
 // Parámetros de escala de la simulación
-const s_scale = 3.5 * sunr; // Escala del espacio (kilómetros por pixel de lienzo)
-const t_scale = 100.0 * eday; // Escala del tiempo (Segundos simulados por segundo real)
+var s_scale = 3.5 * sunr; // Escala del espacio (kilómetros por pixel de lienzo)
+var t_scale = 1.0 * eday; // Escala del tiempo (Segundos simulados por segundo real)
 var center = { // Punto de referencia (kilómetros)
 	x: to_km( width_p( .5 ) ),
 	y: to_km( height_p( .5 ) ),
@@ -97,16 +99,16 @@ function orbitLoop(){
 	
 	// Verificar el segundero del reloj universal
 	u_time = Date.now().toString();
-	u_seconds = u_time.substr(-4).charAt(0);
+	u_seconds = u_time.substr(-3).charAt(0);
 	
-	// Hacer un ajuste cada segundo
+	// Hacer un ajuste cada décima de segundo
 	if(u_seconds != l_seconds){
 		
 		// El reloj local se sincroniza con el reloj universal
-		l_time++;
+		l_time += .1;
 		
 		// El tiempo simulado se sincroniza con el reloj local
-		s_time = to_sim_t( l_time );
+		s_time = carried_time + ( l_time - carried_seconds ) * to_sim_t( 1 );
 		
 		// El segundero local sincroniza con el segundero universal
 		l_seconds = u_seconds;
@@ -176,6 +178,31 @@ canvas1.addEventListener('mousemove', evt => {
 	mousePos1 = getMousePos(canvas1, evt);
 }, false);
 
+// Captura de parámetros de escala de simulación
+const s_scale_slider = document.getElementById("s_scale");
+s_scale_slider.value = 10 * s_scale / sunr;
+s_scale_slider.oninput = () => {
+	s_scale = sunr * s_scale_slider.value * .1;
+	
+	// Redibujar las curvas de la órbitas según la escala de espacio
+	Satellite.list.forEach(function(value, index, array){
+		value.redraw_orbit();
+	});
+};
+const t_scale_slider = document.getElementById("t_scale");
+t_scale_slider.value = to_eday( t_scale );
+t_scale_slider.oninput = () => {
+	
+	// Registrar el tiempo acumulado antes de realizar el cambio de escala
+	carried_time = ts;
+	
+	// Registrar la marca del reloj local antes de realizar el cambio de escala
+	carried_seconds = l_time;
+	
+	// Realizar el cambio de escala
+	t_scale = eday * t_scale_slider.value;
+};
+
 // Captura de parámetros del satélite controlado
 const posx_slider = document.getElementById("posx");
 posx_slider.max = width_p( 1 );
@@ -228,7 +255,7 @@ canvas1.addEventListener('click', () => {
 
 //------OBJETOS A SIMULAR--------------
 
-// Venus
+/*/ Venus
 Satellite.sat_from_orbit(
 	'venus',
 	sun_u,
@@ -280,18 +307,18 @@ Satellite.sat_from_orbit(
 		tilt: c_axial_tilt
 	},
 	0
-);
+);*/
 
 // Tierra (SE J2000)
 Satellite.sat_from_orbit(
 	'earth',
 	sun_u,
-	e_a,
-	0.0167,
-	147.095e6,
-	8.7266462599716478846184538424431e-7,
-	1.9933026650579555328527279826012,
-	6.0866500632978122028543868744063,
+	E_SEMI_MAJOR_AXIS,
+	E_ECCENTRICITY,
+	E_PERIAPSE,
+	E_INCLINATION,
+	E_ARGUMENT_OF_PERIHELION,
+	E_LONGITUDE_OF_ASCENDING_NODE,
 	{
 		T: e_sidereal_rotation_period,
 		t0: 0,
