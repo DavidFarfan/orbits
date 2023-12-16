@@ -3,21 +3,39 @@
 
 // Números
 const PI = Math.PI; // Pi
-const euler = Math.E; // Euler
+const EULER = Math.E; // Euler
 const AU = 1.495978707e8; // Unidad astronómica (km)
+const JULIAN_CENTURY = 3.15576e9; // Siglo juliano (s)
+
+// Parámetros del Sol
+const SUN_U = 1.3271283864171489e+11; // Parámetro gravitacional (km^3/s^2)
+const SUNR = 696000.0; // Radio (km)
 
 // Parámetros de La Tierra
-const e_u = 3.9860e5; // Parámetro gravitacional (km^3/s^2)
-const er = 6.371e3; // Radio (km)
-const eday = h_to_s( 24 ); // Día solar (s)
-const E_SEMI_MAJOR_AXIS = 149.598e6; // Semi-eje mayor (km)
-const E_ECCENTRICITY = 0.0167; // Excentricidad
-const E_PERIAPSE = 147.095e6; // Periapsis (km)
-const E_INCLINATION = 8.7266462599716478846184538424431e-7; // Inclinación (rad)
-const E_ARGUMENT_OF_PERIHELION = 1.99330266505795553285272798; // Arg. de perihelio (rad)
-const E_LONGITUDE_OF_ASCENDING_NODE = 6.0866500632978122028; // Long. del nodo asc. (rad)
-const e_axial_tilt = 0.40910517666747085283091311613373; // Oblicuidad de la órbita (rad)
-const e_sidereal_rotation_period = h_to_s( 23.9345 ); // Periodo de rotación sideral (s)
+const E_U = 398600.435436; // Parámetro gravitacional (km^3/s^2)
+const ER = 6371.01; // Radio volumétrico medio (km)
+const EDAY = 86400.002; // Día solar medio (s)
+const E_INITIAL_SEMI_MAJOR_AXIS = 1.00000261 * AU; // Semi-eje mayor J2000 (km)
+const E_INITIAL_ECCENTRICITY = 0.01671123; // Excentricidad J2000
+const E_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
+	E_INITIAL_SEMI_MAJOR_AXIS,
+	E_INITIAL_ECCENTRICITY
+);
+const E_INITIAL_INCLINATION = deg_to_rad( -0.00001531 ); // Inclinación J2000 (rad)
+const E_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( -5.11260389 ); // RAAN  J2000 (rad)
+const E_INITIAL_ARGUMENT_OF_PERIHELION = deg_to_rad( // Argumento de perihelio J2000 (rad)
+	102.93005885
+) - E_INITIAL_LONGITUDE_OF_ASCENDING_NODE;
+const E_AXIAL_TILT = deg_to_rad( 23.4392911 ); // Oblicuidad de la órbita (rad)
+const E_SIDEREAL_ROTATION_PERIOD = h_to_s( 23.9344695944 ); // Periodo rot. sideral (s)
+const E_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
+	period( E_INITIAL_SEMI_MAJOR_AXIS, SUN_U ),
+	-225000
+);
+const E_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0 (s)
+	E_SIDEREAL_ROTATION_PERIOD,
+	25427
+));
 
 // Parámetros de Venus
 const v_u = 3.2486e5; // Parámetro gravitacional (km^3/s^2)
@@ -40,10 +58,6 @@ const cday = 9 * 3600; // Día solar (s)
 const c_axial_tilt = 0.06981317007977318307694763073954; // Oblicuidad de la órbita (rad)
 const c_sidereal_rotation_period = h_to_s( 9.07 ); // Periodo de rotación sideral (s)
 
-// Parámetros del Sol
-const sun_u = 1.32712e11; // Parámetro gravitacional (km^3/s^2)
-const sunr = 6.95700e5; // Radio (km)
-
 //------BÁSICAS-------------
 
 // PARTE ENTERA
@@ -63,7 +77,7 @@ function pow(a, b){
 
 // EXP
 function exp(x){
-	return pow( euler, x );
+	return pow( EULER, x );
 };
 
 // RAIZ CUADRADA
@@ -142,14 +156,75 @@ function deg_to_rad(deg){
 	return deg * PI / 180;
 };
 
+// SEGUNDOS A GRADOS
+function s_to_deg(s){
+	return s / 240;
+};
+
+// GRADOS A SEGUNDOS
+function deg_to_s(d){
+	return d * 240;
+};
+
+// RADIANES A SEGUNDOS
+function rad_to_s(rad){
+	return deg_to_s( rad_to_deg( rad ) );
+};
+
+// SEGUNDOS A RADIANES
+function s_to_rad(s){
+	return deg_to_rad( s_to_deg( s ) );
+};
+
+// MINUTOS A SEGUNDOS
+function min_to_s(m){
+	return m * 60;
+};
+
+// SEGUNDOS A MINUTOS
+function s_to_min(s){
+	return s / 60;
+};
+
 // HORAS A SEGUNDOS
 function h_to_s(h){
 	return h * 3600;
 };
 
+// SEGUNDOS A HORAS
+function s_to_h(s){
+	return s / 3600;
+};
+
 // DÍAS A SEGUNDOS
 function eday_to_s(d){
 	return d * h_to_s( 24 );
+};
+
+// HORA/MINUTO/SEGUNDO A SEGUNDOS
+function h_m_s(h, min, s){
+	return h_to_s( h ) + min_to_s( min ) + s;
+};
+
+// HORA/MINUTO/SEGUNDO A GRADOS
+function h_m_s_to_deg(h, min, s){
+	return s_to_deg( h_m_s( h, min, s ) );
+};
+
+// HORA/MINUTO/SEGUNDO A RADIANES
+function h_m_s_to_rad(h, min, s){
+	return deg_to_rad( h_m_s_to_deg( h, min, s ) );
+};
+
+function rad_to_h_m_s(rad){
+	let hours = floor( s_to_h( rad_to_s( rad ) ) );
+	let minus = floor( s_to_min( rad_to_s( rad ) - h_to_s( hours ) ) );
+	let secns = floor( rad_to_s( rad ) - h_to_s( hours ) - min_to_s( minus ) );
+	return {
+		h: hours,
+		min: minus,
+		s: secns
+	};
 };
 
 // SEGUNDOS A MILISEGUNDOS
@@ -159,12 +234,12 @@ function s_to_ms(s){
 
 // SEGUNDOS A DÍAS TERRESTRES
 function to_eday(s){
-	return s / eday;
+	return s / EDAY;
 };
 
 // KILÓMETROS A RADIOS TERRESTRES
 function to_er(km){
-	return km / er;
+	return km / ER;
 };
 
 //------CURVAS PARAMÉTRICAS-----------
@@ -535,6 +610,11 @@ function periapse(p, e){
 	return p / (1 + e);
 };
 
+// PERIAPSE FROM SEMI-MAJOR AXIS
+function periapse_from_semi_major_axis(a, e){
+	return a * ( 1 - e );
+};
+
 // INCLINATION
 function inclination(h){
 	return acos( dot_prod( h, {
@@ -695,6 +775,71 @@ function r_v_vecs(type, t, a, e, u, p, fo, T, i, omega, upper_omega){
 		r: r_vec,
 		v: v_vec
 	};
+};
+
+// INVARIANTS FROM ELEMENTS
+function invariants_from_elements(u, a, e, rp, i, omega, upper_omega, f0){
+
+	// Invariantes orbitales y anomalías en el punto especificado
+	let p = semi_latus_rectum_from_periapse(rp, e);
+	let fo;
+	let T;
+	let t0;
+	let sat_at_t0;
+	if(e >= 1){
+		fo = outgoing_angle(e);
+		t0 = ht_from_M(
+			M_from_H(
+				H_from_f(
+					f0, 
+					e
+				),
+				e
+			),
+			u,
+			a
+		);
+		sat_at_t0 = r_v_vecs(
+			'hyperbolic',
+			t0,
+			a,
+			e,
+			u,
+			p,
+			fo,
+			T,
+			i,
+			omega,
+			upper_omega
+		);
+	}else{
+		T = period(a, u);
+		t0 = t_from_M(
+			M_from_E(
+				E_from_f(
+					f0, 
+					e
+				),
+				e
+			),
+			e,
+			T
+		);
+		sat_at_t0 = r_v_vecs(
+			'elliptic',
+			t0,
+			a,
+			e,
+			u,
+			p,
+			fo,
+			T,
+			i,
+			omega,
+			upper_omega
+		);
+	};
+	return sat_at_t0;
 };
 
 // VIS-VIVA EQUATION
@@ -926,7 +1071,7 @@ function f_from_H(H, e){
 function GST(T, t, t0){
 	
 	// Los objetos en la esfera celeste van quedando atrás
-	return 2 * PI - M_from_t(T, t + t0);
+	return M_from_t(T, t + t0);
 };
 
 // TIEMPO SIDERAL LOCAL
@@ -961,5 +1106,18 @@ function celestial_sphere_pos(ra, d, longitude, latitude, GST){
 	if(latitude < 0){
 		pos.y *= -1;
 	};
-	return pos;
+	
+	// Orientar el este hacia la derecha
+	pos.x *= -1;
+	
+	// Obtener hora
+	let ref_vec = y_rot( x_rot( pos, -latitude ), -PI / 2 );
+	let hour = angle_vec({
+		x: ref_vec.x,
+		y: ref_vec.z
+	});
+	return {
+		pos: pos,
+		hour: hour
+	};
 };

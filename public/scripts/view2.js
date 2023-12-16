@@ -7,7 +7,7 @@ function view2(animator){
 	//-------OBJETOS-----------------
 	
 	// Sol
-	var sun_radius = max( 1, to_px( sunr ) );
+	var sun_radius = max( 1, to_px( SUNR ) );
 	request.push([
 		'circle', 
 		to_px( center.y ),
@@ -55,6 +55,15 @@ function view2(animator){
 				// La longitud del vector se dibuja sin tener en cuenta la escala
 				to_px( center.y + value[1] ) + value[4] * 1e0,
 				to_px( center.z + value[2] ) + value[5] * 1e0,
+				'YELLOW'
+			]);
+			
+			// Secuencia
+			request.push([
+				'print', 
+				index,
+				to_px( center.y + value[1] ) - 10, 
+				to_px( center.z + value[2] ) + 10,
 				'YELLOW'
 			]);
 		});

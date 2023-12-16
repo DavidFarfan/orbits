@@ -1,7 +1,39 @@
 //--------ÓRBITA------------
 class Orbit{
 	
-	// Tipo de órbita
+	// Crear órbita ficticia desde sus elementos
+	static fictional_orbit(u, a, e, i, omega, upper_omega, f0, tilt){
+		
+		// Invariantes
+		let inv = invariants_from_elements(
+			u,
+			a,
+			e, 
+			periapse_from_semi_major_axis( a, e ),
+			i,
+			omega,
+			upper_omega,
+			f0
+		);
+		
+		log( inv );
+		log( angular_momentum( inv.r, inv.v ) );
+		log( orbital_energy( norm_vec( inv.v ), u, norm_vec( inv.r ) ) );
+		
+		// Órbita ficticia
+		let f_orbit = new Orbit(
+			angular_momentum( inv.r, inv.v ),
+			orbital_energy( norm_vec( inv.v ), u, norm_vec( inv.r ) ),
+			u,
+			inv.v,
+			inv.r,
+			tilt
+		);
+		
+		return f_orbit;
+	};
+	
+	// Orbit type
 	set_type(E){
 		if(E > 0){
 			this.type = 'hyperbolic';
@@ -12,7 +44,7 @@ class Orbit{
 		};
 	};
 	
-	// Línea de nodos
+	// Líne of nodes
 	set_line_of_nodes(h){
 		this.n = line_of_nodes( h );
 	};
@@ -64,6 +96,7 @@ class Orbit{
 	// Longitude of the ascending node
 	set_upper_omega(h, axial_tilt){
 		this.upper_omega = longitude_ascending_node( this.n );
+		this.axial_tilt = axial_tilt;
 		this.rot_axis = rotation_axis(
 			h,
 			axial_tilt,
@@ -134,53 +167,9 @@ class Orbit{
 		};
 	};
 	
-	// Curve and Outgoing angle
-	set_curve_fo(r){
-		if(this.type != 'elliptic'){
-			this.fo = outgoing_angle( this.e );
-			
-			// Descartar la trayectoria ficticia
-			this.plot_inf_lim = - this.fo + 1e-2;
-			this.plot_sup_lim = this.fo - 1e-2;
-		}else{
-			this.plot_inf_lim = 0;
-			this.plot_sup_lim = 2 * PI;
-		};
-		
-		// Curva en el plano orbital
-		this.curve = cartesian_from_polar_curve(curve(
-			(f) => {
-				return to_px(r_from_f(
-					this.p,
-					this.e,
-					f
-				));
-			},
-			(f) => {
-				return f;
-			},
-			(f) => {
-				return 0;
-			},
-			this.plot_inf_lim,
-			this.plot_sup_lim,
-			.1
-		));
-		
-		// Curva en el espacio en formato transferible
-		for(var k=0; k<this.curve.length; k++){
-			let space_point = orbit_planar_point_to_space_point(
-				this.curve[k],
-				this.i,
-				this.omega,
-				this.upper_omega
-			);
-			this.curve[k] = [
-				space_point.x,
-				space_point.y,
-				space_point.z
-			];
-		};
+	// outgoing angle
+	set_fo(){
+		this.fo = outgoing_angle( this.e );
 	};
 	
 	// Apoapse
@@ -204,25 +193,39 @@ class Orbit{
 		};
 	};
 	
-	// Simulated run
+	// Simulation routine
 	set_sim(ts, u){
 		
 		// Tiempo de órbita
 		this.t = ts + this.t0;
 		
-		// Posición y velocidad en el tiempo
-		let sim = r_v_vecs(
-			this.type,
-			this.t,
+		// Perturbación
+		this.perturbation = Orbit.fictional_orbit(
+			u,
 			this.a,
 			this.e,
+			to_eday( this.t ),
+			to_eday( this.t ),
+			to_eday( this.t ),
+			this.f0,
+			this.axial_tilt
+		);
+		
+		log( this.perturbation );
+		
+		// Posición y velocidad en el tiempo
+		let sim = r_v_vecs(
+			this.perturbation.type,
+			this.t,
+			this.perturbation.a,
+			this.perturbation.e,
 			u,
-			this.p,
-			this.fo,
-			this.T,
-			this.i,
-			this.omega,
-			this.upper_omega
+			this.perturbation.p,
+			this.perturbation.fo,
+			this.perturbation.T,
+			this.perturbation.i,
+			this.perturbation.omega,
+			this.perturbation.upper_omega
 		);
 		
 		// Simulación
@@ -232,6 +235,57 @@ class Orbit{
 		this.f = sim.f;
 		this.r = sim.r;
 		this.v = sim.v;
+		
+		// Curva
+		this.set_curve( this.r, this.perturbation );
+	};
+	
+	// Simulation curve
+	set_curve(r, fictional){
+		if(fictional.type != 'elliptic'){
+			
+			// Descartar la trayectoria ficticia
+			this.plot_inf_lim = - fictional.fo + 1e-2;
+			this.plot_sup_lim = fictional.fo - 1e-2;
+		}else{
+			this.plot_inf_lim = 0;
+			this.plot_sup_lim = 2 * PI;
+		};
+		
+		// Curva en el plano orbital
+		this.curve = cartesian_from_polar_curve(curve(
+			(f) => {
+				return to_px(r_from_f(
+					fictional.p,
+					fictional.e,
+					f
+				));
+			},
+			(f) => {
+				return f;
+			},
+			(f) => {
+				return 0;
+			},
+			this.plot_inf_lim,
+			this.plot_sup_lim,
+			.1
+		));
+		
+		// Curva en el espacio en formato transferible
+		for(var k=0; k<this.curve.length; k++){
+			let space_point = orbit_planar_point_to_space_point(
+				this.curve[k],
+				fictional.i,
+				fictional.omega,
+				fictional.upper_omega
+			);
+			this.curve[k] = [
+				space_point.x,
+				space_point.y,
+				space_point.z
+			];
+		};
 	};
 	
 	// Vista 1
@@ -242,8 +296,8 @@ class Orbit{
 			'line',
 			to_px( center.x ),
 			to_px( center.y ),
-			to_px( center.x + this.ascending_node.x ),
-			to_px( center.y + this.ascending_node.y ),
+			to_px( center.x + this.perturbation.ascending_node.x ),
+			to_px( center.y + this.perturbation.ascending_node.y ),
 			"GREEN"
 		]);
 		
@@ -252,8 +306,8 @@ class Orbit{
 			'line',
 			to_px( center.x ),
 			to_px( center.y ),
-			to_px( center.x + this.periapse.x ),
-			to_px( center.y + this.periapse.y ),
+			to_px( center.x + this.perturbation.periapse.x ),
+			to_px( center.y + this.perturbation.periapse.y ),
 			'RED'
 		]);
 		
@@ -262,8 +316,8 @@ class Orbit{
 			'line',
 			to_px( center.x ),
 			to_px( center.y ),
-			to_px( center.x + this.semi_latus_rectum.x ),
-			to_px( center.y + this.semi_latus_rectum.y ),
+			to_px( center.x + this.perturbation.semi_latus_rectum.x ),
+			to_px( center.y + this.perturbation.semi_latus_rectum.y ),
 			'GREY'
 		]);
 		
@@ -309,8 +363,8 @@ class Orbit{
 			'line',
 			to_px( center.y ),
 			to_px( center.z ),
-			to_px( center.y + this.ascending_node.y ),
-			to_px( center.z + this.ascending_node.z ),
+			to_px( center.y + this.perturbation.ascending_node.y ),
+			to_px( center.z + this.perturbation.ascending_node.z ),
 			"GREEN"
 		]);
 		
@@ -319,8 +373,8 @@ class Orbit{
 			'line',
 			to_px( center.y ),
 			to_px( center.z ),
-			to_px( center.y + this.periapse.y ),
-			to_px( center.z + this.periapse.z ),
+			to_px( center.y + this.perturbation.periapse.y ),
+			to_px( center.z + this.perturbation.periapse.z ),
 			'RED'
 		]);
 		
@@ -329,8 +383,8 @@ class Orbit{
 			'line',
 			to_px( center.y ),
 			to_px( center.z ),
-			to_px( center.y + this.semi_latus_rectum.y ),
-			to_px( center.z + this.semi_latus_rectum.z ),
+			to_px( center.y + this.perturbation.semi_latus_rectum.y ),
+			to_px( center.z + this.perturbation.semi_latus_rectum.z ),
 			'GREY'
 		]);
 		
@@ -382,7 +436,7 @@ class Orbit{
 		this.set_upper_omega(h, axial_tilt);
 		this.set_omega_f0(r);
 		this.structure();
-		this.set_curve_fo(r);
+		this.set_fo(r);
 		this.set_T(u);
 		this.set_t0(u);
 		this.set_ra();

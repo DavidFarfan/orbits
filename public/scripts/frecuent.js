@@ -18,3 +18,24 @@ function str(x){
 function significant(x, n){
 	return x.toPrecision( n );
 };
+
+// Hour string
+function hour_string(hour){
+	let h = hour.h;
+	let min = hour.min;
+	let s = hour.s;
+	let string = '';
+	if(h < 10){
+		string += '0';
+	};
+	string += str( h ) + ':';
+	if(min < 10){
+		string += '0';
+	};
+	string += str( min ) + ':';
+	if(s < 10){
+		string += '0';
+	};
+	string += str( s );
+	return string;
+};

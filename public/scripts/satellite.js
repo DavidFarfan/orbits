@@ -48,65 +48,17 @@ class Satellite{
 	// Satélite a partir de la órbita
 	static sat_from_orbit(name, u, a, e, rp, i, omega, upper_omega, rot, f0){
 		
-		// Construir el satélite según r y v en el tiempo t0
-		let p = semi_latus_rectum_from_periapse(rp, e);
-		let fo;
-		let T;
-		let t0;
-		let sat_at_t0;
-		if(e >= 1){
-			fo = outgoing_angle(e);
-			t0 = ht_from_M(
-				M_from_H(
-					H_from_f(
-						f0, 
-						e
-					),
-					e
-				),
-				u,
-				a
-			);
-			sat_at_t0 = r_v_vecs(
-				'hyperbolic',
-				t0,
-				a,
-				e,
-				u,
-				p,
-				fo,
-				T,
-				i,
-				omega,
-				upper_omega
-			);
-		}else{
-			T = period(a, u);
-			t0 = t_from_M(
-				M_from_E(
-					E_from_f(
-						f0, 
-						e
-					),
-					e
-				),
-				e,
-				T
-			);
-			sat_at_t0 = r_v_vecs(
-				'elliptic',
-				t0,
-				a,
-				e,
-				u,
-				p,
-				fo,
-				T,
-				i,
-				omega,
-				upper_omega
-			);
-		};
+		// Construir el satélite en el punto f0
+		let sat_at_t0 = invariants_from_elements(
+			u,
+			a,
+			e,
+			rp,
+			i,
+			omega,
+			upper_omega,
+			f0
+		);
 		let sat = new Satellite(
 			name,
 			sat_at_t0.r,
@@ -207,9 +159,12 @@ class Satellite{
 		);
 	};
 	
-	// Redibujar curva escalada de la órbita
-	redraw_orbit(){
-		this.orbit.set_curve_fo( this.pos );
+	// Simmulación
+	sim( ts, u ){
+		
+		// Acción
+		this.orbit.set_sim( ts, u ); // Traslación
+		this.rotate(ts); // Rotación
 	};
 	
 	// Vista 1

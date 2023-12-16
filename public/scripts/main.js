@@ -14,7 +14,7 @@ animator1.postMessage({ type: 'context', canvas: main_offscreen_1 }, [main_offsc
 //-------PARÁMETROS DE LA SIMULACIÓN-----------
 
 // Parámetros básicos
-Satellite.u = sun_u; // Astro orbitado
+Satellite.u = SUN_U; // Astro orbitado
 
 // Parámetros para el control manual
 var mousePos1 = { // Posicion del mouse sobre el lienzo 1
@@ -47,15 +47,15 @@ var carried_seconds = 0; // Segundos del tiempo acarreado
 var frac = 60; // Fracción de segundo real para el loop
 
 // Parámetros de escala de la simulación
-var s_scale = 3.5 * sunr; // Escala del espacio (kilómetros por pixel de lienzo)
-var t_scale = 1.0 * eday; // Escala del tiempo (Segundos simulados por segundo real)
+var s_scale = 3.5 * SUNR; // Escala del espacio (kilómetros por pixel de lienzo)
+var t_scale = 0; // Escala del tiempo (Segundos simulados por segundo real)
 var center = { // Punto de referencia (kilómetros)
 	x: to_km( width_p( .5 ) ),
 	y: to_km( height_p( .5 ) ),
 	z: to_km( height_p( .5 ) )
 };
-var PHI = deg_to_rad( 35.6 ); // Latitud sobre el satélite
-var LAMBDA = deg_to_rad( 139.6 ); // Longitud sobre el satélite
+var PHI = 0; // Latitud sobre el satélite
+var LAMBDA = 0; // Longitud sobre el satélite
 
 // Recursos de Horizons system
 var ephemeris = null; // Efemérides
@@ -136,8 +136,7 @@ function orbitLoop(){
 	
 	// Simular movimiento de los satélites
 	Satellite.list.forEach(function(value, index, array){
-		value.rotate(ts); // Rotación
-		value.orbit.set_sim( ts, Satellite.u ); // Traslación
+		value.sim( ts, Satellite.u );
 	});
 	
 	//------------SELECCIÓN DE VISTA-----------
@@ -181,11 +180,12 @@ self.onmessage = (e) => {
 // Comunicación con Horizons system
 $(document).ready((data, status) => {
 	
-	// Efemérides de la tierra (01-01-2000 a 01-01-2001)
+	// Efemérides cartesianas de la tierra (01-01-2000 a 01-01-2001)
 	$.get(
-		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='2000-01-01'&STOP_TIME='2001-01-01'&STEP_SIZE='1mo'",
+		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='2000-01-01 12:00'&STOP_TIME='2000-12-01 12:00'&STEP_SIZE='1mo'",
 		(data, status) => {
-			let aux1 = data.split( 'TDB' ).slice( 4, 17 );
+			log( data );
+			let aux1 = data.split( 'TDB' ).slice( 4, 16 );
 			let aux2 = [];
 			let vectors = [];
 			aux1.forEach(function(value, index, array){
@@ -201,6 +201,14 @@ $(document).ready((data, status) => {
 				vectors.push( vector );
 			});
 			self.postMessage({ type: 'ephemeris', eph: vectors });
+		}
+	);
+	
+	// Efemérides (elementos orbitales) de la tierra (01-01-2000)
+	$.get(
+		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='500@10'&START_TIME='2000-01-01 12:00'&STOP_TIME='2000-02-01 12:00'&STEP_SIZE='40d'",
+		(data, status) => {
+			//log( data );
 		}
 	);
 });
@@ -224,14 +232,9 @@ canvas1.addEventListener('mousemove', evt => {
 
 // Captura de parámetros de escala de simulación
 const s_scale_slider = document.getElementById("s_scale");
-s_scale_slider.value = 10 * s_scale / sunr;
+s_scale_slider.value = 10 * s_scale / SUNR;
 s_scale_slider.oninput = () => {
-	s_scale = sunr * s_scale_slider.value * .1;
-	
-	// Redibujar las curvas de la órbitas según la escala de espacio
-	Satellite.list.forEach(function(value, index, array){
-		value.redraw_orbit();
-	});
+	s_scale = SUNR * s_scale_slider.value * .1;
 };
 const t_scale_slider = document.getElementById("t_scale");
 t_scale_slider.value = to_eday( t_scale );
@@ -244,7 +247,7 @@ t_scale_slider.oninput = () => {
 	carried_seconds = l_time;
 	
 	// Realizar el cambio de escala
-	t_scale = eday * t_scale_slider.value;
+	t_scale = EDAY * t_scale_slider.value;
 };
 
 // Captura de parámetros del satélite controlado
@@ -292,6 +295,19 @@ long_slider.oninput = () => {
 	LAMBDA = long_slider.value * PI / 500;
 };
 
+// Captura control del tiempo
+const time_text = document.getElementById("time_txt");
+const time_input = document.getElementById("time_button");
+time_input.value = 'set time_0';
+time_input.onclick = () => {
+	ts0 = -Number( time_text.value );
+};
+const time__add_input = document.getElementById("time_add_button");
+time__add_input.value = 'add time_0';
+time__add_input.onclick = () => {
+	ts0 += -Number( time_text.value );
+};
+
 // Reiniciar el programa con un click
 canvas1.addEventListener('click', () => {
 	view = ( view + 1 ) % 3 + 1;
@@ -302,7 +318,7 @@ canvas1.addEventListener('click', () => {
 /*/ Venus
 Satellite.sat_from_orbit(
 	'venus',
-	sun_u,
+	SUN_U,
 	108.210e6,
 	0.00677323,
 	107.480e6,
@@ -320,7 +336,7 @@ Satellite.sat_from_orbit(
 // Marte
 Satellite.sat_from_orbit(
 	'mars',
-	sun_u,
+	SUN_U,
 	227.956e6,
 	0.0935,
 	206.650e6,
@@ -338,7 +354,7 @@ Satellite.sat_from_orbit(
 // Ceres
 Satellite.sat_from_orbit(
 	'ceres',
-	sun_u,
+	SUN_U,
 	2.77 * AU,
 	0.0785,
 	2.55 * AU,
@@ -356,19 +372,19 @@ Satellite.sat_from_orbit(
 // Tierra (SE J2000)
 Satellite.sat_from_orbit(
 	'earth',
-	sun_u,
-	E_SEMI_MAJOR_AXIS,
-	E_ECCENTRICITY,
-	E_PERIAPSE,
-	E_INCLINATION,
-	E_ARGUMENT_OF_PERIHELION,
-	E_LONGITUDE_OF_ASCENDING_NODE,
+	SUN_U,
+	E_INITIAL_SEMI_MAJOR_AXIS,
+	E_INITIAL_ECCENTRICITY,
+	E_INITIAL_PERIAPSE,
+	E_INITIAL_INCLINATION,
+	E_INITIAL_ARGUMENT_OF_PERIHELION,
+	E_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
 	{
-		T: e_sidereal_rotation_period,
-		t0: 0,
-		tilt: e_axial_tilt
+		T: E_SIDEREAL_ROTATION_PERIOD,
+		t0: E_INITIAL_GST,
+		tilt: E_AXIAL_TILT
 	},
-	0
+	E_INITIAL_TRUE_ANOMALY
 );
 
 // Comenzar loop del programa

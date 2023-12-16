@@ -113,15 +113,23 @@ function view3(animator, origin, PHI, LAMBDA){
 	let sun_sky = celestial_sphere_pos(p_q.alpha, p_q.delta, LAMBDA, PHI, Satellite.ctrl.GST);
 	request.push([
 		'print', 
-		"sun x = " + str( significant( sun_sky.x, 3 ) ) + 
-		", sun y = " + str( significant( sun_sky.y, 3 ) ) + 
-		", sun z = " + str( significant( sun_sky.z, 3 ) ),
+		"UTC = " + hour_string( rad_to_h_m_s( sun_sky.hour ) ),
 		10, 
 		40,
 		'WHITE'
 	]);
+	
+	request.push([
+		'print', 
+		"sun x = " + str( significant( sun_sky.pos.x, 3 ) ) + 
+		", sun y = " + str( significant( sun_sky.pos.y, 3 ) ) + 
+		", sun z = " + str( significant( sun_sky.pos.z, 3 ) ),
+		10, 
+		50,
+		'WHITE'
+	]);
 	let color;
-	if(sun_sky.z > 0){
+	if(sun_sky.pos.z > 0){
 		color = 'YELLOW';
 	}else{
 		color = 'GREY'
@@ -130,8 +138,8 @@ function view3(animator, origin, PHI, LAMBDA){
 	// Sun
 	request.push([
 		'circle', 
-		origin.x + sun_sky.x * 1e2,
-		origin.y + sun_sky.y * 1e2, 
+		origin.x + sun_sky.pos.x * 1e2,
+		origin.y + sun_sky.pos.y * 1e2, 
 		2,
 		color
 	]);
@@ -140,14 +148,14 @@ function view3(animator, origin, PHI, LAMBDA){
 	let north_sky = celestial_sphere_pos(0, PI / 2, LAMBDA, PHI, Satellite.ctrl.GST);
 	request.push([
 		'print', 
-		"north x = " + str( significant( north_sky.x, 3 ) ) + 
-		", north y = " + str( significant( north_sky.y, 3 ) ) + 
-		", north z = " + str( significant( north_sky.z, 3 ) ),
+		"north x = " + str( significant( north_sky.pos.x, 3 ) ) + 
+		", north y = " + str( significant( north_sky.pos.y, 3 ) ) + 
+		", north z = " + str( significant( north_sky.pos.z, 3 ) ),
 		10, 
-		50,
+		60,
 		'WHITE'
 	]);
-	if(north_sky.z > 0){
+	if(north_sky.pos.z > 0){
 		color = 'RED';
 	}else{
 		color = 'GREY'
@@ -156,8 +164,8 @@ function view3(animator, origin, PHI, LAMBDA){
 	// North
 	request.push([
 		'circle', 
-		origin.x + north_sky.x * 1e2,
-		origin.y + north_sky.y * 1e2, 
+		origin.x + north_sky.pos.x * 1e2,
+		origin.y + north_sky.pos.y * 1e2, 
 		1,
 		color
 	]);
@@ -166,14 +174,14 @@ function view3(animator, origin, PHI, LAMBDA){
 	let south_sky = celestial_sphere_pos(0, -PI / 2, LAMBDA, PHI, Satellite.ctrl.GST);
 	request.push([
 		'print', 
-		"south x = " + str( significant( south_sky.x, 3 ) ) + 
-		", south y = " + str( significant( south_sky.y, 3 ) ) + 
-		", south z = " + str( significant( south_sky.z, 3 ) ),
+		"south x = " + str( significant( south_sky.pos.x, 3 ) ) + 
+		", south y = " + str( significant( south_sky.pos.y, 3 ) ) + 
+		", south z = " + str( significant( south_sky.pos.z, 3 ) ),
 		10, 
-		60,
+		70,
 		'WHITE'
 	]);
-	if(south_sky.z > 0){
+	if(south_sky.pos.z > 0){
 		color = 'RED';
 	}else{
 		color = 'GREY'
@@ -182,8 +190,8 @@ function view3(animator, origin, PHI, LAMBDA){
 	// South
 	request.push([
 		'circle', 
-		origin.x + south_sky.x * 1e2,
-		origin.y + south_sky.y * 1e2, 
+		origin.x + south_sky.pos.x * 1e2,
+		origin.y + south_sky.pos.y * 1e2, 
 		1,
 		color
 	]);
@@ -198,14 +206,14 @@ function view3(animator, origin, PHI, LAMBDA){
 	);
 	request.push([
 		'print', 
-		"local x = " + str( significant( local_sky.x, 3 ) ) + 
-		", local y = " + str( significant( local_sky.y, 3 ) ) + 
-		", local z = " + str( significant( local_sky.z, 3 ) ),
+		"local x = " + str( significant( local_sky.pos.x, 3 ) ) + 
+		", local y = " + str( significant( local_sky.pos.y, 3 ) ) + 
+		", local z = " + str( significant( local_sky.pos.z, 3 ) ),
 		10, 
-		70,
+		80,
 		'WHITE'
 	]);
-	if(local_sky.z > 0){
+	if(local_sky.pos.z > 0){
 		color = 'BLUE';
 	}else{
 		color = 'GREY'
@@ -214,8 +222,8 @@ function view3(animator, origin, PHI, LAMBDA){
 	// Local meridian
 	request.push([
 		'circle', 
-		origin.x + local_sky.x * 1e2,
-		origin.y + local_sky.y * 1e2, 
+		origin.x + local_sky.pos.x * 1e2,
+		origin.y + local_sky.pos.y * 1e2, 
 		1,
 		color
 	]);
@@ -230,14 +238,14 @@ function view3(animator, origin, PHI, LAMBDA){
 	);
 	request.push([
 		'print', 
-		"east x = " + str( significant( east_sky.x, 3 ) ) + 
-		", east y = " + str( significant( east_sky.y, 3 ) ) + 
-		", east z = " + str( significant( east_sky.z, 3 ) ),
+		"east x = " + str( significant( east_sky.pos.x, 3 ) ) + 
+		", east y = " + str( significant( east_sky.pos.y, 3 ) ) + 
+		", east z = " + str( significant( east_sky.pos.z, 3 ) ),
 		10, 
-		80,
+		90,
 		'WHITE'
 	]);
-	if(east_sky.z > 0){
+	if(east_sky.pos.z > 0){
 		color = 'GREEN';
 	}else{
 		color = 'GREY'
@@ -246,8 +254,8 @@ function view3(animator, origin, PHI, LAMBDA){
 	// East
 	request.push([
 		'circle', 
-		origin.x + east_sky.x * 1e2,
-		origin.y + east_sky.y * 1e2, 
+		origin.x + east_sky.pos.x * 1e2,
+		origin.y + east_sky.pos.y * 1e2, 
 		1,
 		color
 	]);
