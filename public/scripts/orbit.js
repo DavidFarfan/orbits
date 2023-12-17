@@ -16,10 +16,6 @@ class Orbit{
 			f0
 		);
 		
-		log( inv );
-		log( angular_momentum( inv.r, inv.v ) );
-		log( orbital_energy( norm_vec( inv.v ), u, norm_vec( inv.r ) ) );
-		
 		// Órbita ficticia
 		let f_orbit = new Orbit(
 			angular_momentum( inv.r, inv.v ),
@@ -29,7 +25,6 @@ class Orbit{
 			inv.r,
 			tilt
 		);
-		
 		return f_orbit;
 	};
 	
@@ -204,14 +199,12 @@ class Orbit{
 			u,
 			this.a,
 			this.e,
-			to_eday( this.t ),
-			to_eday( this.t ),
-			to_eday( this.t ),
+			this.i,
+			this.omega,
+			this.upper_omega,
 			this.f0,
 			this.axial_tilt
 		);
-		
-		log( this.perturbation );
 		
 		// Posición y velocidad en el tiempo
 		let sim = r_v_vecs(

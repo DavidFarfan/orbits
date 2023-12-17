@@ -231,8 +231,8 @@ class Satellite{
 			to_px( center.y + this.orbit.r.y ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( center.x + this.orbit.r.x ) + this.orbit.rot_axis.x * 1e-5,
-			to_px( center.y + this.orbit.r.y ) + this.orbit.rot_axis.y * 1e-5,
+			to_px( center.x + this.orbit.r.x ) + this.orbit.perturbation.rot_axis.x * 1e-5,
+			to_px( center.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
 			"CYAN"
 		]);
 		
@@ -310,8 +310,8 @@ class Satellite{
 			to_px( center.z + this.orbit.r.z ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( center.y + this.orbit.r.y ) + this.orbit.rot_axis.y * 1e-5,
-			to_px( center.z + this.orbit.r.z ) + this.orbit.rot_axis.z * 1e-5,
+			to_px( center.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
+			to_px( center.z + this.orbit.r.z ) + this.orbit.perturbation.rot_axis.z * 1e-5,
 			"CYAN"
 		]);
 		

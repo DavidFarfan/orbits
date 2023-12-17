@@ -68,7 +68,7 @@ function view3(animator, origin, PHI, LAMBDA){
 	
 	// Pointing Coordinates of the sun from ctrl (rad)
 	let p_q;
-	if(Satellite.ctrl.orbit.r != undefined){
+	if(Satellite.ctrl.orbit.perturbation != undefined){
 		p_q = pointing_coordiantes(
 			Satellite.ctrl.orbit.r,
 			{	// Sun
@@ -76,9 +76,9 @@ function view3(animator, origin, PHI, LAMBDA){
 				y: 0,
 				z: 0
 			},
-			Satellite.ctrl.orbit.i,
-			Satellite.ctrl.axial_tilt,
-			Satellite.ctrl.orbit.upper_omega
+			Satellite.ctrl.orbit.perturbation.i,
+			Satellite.ctrl.orbit.perturbation.axial_tilt,
+			Satellite.ctrl.orbit.perturbation.upper_omega
 		);
 		
 		// Right ascension
