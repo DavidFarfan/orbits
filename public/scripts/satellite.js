@@ -125,9 +125,6 @@ class Satellite{
 	// Magnitudes físicas
 	physics(){
 		
-		// Ángulo entre r y v
-		this.alpha = angle_between( this.pos, this.vel );
-		
 		// Vector momento angular
 		this.h_vec = angular_momentum( this.pos, this.vel );
 		

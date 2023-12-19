@@ -2,7 +2,12 @@
 
 // Lienzo
 const canvas1 = document.getElementById('view1');
+
+// Vista
 var view = 1;
+
+// Información
+var info = 0;
 
 // Animador
 const animator1 = new Worker("/scripts/animador.js");
@@ -40,7 +45,6 @@ var u_seconds; // Segundero universal
 var l_time = 0; // Reloj local
 var l_seconds = '0'; // Segundero local
 var s_time = 0; // Tiempo absoluto simulado
-var ts0 = 0; // Tiempo inicial de la simulación
 var ts = 0; // Tiempo actual de la simulación
 var carried_time = 0; // Tiempo acarreado desde el último cambio de escala
 var carried_seconds = 0; // Segundos del tiempo acarreado
@@ -118,14 +122,14 @@ function orbitLoop(){
 	};
 	
 	// Calcular tiempo actual de simulación
-	ts = s_time - ts0;
+	ts = s_time;
 	
 	//------------CONTROL MANUAL---------
 	//Satellite.ctrl_rutine();
 	
 	//------------SIMULACIÓN------------
 	
-	// Centrar en el recorrido simulado del satélite controlado
+	// Centrar la cámara en la simulación del satélite controlado
 	if(Satellite.ctrl.orbit.r != undefined){
 		center = {
 			x: to_km( width_p( .5 ) ) - Satellite.ctrl.orbit.r.x,
@@ -142,13 +146,13 @@ function orbitLoop(){
 	//------------SELECCIÓN DE VISTA-----------
 	switch(view){
 		case 1:
-			view1(animator1, ephemeris);
+			View1.show(animator1);
 			break;
 		case 2:
-			view2(animator1, ephemeris);
+			View2.show(animator1);
 			break;
 		case 3:
-			view3(
+			View3.show(
 				animator1, 
 				{
 					x: width_p( .5 ),
@@ -295,17 +299,10 @@ long_slider.oninput = () => {
 	LAMBDA = long_slider.value * PI / 500;
 };
 
-// Captura control del tiempo
-const time_text = document.getElementById("time_txt");
-const time_input = document.getElementById("time_button");
-time_input.value = 'set time_0';
-time_input.onclick = () => {
-	ts0 = -Number( time_text.value );
-};
-const time__add_input = document.getElementById("time_add_button");
-time__add_input.value = 'add time_0';
-time__add_input.onclick = () => {
-	ts0 += -Number( time_text.value );
+// Captura de página de info. de simulación a desplegar
+const display_page_button = document.getElementById("page");
+display_page_button.onclick = () => {
+	info = ( info + 1 ) % 2;
 };
 
 // Reiniciar el programa con un click

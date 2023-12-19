@@ -16,6 +16,7 @@ function str(x){
 
 // Precision
 function significant(x, n){
+	if(x == undefined) return NaN;
 	return x.toPrecision( n );
 };
 

@@ -311,7 +311,7 @@ class Orbit{
 			to_px( center.y ),
 			to_px( center.x + this.perturbation.semi_latus_rectum.x ),
 			to_px( center.y + this.perturbation.semi_latus_rectum.y ),
-			'GREY'
+			'BLUE'
 		]);
 		
 		// Curva de la órbita
@@ -378,7 +378,7 @@ class Orbit{
 			to_px( center.z ),
 			to_px( center.y + this.perturbation.semi_latus_rectum.y ),
 			to_px( center.z + this.perturbation.semi_latus_rectum.z ),
-			'GREY'
+			'BLUE'
 		]);
 		
 		// Curva de la órbita
