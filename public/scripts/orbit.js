@@ -193,15 +193,21 @@ class Orbit{
 		
 		// Tiempo de órbita
 		this.t = ts + this.t0;
+		this.dt = to_century( this.t - this.t0 );
+		this.da = -0.00000003 * AU * this.dt;
+		this.de = -0.00003661 * this.dt;
+		this.di = -deg_to_rad( 0.01337178 ) * this.dt;
+		this.domega = deg_to_rad( 0.31795260 + 0.24123856 ) * this.dt;
+		this.dupper_omega = -deg_to_rad( 0.24123856 ) * this.dt;
 		
 		// Perturbación
 		this.perturbation = Orbit.fictional_orbit(
 			u,
-			this.a,
-			this.e,
-			this.i,
-			this.omega,
-			this.upper_omega,
+			this.a + this.da,
+			this.e + this.de,
+			this.i + this.di,
+			this.omega + this.domega,
+			this.upper_omega + this.dupper_omega,
 			this.f0,
 			this.axial_tilt
 		);

@@ -237,6 +237,11 @@ function to_eday(s){
 	return s / EDAY;
 };
 
+// SEGUNDOS A SIGLOS TERRESTRES
+function to_century(s){
+	return s / JULIAN_CENTURY;
+};
+
 // KILÓMETROS A RADIOS TERRESTRES
 function to_er(km){
 	return km / ER;

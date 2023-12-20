@@ -73,6 +73,24 @@ class View{
 			height_p( 1 ) - 70,
 			'WHITE'
 		]);
+		
+		// dx
+		request.push([
+			'print', 
+			"dx (deg) = " + str( rad_to_deg( Satellite.ctrl.orbit.di ) ),
+			10, 
+			height_p( 1 ) - 80,
+			'WHITE'
+		]);
+		
+		// Tiempo pasado el Epoch
+		request.push([
+			'print', 
+			"dt (Cy) = " + str( Satellite.ctrl.orbit.dt ),
+			10, 
+			height_p( 1 ) - 90,
+			'WHITE'
+		]);
 	};
 	
 	// Impresión de las magnitudes
