@@ -44,10 +44,8 @@ var u_time; // Reloj universal
 var u_seconds; // Segundero universal
 var l_time = 0; // Reloj local
 var l_seconds = '0'; // Segundero local
-var s_time = 0; // Tiempo absoluto simulado
-var ts = 0; // Tiempo actual de la simulación
-var carried_time = 0; // Tiempo acarreado desde el último cambio de escala
-var carried_seconds = 0; // Segundos del tiempo acarreado
+var s_time = 0; // Tiempo simulado
+var assigned_time = 0; // Último tiempo asignado
 var frac = 60; // Fracción de segundo real para el loop
 
 // Parámetros de escala de la simulación
@@ -115,14 +113,11 @@ function orbitLoop(){
 		l_time += .1;
 		
 		// El tiempo simulado se sincroniza con el reloj local
-		s_time = carried_time + ( l_time - carried_seconds ) * to_sim_t( 1 );
+		s_time = assigned_time + to_sim_t( l_time );
 		
 		// El segundero local sincroniza con el segundero universal
 		l_seconds = u_seconds;
 	};
-	
-	// Calcular tiempo actual de simulación
-	ts = s_time;
 	
 	//------------CONTROL MANUAL---------
 	//Satellite.ctrl_rutine();
@@ -140,7 +135,7 @@ function orbitLoop(){
 	
 	// Simular movimiento de los satélites
 	Satellite.list.forEach(function(value, index, array){
-		value.sim( ts, Satellite.u );
+		value.sim( Satellite.u );
 	});
 	
 	//------------SELECCIÓN DE VISTA-----------
@@ -244,12 +239,6 @@ const t_scale_slider = document.getElementById("t_scale");
 t_scale_slider.value = to_eday( t_scale );
 t_scale_slider.oninput = () => {
 	
-	// Registrar el tiempo acumulado antes de realizar el cambio de escala
-	carried_time = ts;
-	
-	// Registrar la marca del reloj local antes de realizar el cambio de escala
-	carried_seconds = l_time;
-	
 	// Realizar el cambio de escala
 	t_scale = EDAY * t_scale_slider.value;
 };
@@ -303,6 +292,13 @@ long_slider.oninput = () => {
 const display_page_button = document.getElementById("page");
 display_page_button.onclick = () => {
 	info = ( info + 1 ) % 2;
+};
+
+// Captura de tiempo de simulación
+const text_time = document.getElementById("text_time");
+const button_time = document.getElementById("button_time");
+button_time.onclick = () => {
+	assigned_time = eday_to_s( Number( text_time.value ) );
 };
 
 // Reiniciar el programa con un click
@@ -380,6 +376,13 @@ Satellite.sat_from_orbit(
 		T: E_SIDEREAL_ROTATION_PERIOD,
 		t0: E_INITIAL_GST,
 		tilt: E_AXIAL_TILT
+	},
+	{
+		da: E_DIFF_SEMI_MAJOR_AXIS,
+		de: E_DIFF_ECCENTRICITY,
+		di: E_DIFF_INCLINATION,
+		dupper_omega: E_DIFF_LONGITUDE_OF_ASCENDING_NODE,
+		dp: E_DIFF_LONGITUDE_OF_PERIAPSE
 	},
 	E_INITIAL_TRUE_ANOMALY
 );

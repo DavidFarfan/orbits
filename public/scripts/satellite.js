@@ -41,12 +41,12 @@ class Satellite{
 			Satellite.ctrl.physics();
 			
 			// Reiniciar tiempo de simulación
-			ts0 = s_time;
+			// ...
 		};
 	};
 	
 	// Satélite a partir de la órbita
-	static sat_from_orbit(name, u, a, e, rp, i, omega, upper_omega, rot, f0){
+	static sat_from_orbit(name, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
 		
 		// Construir el satélite en el punto f0
 		let sat_at_t0 = invariants_from_elements(
@@ -64,6 +64,7 @@ class Satellite{
 			sat_at_t0.r,
 			sat_at_t0.v,
 			rot,
+			dif,
 			true
 		);
 	};
@@ -123,7 +124,7 @@ class Satellite{
 	};
 	
 	// Magnitudes físicas
-	physics(){
+	physics(dif){
 		
 		// Vector momento angular
 		this.h_vec = angular_momentum( this.pos, this.vel );
@@ -141,27 +142,28 @@ class Satellite{
 			Satellite.u,
 			this.vel,
 			this.pos,
-			this.axial_tilt
+			this.axial_tilt,
+			dif
 		);
 	};
 	
 	// Rotación simulada
-	rotate(ts){
+	rotate(){
 		
 		// Ascensión recta del meridiano cero
 		this.GST = GST(
 			this.sidereal_rotation_period,
-			ts,
+			s_time,
 			this.GST0
 		);
 	};
 	
 	// Simmulación
-	sim( ts, u ){
+	sim(u){
 		
 		// Acción
-		this.orbit.set_sim( ts, u ); // Traslación
-		this.rotate(ts); // Rotación
+		this.orbit.set_sim( u ); // Traslación
+		this.rotate(); // Rotación
 	};
 	
 	// Vista 1
@@ -323,13 +325,13 @@ class Satellite{
 	};
 	
 	// Variables del satélite
-	constructor(name, pos, vel, rot, ctrl){
+	constructor(name, pos, vel, rot, dif, ctrl){
 		this.name_set(name);
 		this.ctrl_set(ctrl);
 		this.pos_set(pos);
 		this.vel_set(vel);
 		this.rotation_set(rot);
-		this.physics();
+		this.physics(dif);
 		Satellite.list.push(this);
 	};
 };

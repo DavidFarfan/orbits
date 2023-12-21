@@ -21,11 +21,11 @@ const E_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km
 	E_INITIAL_SEMI_MAJOR_AXIS,
 	E_INITIAL_ECCENTRICITY
 );
-const E_INITIAL_INCLINATION = deg_to_rad( -0.00001531 ); // Inclinación J2000 (rad)
-const E_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( -5.11260389 ); // RAAN  J2000 (rad)
-const E_INITIAL_ARGUMENT_OF_PERIHELION = deg_to_rad( // Argumento de perihelio J2000 (rad)
-	102.93005885
-) - E_INITIAL_LONGITUDE_OF_ASCENDING_NODE;
+const E_INITIAL_INCLINATION = deg_to_rad( 0.00001531 ); // Inclinación J2000 (rad)
+const E_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 180 - 5.11260389 ); // RAAN  J2000 (rad)
+const E_INITIAL_LONGITUDE_OF_PERIHELION = deg_to_rad( 102.93005885 ); // Longitud de perihelio J2000 (rad)
+const E_INITIAL_ARGUMENT_OF_PERIHELION = E_INITIAL_LONGITUDE_OF_PERIHELION // Argumento de perihelio J2000 (rad)
+	 - E_INITIAL_LONGITUDE_OF_ASCENDING_NODE;
 const E_AXIAL_TILT = deg_to_rad( 23.4392911 ); // Oblicuidad de la órbita (rad)
 const E_SIDEREAL_ROTATION_PERIOD = h_to_s( 23.9344695944 ); // Periodo rot. sideral (s)
 const E_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
@@ -36,6 +36,11 @@ const E_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0 (s)
 	E_SIDEREAL_ROTATION_PERIOD,
 	25427
 ));
+const E_DIFF_SEMI_MAJOR_AXIS = -0.00000003 * AU; // Cambio del Semi-eje mayor J2000 (km/Cy)
+const E_DIFF_ECCENTRICITY = -0.00003661; // Cambio de la Excentricidad J2000 (1//Cy)
+const E_DIFF_INCLINATION = deg_to_rad( 0.01337178 ); // Cambio de la Inclinación J2000 (rad/Cy)
+const E_DIFF_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( -0.24123856 ); // Cambio de la RAAN J2000 (rad/Cy)
+const E_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0.31795260 ); // Cambio de la longitud de perihelio J2000 (rad/Cy)
 
 // Parámetros de Venus
 const v_u = 3.2486e5; // Parámetro gravitacional (km^3/s^2)

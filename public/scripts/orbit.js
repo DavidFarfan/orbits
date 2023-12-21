@@ -23,7 +23,14 @@ class Orbit{
 			u,
 			inv.v,
 			inv.r,
-			tilt
+			tilt,
+			{	// La órbita ficticia no necesita los diferenciales, realmente.
+				da: this.da_dt,
+				de: this.de_dt,
+				di: this.di_dt,
+				dupper_omega: this.dupper_omega_dt,
+				dp: this.dp_dt
+			}
 		);
 		return f_orbit;
 	};
@@ -55,13 +62,15 @@ class Orbit{
 	};
 	
 	// Semi-major axis
-	set_a(E, u){
+	set_a(E, u, da){
 		this.a = semi_major_axis( E, u );
+		this.da_dt = da;
 	};
 	
 	// Eccentricity
-	set_e(E){
+	set_e(E, de){
 		this.e = eccentricity( E, this.p, this.a );
+		this.de_dt = de;
 	};
 	
 	// Semi-minor/conjugate axis
@@ -79,17 +88,18 @@ class Orbit{
 	};
 	
 	// Inclination
-	set_i(h){
+	set_i(h, di){
 		this.i = inclination( h );
 		if(this.i < PI / 2){
 			this.sense = 'prograde';
 		}else{
 			this.sense = 'retrograde';
 		};
+		this.di_dt = di;
 	};
 	
 	// Longitude of the ascending node
-	set_upper_omega(h, axial_tilt){
+	set_upper_omega(h, axial_tilt, du){
 		this.upper_omega = longitude_ascending_node( this.n );
 		this.axial_tilt = axial_tilt;
 		this.rot_axis = rotation_axis(
@@ -97,10 +107,11 @@ class Orbit{
 			axial_tilt,
 			this.upper_omega
 		);
+		this.dupper_omega_dt = du;
 	};
 	
 	// Argument of periapse and initial true anomaly
-	set_omega_f0(r){
+	set_omega_f0(r, dp){
 		let angles = argument_of_periapse_f(
 			this.eccentricity,
 			r,
@@ -109,6 +120,7 @@ class Orbit{
 		);
 		this.omega = angles.omega;
 		this.f0 = angles.f;
+		this.dp_dt = dp;
 	};
 	
 	// Structure vectors
@@ -189,16 +201,16 @@ class Orbit{
 	};
 	
 	// Simulation routine
-	set_sim(ts, u){
+	set_sim(u){
 		
-		// Tiempo de órbita
-		this.t = ts + this.t0;
-		this.dt = to_century( this.t - this.t0 );
-		this.da = -0.00000003 * AU * this.dt;
-		this.de = -0.00003661 * this.dt;
-		this.di = -deg_to_rad( 0.01337178 ) * this.dt;
-		this.domega = deg_to_rad( 0.31795260 + 0.24123856 ) * this.dt;
-		this.dupper_omega = -deg_to_rad( 0.24123856 ) * this.dt;
+		// Tiempo de órbita y diferenciales
+		this.t = s_time + this.t0;
+		let dt = to_century( s_time );
+		this.da = this.da_dt * dt;
+		this.de = this.de_dt * dt;
+		this.di = this.di_dt * dt;
+		this.dupper_omega = this.dupper_omega_dt * dt;
+		this.domega = this.dp_dt * dt - this.dupper_omega;
 		
 		// Perturbación
 		this.perturbation = Orbit.fictional_orbit(
@@ -422,18 +434,18 @@ class Orbit{
 	};
 	
 	// Variables de la órbita (a partir del satélite que la recorre)
-	constructor(h, E, u, v, r, axial_tilt){
+	constructor(h, E, u, v, r, axial_tilt, dif){
 		this.set_type(E);
 		this.set_line_of_nodes(h);
 		this.set_eccentricity(u, v, h, r);
 		this.set_p(h, u);
-		this.set_a(E, u);
-		this.set_e(E);
+		this.set_a(E, u, dif.da);
+		this.set_e(E, dif.de);
 		this.set_b();
 		this.set_rp();
-		this.set_i(h);
-		this.set_upper_omega(h, axial_tilt);
-		this.set_omega_f0(r);
+		this.set_i(h, dif.di);
+		this.set_upper_omega(h, axial_tilt, dif.dupper_omega);
+		this.set_omega_f0(r, dif.dp);
 		this.structure();
 		this.set_fo(r);
 		this.set_T(u);

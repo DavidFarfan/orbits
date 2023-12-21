@@ -34,21 +34,12 @@ class View{
 			'WHITE'
 		]);
 		
-		// Tiempo absoluto simulado transcurrido (eday)
+		// Tiempo de simulación (eday)
 		request.push([
 			'print', 
-			"simul absolute (eday) = " + str( significant( to_eday( s_time ), 4 ) ),
+			"simul time (eday) = " + str( significant( to_eday( s_time ), 4 ) ),
 			10, 
 			height_p( 1 ) - 40,
-			'WHITE'
-		]);
-		
-		// Tiempo de simulación transcurrido (eday)
-		request.push([
-			'print', 
-			"simul elapsed (eday) = " + str( significant( to_eday( ts ), 4 ) ),
-			10, 
-			height_p( 1 ) - 50,
 			'WHITE'
 		]);
 		
@@ -57,7 +48,7 @@ class View{
 			'print', 
 			"orbit time (eday) = " + str( significant( to_eday( Satellite.ctrl.orbit.t ), 4 ) ),
 			10, 
-			height_p( 1 ) - 60,
+			height_p( 1 ) - 50,
 			'WHITE'
 		]);
 		
@@ -70,25 +61,16 @@ class View{
 				+ str( significant( to_er( -center.z ), 4 ) ) 
 			+ " ]",
 			10, 
+			height_p( 1 ) - 60,
+			'WHITE'
+		]);
+		
+		// Siglos desde el Epoch
+		request.push([
+			'print', 
+			"dt (Cy) = " + str( to_century( s_time ) ),
+			10, 
 			height_p( 1 ) - 70,
-			'WHITE'
-		]);
-		
-		// dx
-		request.push([
-			'print', 
-			"dx (deg) = " + str( rad_to_deg( Satellite.ctrl.orbit.di ) ),
-			10, 
-			height_p( 1 ) - 80,
-			'WHITE'
-		]);
-		
-		// Tiempo pasado el Epoch
-		request.push([
-			'print', 
-			"dt (Cy) = " + str( Satellite.ctrl.orbit.dt ),
-			10, 
-			height_p( 1 ) - 90,
 			'WHITE'
 		]);
 	};
