@@ -45,7 +45,6 @@ var u_seconds; // Segundero universal
 var l_time = 0; // Reloj local
 var l_seconds = '0'; // Segundero local
 var s_time = 0; // Tiempo simulado
-var assigned_time = 0; // Último tiempo asignado
 var frac = 60; // Fracción de segundo real para el loop
 
 // Parámetros de escala de la simulación
@@ -99,9 +98,6 @@ function orbitLoop(){
 	
 	//------------CONTEO DEL TIEMPO------------
 	
-	// Agregar la fracción de tiempo simulado que corresponde
-	s_time += to_sim_t( 1 / frac );
-	
 	// Verificar el segundero del reloj universal
 	u_time = Date.now().toString();
 	u_seconds = u_time.substr(-3).charAt(0);
@@ -112,8 +108,8 @@ function orbitLoop(){
 		// El reloj local se sincroniza con el reloj universal
 		l_time += .1;
 		
-		// El tiempo simulado se sincroniza con el reloj local
-		s_time = assigned_time + to_sim_t( l_time );
+		// Agregar la fracción de tiempo simulado que corresponde
+		s_time += to_sim_t( .1 );
 		
 		// El segundero local sincroniza con el segundero universal
 		l_seconds = u_seconds;
@@ -298,7 +294,11 @@ display_page_button.onclick = () => {
 const text_time = document.getElementById("text_time");
 const button_time = document.getElementById("button_time");
 button_time.onclick = () => {
-	assigned_time = eday_to_s( Number( text_time.value ) );
+	s_time = eday_to_s( Number( text_time.value ) );
+};
+const button_time_add = document.getElementById("button_time_add");
+button_time_add.onclick = () => {
+	s_time += eday_to_s( Number( text_time.value ) );
 };
 
 // Reiniciar el programa con un click
