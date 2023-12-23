@@ -5,6 +5,7 @@ var request = []; // Último pedido
 const colors = { // Paleta
 	WHITE: '#FFFFFF',
 	BLACK: '#000000',
+	GREY: '#888888',
 	RED: '#FF0000',
 	GREEN: '#00FF00',
 	BLUE: '#0000FF',
@@ -31,7 +32,7 @@ function line(x1, y1, x2, y2, c){
 }
 
 // CURVA
-function plot(points, center, angle, color){
+function plot(points, center, angle, color, axis1, axis2){
 	
 	// Verificar que hay puntos
 	if(points == null){
@@ -46,7 +47,7 @@ function plot(points, center, angle, color){
 	
 	// Rotar el lienzo
 	ctx.save();
-	ctx.translate(center[0], center[1]);
+	ctx.translate(center[axis1], center[axis2]);
 	ctx.rotate(angle);
 	
 	// Dibujar segmentos iterativamente
@@ -57,10 +58,10 @@ function plot(points, center, angle, color){
 		
 		// Trazar línea
 		line(
-			start[0],
-			start[1],
-			end[0],
-			end[1],
+			start[axis1],
+			start[axis2],
+			end[axis1],
+			end[axis2],
 			color
 		);
 		
@@ -83,9 +84,17 @@ function ellipse(cx, cy, rx, ry, c){
 
 // TEXTO
 function print(txt, x, y, c){
+	
+	// Reflejar texto (está al revés)
+	ctx.save();
+	ctx.scale(1, -1);
+	
+	// Imprimir texto en la posición correcta
+	ctx.translate(x, -y);
 	ctx.font = "10px Arial";
 	ctx.fillStyle = colors[c];
-	ctx.fillText(txt, x, y);
+	ctx.fillText(txt, 0, 0);
+	ctx.restore();
 }
 
 //-----COMUNICACIÓN--------
@@ -99,11 +108,12 @@ self.onmessage = (e) => {
 			
 			// Adoptar contexto
 			ctx = e.data.canvas.getContext('2d');
+			self.postMessage('contexto recibido.');
 			
 			// Comenzar loop de animación
 			animate();
 			break;
-		
+
 		// Recibir un pedido
 		case 'request':
 			
@@ -128,10 +138,16 @@ function animate(){
 	// Limpiar canvas
 	erase();
 	
+	// Corrección de la dirección del eje vertical
+	ctx.save();
+	ctx.scale(1, -1);
+	ctx.translate(0, -ctx.canvas.height);
+	
 	// Resolver la lista de ítems
 	reqs.forEach(function(value, index, array){
 		solve(value);
 	});
+	ctx.restore();
 	
 	// Enviar frame
 	requestAnimationFrame(animate);
@@ -141,7 +157,7 @@ function animate(){
 function solve(req){
 	switch(req[0]){
 		case 'plot':
-			plot(req[1], req[2], req[3], req[4]);
+			plot(req[1], req[2], req[3], req[4], req[5], req[6]);
 		case 'line':
 			line(req[1], req[2], req[3], req[4], req[5]);
 			break;

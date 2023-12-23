@@ -7,11 +7,20 @@ body {
 	background-color:#272727;
 }
 
-#draw {
+#view1 {
 	background-color: #fff;
 	margin-bottom:12px;
-	cursor: none;
-	width:100%;
+	cursor: crosshair;
+	width:95%;
+	height:95%;
+}
+
+#view2 {
+	background-color: #fff;
+	margin-bottom:12px;
+	cursor: crosshair;
+	width:95%;
+	height:95%;
 }
 
 .flex-container {
