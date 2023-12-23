@@ -44,6 +44,7 @@ var u_time; // Reloj universal
 var u_seconds; // Segundero universal
 var l_time = 0; // Reloj local
 var l_seconds = '0'; // Segundero local
+var s_base_time = 0; // Tiempo simulado base
 var s_time = 0; // Tiempo simulado
 var frac = 60; // Fracción de segundo real para el loop
 
@@ -98,6 +99,9 @@ function orbitLoop(){
 	
 	//------------CONTEO DEL TIEMPO------------
 	
+	// Agregar la unidad mínima de tiempo simulado
+	s_time += to_sim_t( 1 / frac );
+	
 	// Verificar el segundero del reloj universal
 	u_time = Date.now().toString();
 	u_seconds = u_time.substr(-3).charAt(0);
@@ -108,8 +112,11 @@ function orbitLoop(){
 		// El reloj local se sincroniza con el reloj universal
 		l_time += .1;
 		
-		// Agregar la fracción de tiempo simulado que corresponde
-		s_time += to_sim_t( .1 );
+		// Agregar el equivalente de tiempo simulado que corresponde
+		s_base_time += to_sim_t( .1 );
+		
+		// Corregir el tiempo que usa la simulación de órbitas
+		s_time = s_base_time;
 		
 		// El segundero local sincroniza con el segundero universal
 		l_seconds = u_seconds;
@@ -177,7 +184,7 @@ $(document).ready((data, status) => {
 	
 	// Efemérides cartesianas de la tierra (01-01-2000 a 01-01-2001)
 	$.get(
-		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='2000-01-01 12:00'&STOP_TIME='2000-12-01 12:00'&STEP_SIZE='1mo'",
+		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='2500-01-01 12:00'&STOP_TIME='2500-12-01 12:00'&STEP_SIZE='1mo'",
 		(data, status) => {
 			log( data );
 			let aux1 = data.split( 'TDB' ).slice( 4, 16 );
@@ -201,7 +208,7 @@ $(document).ready((data, status) => {
 	
 	// Efemérides (elementos orbitales) de la tierra (01-01-2000)
 	$.get(
-		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='500@10'&START_TIME='2000-01-01 12:00'&STOP_TIME='2000-02-01 12:00'&STEP_SIZE='40d'",
+		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='500@10'&START_TIME='2500-01-01 12:00'&STOP_TIME='2500-02-01 12:00'&STEP_SIZE='40d'",
 		(data, status) => {
 			//log( data );
 		}
@@ -294,11 +301,11 @@ display_page_button.onclick = () => {
 const text_time = document.getElementById("text_time");
 const button_time = document.getElementById("button_time");
 button_time.onclick = () => {
-	s_time = eday_to_s( Number( text_time.value ) );
+	s_base_time = eday_to_s( Number( text_time.value ) );
 };
 const button_time_add = document.getElementById("button_time_add");
 button_time_add.onclick = () => {
-	s_time += eday_to_s( Number( text_time.value ) );
+	s_base_time += eday_to_s( Number( text_time.value ) );
 };
 
 // Reiniciar el programa con un click
@@ -386,6 +393,11 @@ Satellite.sat_from_orbit(
 	},
 	E_INITIAL_TRUE_ANOMALY
 );
+
+let date1 = new Date('January 01, 2000 12:00:00 GMT+00:00');
+let date2 = new Date('December 01, 2500 12:00:00 GMT+00:00');
+let days = to_eday( ms_to_s( date2.getTime() - date1.getTime() ) );
+log( 'Diff: ' + str( days ) );
 
 // Comenzar loop del programa
 setInterval(orbitLoop, s_to_ms( 1 / frac ) );

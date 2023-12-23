@@ -237,6 +237,11 @@ function s_to_ms(s){
 	return 1000 * s;
 };
 
+// MILISEGUNDOS A SEGUNDOS
+function ms_to_s(ms){
+	return ms * .001;
+};
+
 // SEGUNDOS A DÍAS TERRESTRES
 function to_eday(s){
 	return s / EDAY;
