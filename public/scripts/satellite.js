@@ -236,7 +236,7 @@ class Satellite{
 		]);
 		
 		// Nombre
-		request.push([
+		request.push([ 
 			'print', 
 			this.name,
 			to_px( center.x + this.orbit.r.x ) - 10, 

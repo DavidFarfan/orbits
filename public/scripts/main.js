@@ -182,9 +182,9 @@ self.onmessage = (e) => {
 // Comunicación con Horizons system
 $(document).ready((data, status) => {
 	
-	// Efemérides cartesianas de la tierra (01-01-2000 a 01-01-2001)
+	// Efemérides cartesianas de la tierra (SE J2000)
 	$.get(
-		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='2500-01-01 12:00'&STOP_TIME='2500-12-01 12:00'&STEP_SIZE='1mo'",
+		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='1999-01-01 12:00'&STOP_TIME='1999-12-01 12:00'&STEP_SIZE='1mo'",
 		(data, status) => {
 			log( data );
 			let aux1 = data.split( 'TDB' ).slice( 4, 16 );
@@ -206,9 +206,9 @@ $(document).ready((data, status) => {
 		}
 	);
 	
-	// Efemérides (elementos orbitales) de la tierra (01-01-2000)
+	// Efemérides (elementos orbitales) de la tierra (SE J2000)
 	$.get(
-		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='500@10'&START_TIME='2500-01-01 12:00'&STOP_TIME='2500-02-01 12:00'&STEP_SIZE='40d'",
+		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='500@10'&START_TIME='1999-01-01 12:00'&STOP_TIME='1999-02-01 12:00'&STEP_SIZE='40d'",
 		(data, status) => {
 			//log( data );
 		}
@@ -244,6 +244,13 @@ t_scale_slider.oninput = () => {
 	
 	// Realizar el cambio de escala
 	t_scale = EDAY * t_scale_slider.value;
+};
+const stop_button = document.getElementById("stop_button");
+stop_button.onclick = () => {
+	
+	// Detener el tiempo
+	t_scale = 0;
+	t_scale_slider.value = 0;
 };
 
 // Captura de parámetros del satélite controlado

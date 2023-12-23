@@ -74,6 +74,14 @@ class View3 extends View{
 		// Pointing Coordinates of the sun from ctrl (rad)
 		let p_q;
 		if(Satellite.ctrl.orbit.perturbation != undefined){
+			
+			// Corregir si el nodo ascendente ha cambiado de dirección
+			let u_omega = Satellite.ctrl.orbit.perturbation.upper_omega;
+			let tilt = Satellite.ctrl.orbit.perturbation.axial_tilt;
+			if(Satellite.ctrl.orbit.perturbation.negative_inclination){
+				u_omega += PI;
+				tilt *= -1;
+			};
 			p_q = pointing_coordiantes(
 				Satellite.ctrl.orbit.r,
 				{	// Sun
@@ -82,8 +90,8 @@ class View3 extends View{
 					z: 0
 				},
 				Satellite.ctrl.orbit.perturbation.i,
-				Satellite.ctrl.orbit.perturbation.axial_tilt,
-				Satellite.ctrl.orbit.perturbation.upper_omega
+				tilt,
+				u_omega
 			);
 			
 			// Right ascension
@@ -123,7 +131,6 @@ class View3 extends View{
 			50,
 			'WHITE'
 		]);
-		
 		request.push([
 			'print', 
 			"sun x = " + str( significant( sun_sky.pos.x, 4 ) ) + 

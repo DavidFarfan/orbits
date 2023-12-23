@@ -4,6 +4,12 @@ class Orbit{
 	// Crear órbita ficticia desde sus elementos
 	static fictional_orbit(u, a, e, i, omega, upper_omega, f0, tilt){
 		
+		// Corrección del eje de rot. para órbitas ficticias que alcanzan i<0
+		let adjust = false;
+		if(i<0){
+			adjust = true;
+		};
+		
 		// Invariantes
 		let inv = invariants_from_elements(
 			u,
@@ -30,7 +36,8 @@ class Orbit{
 				di: this.di_dt,
 				dupper_omega: this.dupper_omega_dt,
 				dp: this.dp_dt
-			}
+			},
+			adjust
 		);
 		return f_orbit;
 	};
@@ -99,12 +106,18 @@ class Orbit{
 	};
 	
 	// Longitude of the ascending node
-	set_upper_omega(h, axial_tilt, du){
+	set_upper_omega(h, axial_tilt, du, adjust_rot){
 		this.upper_omega = longitude_ascending_node( this.n );
 		this.axial_tilt = axial_tilt;
+		
+		// Corrección para órbitas ficticias que alcanzan i<0
+		if(adjust_rot){
+			this.axial_tilt *= -1;
+			this.negative_inclination = true;
+		};
 		this.rot_axis = rotation_axis(
 			h,
-			axial_tilt,
+			this.axial_tilt,
 			this.upper_omega
 		);
 		this.dupper_omega_dt = du;
@@ -434,7 +447,7 @@ class Orbit{
 	};
 	
 	// Variables de la órbita (a partir del satélite que la recorre)
-	constructor(h, E, u, v, r, axial_tilt, dif){
+	constructor(h, E, u, v, r, axial_tilt, dif, adjust_rot){
 		this.set_type(E);
 		this.set_line_of_nodes(h);
 		this.set_eccentricity(u, v, h, r);
@@ -444,7 +457,7 @@ class Orbit{
 		this.set_b();
 		this.set_rp();
 		this.set_i(h, dif.di);
-		this.set_upper_omega(h, axial_tilt, dif.dupper_omega);
+		this.set_upper_omega(h, axial_tilt, dif.dupper_omega, adjust_rot);
 		this.set_omega_f0(r, dif.dp);
 		this.structure();
 		this.set_fo(r);
