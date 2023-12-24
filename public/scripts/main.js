@@ -179,42 +179,33 @@ self.onmessage = (e) => {
 	};
 };
 
-/*/ Comunicación con Horizons system
+// Comunicación con Horizons system
 $(document).ready((data, status) => {
 	
-	// Efemérides cartesianas de la tierra (SE J2000)
+	// Efemérides cartesianas (SE J2000)
 	$.get(
-		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='1999-01-01 12:00'&STOP_TIME='1999-12-01 12:00'&STEP_SIZE='1mo'",
+		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text" + "&COMMAND='" + HORIZONS_VENUS + "'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='1999-01-01 12:00'&STOP_TIME='1999-12-01 12:00'&STEP_SIZE='1mo'",
 		(data, status) => {
-			log( data );
-			let aux1 = data.split( 'TDB' ).slice( 4, 16 );
-			let aux2 = [];
 			let vectors = [];
+			let aux1 = data.split( '$$SOE' )[1].split( '$$EOE' )[0].split( 'TDB' ).splice( 1 );
 			aux1.forEach(function(value, index, array){
-				aux2.push( value.split( '=' ).slice( 1, 7 ) );
-			});
-			aux2.forEach(function(value, index, array){
+				let rough_values = value.split( '=' ).splice( 1, 6 );
 				let vector = [];
-				value.forEach(function(value2, index2, array2){
-					vector.push(Number(
-						value2.split('E')[0] + 'e' + value2.split('E')[1].substr( 0, 3 )
-					));
+				rough_values.forEach(function(value2, index2, array2){
+					let rough_value = value2.split( 'E' );
+					vector.push(
+						Number(
+							rough_value[0] + 'e' + rough_value[1].substr( 0, 3 )
+						)
+					);
 				});
 				vectors.push( vector );
 			});
 			self.postMessage({ type: 'ephemeris', eph: vectors });
 		}
 	);
-	
-	// Efemérides (elementos orbitales) de la tierra (SE J2000)
-	$.get(
-		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text&COMMAND='399'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='ELEMENTS'&CENTER='500@10'&START_TIME='1999-01-01 12:00'&STOP_TIME='1999-02-01 12:00'&STEP_SIZE='40d'",
-		(data, status) => {
-			//log( data );
-		}
-	);
 });
-*/
+
 // Captura de posición del mouse
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
@@ -308,11 +299,8 @@ const button_time = document.getElementById("button_time");
 button_time.onclick = () => {
 	
 	// Calcular días transcurridos de la fecha ingresada
-	let epoch = new Date('January 01, 2000 12:00:00 GMT+00:00');
 	let date_in = new Date( select_date.value + " 12:00:00 GMT+00:00" );
-	let dif_days = to_eday( ms_to_s( date_in.getTime() - epoch.getTime() ) );
-	log( date_in );
-	log( 'Difference days: ' + str( dif_days ) );
+	let dif_days = to_eday( ms_to_s( date_in.getTime() - EPOCH_J2000.getTime() ) );
 	
 	// Aplicar tiempo simulado 
 	// (days from epoch)

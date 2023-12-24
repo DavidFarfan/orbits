@@ -123,8 +123,7 @@ class View3 extends View{
 		]);
 		
 		// Fecha (TT)
-		let epoch = new Date('January 01, 2000 12:00:00 GMT+00:00');
-		let date = new Date( s_to_ms( s_time ) + epoch.getTime() );
+		let date = new Date( s_to_ms( s_time ) + EPOCH_J2000.getTime() );
 		request.push([
 			'print', 
 			"Date (TT) = " + str( date ),

@@ -7,6 +7,17 @@ const EULER = Math.E; // Euler
 const AU = 1.495978707e8; // Unidad astronómica (km)
 const JULIAN_CENTURY = 3.15576e9; // Siglo juliano (s)
 
+// Horizons Nomenclature
+const HORIZONS_EARTH = '399'; // Earth center
+const HORIZONS_SUN = '10'; // Sun center
+const HORIZONS_MOON = '301'; // Moon center
+const HORIZONS_VENUS = '299'; // Venus center
+const HORIZONS_MARS = '499'; // Mars center
+const HORIZONS_CERES ='A801 AA'; // Ceres center
+
+// Sistemas de coordenadas
+const EPOCH_J2000 = new Date('January 01, 2000 12:00:00 GMT+00:00');
+
 // Parámetros del Sol
 const SUN_U = 1.3271283864171489e+11; // Parámetro gravitacional (km^3/s^2)
 const SUNR = 696000.0; // Radio (km)
