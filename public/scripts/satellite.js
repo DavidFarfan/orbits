@@ -10,14 +10,22 @@ class Satellite{
 	// Parámetro gravitacional del cuerpo orbitado
 	static u = 0;
 	
+	// Cambio de parámetros
+	static moved = false;
+	
 	// Rutina de control manual
 	static ctrl_rutine(){
 		
+		// Verificar cambios de parámetros
+		if(!Satellite.moved){
+			return;
+		};
+		
 		// Cambiar posisición del satélite controlado
 		var pos = {
-			x: to_km( sat.x ) - center.x,
-			y: to_km( sat.y ) - center.y,
-			z: to_km( sat.z ) - center.z
+			x: to_km( sat.x ),
+			y: to_km( sat.y ),
+			z: to_km( sat.z )
 		};
 		
 		// Cambiar velocidad del satélite controlado
@@ -27,22 +35,27 @@ class Satellite{
 			z: sat.vz
 		};
 		
-		// Iniciar una nueva simulación al cambiar las condiciones iniciales
-		if(
-			pos.x != Satellite.ctrl.pos.x ||
-			pos.y != Satellite.ctrl.pos.y ||
-			pos.z != Satellite.ctrl.pos.z ||
-			vel.x != Satellite.ctrl.vel.x ||
-			vel.y != Satellite.ctrl.vel.y ||
-			vel.z != Satellite.ctrl.vel.z
-		){
-			Satellite.ctrl.pos_set(pos);
-			Satellite.ctrl.vel_set(vel);
-			Satellite.ctrl.physics();
-			
-			// Reiniciar tiempo de simulación
-			// ...
-		};
+		// Nueva órbita
+		Satellite.ctrl.pos_set(pos);
+		Satellite.ctrl.vel_set(vel);
+		Satellite.ctrl.rotation_set({
+			T: Satellite.ctrl.sidereal_rotation_period,
+			t0: Satellite.ctrl.GST0,
+			tilt: Satellite.ctrl.axial_tilt
+		});
+		Satellite.ctrl.physics({
+			da: Satellite.ctrl.orbit.da_dt,
+			de: Satellite.ctrl.orbit.de_dt,
+			di: Satellite.ctrl.orbit.di_dt,
+			dupper_omega: Satellite.ctrl.orbit.dupper_omega_dt,
+			dp: Satellite.ctrl.orbit.dp_dt
+		});
+		
+		// Reiniciar tiempo de simulación
+		s_base_time = 0;
+		
+		// Esperar un nuevo cambio de parámetros
+		Satellite.moved = false;
 	};
 	
 	// Satélite a partir de la órbita

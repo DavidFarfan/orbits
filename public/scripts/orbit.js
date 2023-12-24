@@ -447,7 +447,7 @@ class Orbit{
 	};
 	
 	// Variables de la órbita (a partir del satélite que la recorre)
-	constructor(h, E, u, v, r, axial_tilt, dif, adjust_rot){
+	constructor(h, E, u, v, r, axial_tilt, dif, adjust_rot){	
 		this.set_type(E);
 		this.set_line_of_nodes(h);
 		this.set_eccentricity(u, v, h, r);

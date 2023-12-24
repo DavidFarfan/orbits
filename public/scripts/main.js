@@ -123,7 +123,7 @@ function orbitLoop(){
 	};
 	
 	//------------CONTROL MANUAL---------
-	//Satellite.ctrl_rutine();
+	Satellite.ctrl_rutine();
 	
 	//------------SIMULACIÓN------------
 	
@@ -179,7 +179,7 @@ self.onmessage = (e) => {
 	};
 };
 
-// Comunicación con Horizons system
+/*/ Comunicación con Horizons system
 $(document).ready((data, status) => {
 	
 	// Efemérides cartesianas de la tierra (SE J2000)
@@ -214,7 +214,7 @@ $(document).ready((data, status) => {
 		}
 	);
 });
-
+*/
 // Captura de posición del mouse
 function getMousePos(canvas, evt) {
     var rect = canvas.getBoundingClientRect();
@@ -255,37 +255,34 @@ stop_button.onclick = () => {
 
 // Captura de parámetros del satélite controlado
 const posx_slider = document.getElementById("posx");
-posx_slider.max = width_p( 1 );
-posx_slider.value = width_p( .5 );
-sat.x = posx_slider.value;
 posx_slider.oninput = () => {
 	sat.x = posx_slider.value;
+	Satellite.moved = true;
 };
 const posy_slider = document.getElementById("posy");
-posy_slider.max = width_p( 1 );
-posy_slider.value = width_p( .5 );
-sat.y = posy_slider.value;
 posy_slider.oninput = () => {
 	sat.y = posy_slider.value;
+	Satellite.moved = true;
 };
 const posz_slider = document.getElementById("posz");
-posz_slider.max = width_p( 1 );
-posz_slider.value = width_p( .5 );
-sat.z = posz_slider.value;
 posz_slider.oninput = () => {
-	sat.z = posz_slider.max - posz_slider.value;
+	sat.z = posz_slider.value;
+	Satellite.moved = true;
 };
 const velx_slider = document.getElementById("velx");
 velx_slider.oninput = () => {
 	sat.vx = velx_slider.value * .1;
+	Satellite.moved = true;
 };
 const vely_slider = document.getElementById("vely");
 vely_slider.oninput = () => {
 	sat.vy = vely_slider.value * .1;
+	Satellite.moved = true;
 };
 const velz_slider = document.getElementById("velz");
 velz_slider.oninput = () => {
-	sat.vz = -velz_slider.value * .1;
+	sat.vz = velz_slider.value * .1;
+	Satellite.moved = true;
 };
 
 // Captura de parámetros del punto sobre la superficie del satélite controlado
