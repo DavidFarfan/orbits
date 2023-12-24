@@ -167,7 +167,7 @@ function orbitLoop(){
 
 // Recibir confirmación del animador
 animator1.addEventListener("message", (msg) => {
-  log( msg.data );
+  //log( msg.data );
 });
 
 // Recibir efemérides de la NASA
@@ -303,9 +303,26 @@ display_page_button.onclick = () => {
 
 // Captura de tiempo de simulación
 const text_time = document.getElementById("text_time");
+const select_date = document.getElementById("select_date");
 const button_time = document.getElementById("button_time");
 button_time.onclick = () => {
-	s_base_time = eday_to_s( Number( text_time.value ) );
+	
+	// Calcular días transcurridos de la fecha ingresada
+	let epoch = new Date('January 01, 2000 12:00:00 GMT+00:00');
+	let date_in = new Date( select_date.value + " 12:00:00 GMT+00:00" );
+	let dif_days = to_eday( ms_to_s( date_in.getTime() - epoch.getTime() ) );
+	log( date_in );
+	log( 'Difference days: ' + str( dif_days ) );
+	
+	// Aplicar tiempo simulado 
+	// (days from epoch)
+	if(text_time.value == ''){
+		s_base_time = eday_to_s( dif_days );
+		
+	// (selected date)
+	}else{
+		s_base_time = eday_to_s( Number( text_time.value ) );
+	};
 };
 const button_time_add = document.getElementById("button_time_add");
 button_time_add.onclick = () => {
@@ -397,11 +414,6 @@ Satellite.sat_from_orbit(
 	},
 	E_INITIAL_TRUE_ANOMALY
 );
-
-let date1 = new Date('January 01, 2000 12:00:00 GMT+00:00');
-let date2 = new Date('December 01, 2500 12:00:00 GMT+00:00');
-let days = to_eday( ms_to_s( date2.getTime() - date1.getTime() ) );
-log( 'Diff: ' + str( days ) );
 
 // Comenzar loop del programa
 setInterval(orbitLoop, s_to_ms( 1 / frac ) );

@@ -67,11 +67,6 @@
 			</div>
 			<div class="flex-col" align="center">
 				<div class="slidecontainer">
-					<input type="button" class="button" value="Display next page" id="page">
-				</div>
-			</div>
-			<div class="flex-col" align="center">
-				<div class="slidecontainer">
 					<label>simul time</label>
 					<input type="text" value="" id="text_time">
 					<div class="flex-col" align="center">
@@ -79,7 +74,18 @@
 						<input type="button" class="button" value="apply time" id="button_time">
 						<label>edays past present</label>
 						<input type="button" class="button" value="add time" id="button_time_add">
+						<form>
+						  <label>
+							simul date
+							<input type="date" name="party" id="select_date" min="1-01-01" max="3000-12-31" />
+						  </label>
+						</form>
 					</div>
+				</div>
+			</div>
+			<div class="flex-col" align="center">
+				<div class="slidecontainer">
+					<input type="button" class="button" value="Display next page" id="page">
 				</div>
 			</div>
 		</div>

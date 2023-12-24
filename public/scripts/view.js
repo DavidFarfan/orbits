@@ -485,9 +485,9 @@ class View{
 		request.push([
 			'print', 
 			"T (eday) = "
-				+ str( significant( to_eday( Satellite.ctrl.orbit.T ), 4 ) )
+				+ str( significant( to_eday( Satellite.ctrl.orbit.T ), 6 ) )
 			+ ", "
-				+ str( significant( to_eday( Satellite.ctrl.orbit.perturbation.T ), 4 ) ),
+				+ str( significant( to_eday( Satellite.ctrl.orbit.perturbation.T ), 6 ) ),
 			width_p( .65 ),
 			height_p( 1 ) - 20,
 			'WHITE'
