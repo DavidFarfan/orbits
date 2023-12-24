@@ -122,13 +122,24 @@ class View3 extends View{
 			'WHITE'
 		]);
 		
-		// Sun position over location
+		// Fecha (TT)
+		let epoch = new Date('January 01, 2000 12:00:00 GMT+00:00');
+		let date = new Date( s_to_ms( s_time ) + epoch.getTime() );
+		request.push([
+			'print', 
+			"Date (TT) = " + str( date ),
+			10, 
+			50,
+			'WHITE'
+		]);
+		
+		// Hora universal coordinada
 		let sun_sky = celestial_sphere_pos(p_q.alpha, p_q.delta, LAMBDA, PHI, Satellite.ctrl.GST);
 		request.push([
 			'print', 
-			"UTC = " + hour_string( rad_to_h_m_s( sun_sky.hour ) ),
+			"Real UTC = " + hour_string( rad_to_h_m_s( sun_sky.hour ) ),
 			10, 
-			50,
+			60,
 			'WHITE'
 		]);
 		request.push([
@@ -137,7 +148,7 @@ class View3 extends View{
 			", sun y = " + str( significant( sun_sky.pos.y, 4 ) ) + 
 			", sun z = " + str( significant( sun_sky.pos.z, 4 ) ),
 			10, 
-			60,
+			70,
 			'WHITE'
 		]);
 		let color;
@@ -164,7 +175,7 @@ class View3 extends View{
 			", north y = " + str( significant( north_sky.pos.y, 4 ) ) + 
 			", north z = " + str( significant( north_sky.pos.z, 4 ) ),
 			10, 
-			70,
+			80,
 			'WHITE'
 		]);
 		if(north_sky.pos.z > 0){
@@ -190,7 +201,7 @@ class View3 extends View{
 			", south y = " + str( significant( south_sky.pos.y, 4 ) ) + 
 			", south z = " + str( significant( south_sky.pos.z, 4 ) ),
 			10, 
-			80,
+			90,
 			'WHITE'
 		]);
 		if(south_sky.pos.z > 0){
@@ -222,7 +233,7 @@ class View3 extends View{
 			", local y = " + str( significant( local_sky.pos.y, 4 ) ) + 
 			", local z = " + str( significant( local_sky.pos.z, 4 ) ),
 			10, 
-			90,
+			100,
 			'WHITE'
 		]);
 		if(local_sky.pos.z > 0){
@@ -254,7 +265,7 @@ class View3 extends View{
 			", east y = " + str( significant( east_sky.pos.y, 4 ) ) + 
 			", east z = " + str( significant( east_sky.pos.z, 4 ) ),
 			10, 
-			100,
+			110,
 			'WHITE'
 		]);
 		if(east_sky.pos.z > 0){
