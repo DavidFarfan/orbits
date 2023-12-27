@@ -48,7 +48,7 @@ const E_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0, i.e 12:00 aprox. (s)
 	25427 // Segundos desde FPOA en J2000, obtenido empíricamente (s)
 ));
 const E_DIFF_SEMI_MAJOR_AXIS = -0.00000003 * AU; // Cambio del Semi-eje mayor J2000 (km/Cy)
-const E_DIFF_ECCENTRICITY = -0.00003661; // Cambio de la Excentricidad J2000 (1//Cy)
+const E_DIFF_ECCENTRICITY = -0.00003661; // Cambio de la Excentricidad J2000 (1/Cy)
 const E_DIFF_INCLINATION = deg_to_rad( 0.01337178 ); // Cambio de la Inclinación J2000 (rad/Cy)
 const E_DIFF_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( -0.24123856 ); // Cambio de la RAAN J2000 (rad/Cy)
 const E_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0.31795260 ); // Cambio de la longitud de perihelio J2000 (rad/Cy)
@@ -68,11 +68,35 @@ const m_axial_tilt = 0.43964843857737162042707770458228; // Oblicuidad de la ór
 const m_sidereal_rotation_period = h_to_s( 24.6229 ); // Periodo de rotación sideral (s)
 
 // Parámetros de Ceres
-const c_u = 62.62736; // Parámetro gravitacional (km^3/s^2)
-const cr = 476; // Radio (km)
-const cday = 9 * 3600; // Día solar (s)
-const c_axial_tilt = 0.06981317007977318307694763073954; // Oblicuidad de la órbita (rad)
-const c_sidereal_rotation_period = h_to_s( 9.07 ); // Periodo de rotación sideral (s)
+const C_U = 62.6284; // Parámetro gravitacional (km^3/s^2)
+const CR = 469.7; // Radio volumétrico medio (km)
+const C_INITIAL_SEMI_MAJOR_AXIS = 413867951.4842377; // Semi-eje mayor J2000 (km)
+const C_INITIAL_ECCENTRICITY = 0.07870920149752186; // Excentricidad J2000
+const C_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
+	C_INITIAL_SEMI_MAJOR_AXIS,
+	C_INITIAL_ECCENTRICITY
+);
+const C_INITIAL_INCLINATION = deg_to_rad( 10.66837618716704 ); // Inclinación J2000 (rad)
+const C_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 86.50121756637978 ); // RAAN  J2000 (rad)
+const C_INITIAL_LONGITUDE_OF_PERIHELION = deg_to_rad( 58.09210314065005
+	+ C_INITIAL_LONGITUDE_OF_ASCENDING_NODE ); // Longitud de perihelio J2000 (rad)
+const C_INITIAL_ARGUMENT_OF_PERIHELION = C_INITIAL_LONGITUDE_OF_PERIHELION // Argumento de perihelio J2000 (rad)
+	 - C_INITIAL_LONGITUDE_OF_ASCENDING_NODE;
+const C_AXIAL_TILT = deg_to_rad( 4 ); // Oblicuidad de la órbita (rad)
+const C_SIDEREAL_ROTATION_PERIOD = h_m_s( 9, 4, 0); // Periodo rot. sideral (s)
+const C_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
+	period( C_INITIAL_SEMI_MAJOR_AXIS, SUN_U ),
+	41256000 // Ángulo obtenido empíricamente (s)
+);
+const C_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0, i.e 12:00 aprox. (s)
+	C_SIDEREAL_ROTATION_PERIOD,
+	0 // Segundos desde FPOA en J2000, obtenido empíricamente (s)
+));
+const C_DIFF_SEMI_MAJOR_AXIS = 0; // Cambio del Semi-eje mayor J2000 (km/Cy)
+const C_DIFF_ECCENTRICITY = 0; // Cambio de la Excentricidad J2000 (1/Cy)
+const C_DIFF_INCLINATION = deg_to_rad( 0 ); // Cambio de la Inclinación J2000 (rad/Cy)
+const C_DIFF_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 0 ); // Cambio de la RAAN J2000 (rad/Cy)
+const C_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0 ); // Cambio de la longitud de perihelio J2000 (rad/Cy)
 
 //------BÁSICAS-------------
 
