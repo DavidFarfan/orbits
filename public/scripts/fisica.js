@@ -54,18 +54,64 @@ const E_DIFF_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( -0.24123856 ); // Cambio 
 const E_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0.31795260 ); // Cambio de la longitud de perihelio J2000 (rad/Cy)
 
 // Parámetros de Venus
-const v_u = 3.2486e5; // Parámetro gravitacional (km^3/s^2)
-const vr = 6.0518e3; // Radio (km)
-const vday = 2802.0 * 3600; // Día solar (s)
-const v_axial_tilt = 3.0955159613371429376318579469914; // Oblicuidad de la órbita (rad)
-const v_sidereal_rotation_period = h_to_s( 5832.6 ); // Periodo de rotación sideral (s)
+const V_U = 324858.592; // Parámetro gravitacional (km^3/s^2)
+const VR = 6051.84; // Radio volumétrico medio (km)
+const V_INITIAL_SEMI_MAJOR_AXIS = 0.72332102 * AU; // Semi-eje mayor J2000 (km)
+const V_INITIAL_ECCENTRICITY = 0.00676399; // Excentricidad J2000
+const V_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
+	V_INITIAL_SEMI_MAJOR_AXIS,
+	V_INITIAL_ECCENTRICITY
+);
+const V_INITIAL_INCLINATION = deg_to_rad( 3.39777545 ); // Inclinación J2000 (rad)
+const V_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 76.67261496 ); // RAAN  J2000 (rad)
+const V_INITIAL_LONGITUDE_OF_PERIHELION = deg_to_rad( 131.76755713 ); // Longitud de perihelio J2000 (rad)
+const V_INITIAL_ARGUMENT_OF_PERIHELION = V_INITIAL_LONGITUDE_OF_PERIHELION // Argumento de perihelio J2000 (rad)
+	 - V_INITIAL_LONGITUDE_OF_ASCENDING_NODE;
+const V_AXIAL_TILT = deg_to_rad( 177.36 ); // Oblicuidad de la órbita (rad)
+const V_SIDEREAL_ROTATION_PERIOD = h_to_s( 243.018484 * EDAY ); // Periodo rot. sideral (s)
+const V_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
+	period( V_INITIAL_SEMI_MAJOR_AXIS, SUN_U ),
+	2743200 // Ángulo obtenido empíricamente (s)
+);
+const V_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0, i.e 12:00 aprox. (s)
+	V_SIDEREAL_ROTATION_PERIOD,
+	0 // Segundos desde FPOA en J2000, obtenido empíricamente (s)
+));
+const V_DIFF_SEMI_MAJOR_AXIS = -0.00000026 * AU; // Cambio del Semi-eje mayor J2000 (km/Cy)
+const V_DIFF_ECCENTRICITY = -0.00005107; // Cambio de la Excentricidad J2000 (1/Cy)
+const V_DIFF_INCLINATION = deg_to_rad( 0.00043494 ); // Cambio de la Inclinación J2000 (rad/Cy)
+const V_DIFF_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( -0.27274174 ); // Cambio de la RAAN J2000 (rad/Cy)
+const V_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0.05679648 ); // Cambio de la longitud de perihelio J2000 (rad/Cy)
 
 // Parámetros de Marte
-const m_u = 4.2828e4; // Parámetro gravitacional (km^3/s^2)
-const mr = 3.3895e3; // Radio (km)
-const mday = 24.6597 * 3600; // Día solar (s)
-const m_axial_tilt = 0.43964843857737162042707770458228; // Oblicuidad de la órbita (rad)
-const m_sidereal_rotation_period = h_to_s( 24.6229 ); // Periodo de rotación sideral (s)
+const M_U = 42828.375214; // Parámetro gravitacional (km^3/s^2)
+const MR = 3389.92; // Radio volumétrico medio (km)
+const M_INITIAL_SEMI_MAJOR_AXIS = 1.52371243 * AU; // Semi-eje mayor J2000 (km)
+const M_INITIAL_ECCENTRICITY = 0.09336511; // Excentricidad J2000
+const M_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
+	M_INITIAL_SEMI_MAJOR_AXIS,
+	M_INITIAL_ECCENTRICITY
+);
+const M_INITIAL_INCLINATION = deg_to_rad( 1.85181869 ); // Inclinación J2000 (rad)
+const M_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 49.71320984 ); // RAAN  J2000 (rad)
+const M_INITIAL_LONGITUDE_OF_PERIHELION = deg_to_rad( 336.08255216 ); // Longitud de perihelio J2000 (rad)
+const M_INITIAL_ARGUMENT_OF_PERIHELION = M_INITIAL_LONGITUDE_OF_PERIHELION // Argumento de perihelio J2000 (rad)
+	 - M_INITIAL_LONGITUDE_OF_ASCENDING_NODE;
+const M_AXIAL_TILT = deg_to_rad( 25.19 ); // Oblicuidad de la órbita (rad)
+const M_SIDEREAL_ROTATION_PERIOD = h_to_s( 24.622962 ); // Periodo rot. sideral (s)
+const M_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
+	period( M_INITIAL_SEMI_MAJOR_AXIS, SUN_U ),
+	63203329.22 // Ángulo obtenido empíricamente (s)
+);
+const M_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0, i.e 12:00 aprox. (s)
+	M_SIDEREAL_ROTATION_PERIOD,
+	0 // Segundos desde FPOA en J2000, obtenido empíricamente (s)
+));
+const M_DIFF_SEMI_MAJOR_AXIS = 0.00000097 * AU; // Cambio del Semi-eje mayor J2000 (km/Cy)
+const M_DIFF_ECCENTRICITY = 0.00009149; // Cambio de la Excentricidad J2000 (1/Cy)
+const M_DIFF_INCLINATION = deg_to_rad( -0.00724757 ); // Cambio de la Inclinación J2000 (rad/Cy)
+const M_DIFF_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( -0.26852431 ); // Cambio de la RAAN J2000 (rad/Cy)
+const M_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0.45223625 ); // Cambio de la longitud de perihelio J2000 (rad/Cy)
 
 // Parámetros de Ceres
 const C_U = 62.6284; // Parámetro gravitacional (km^3/s^2)

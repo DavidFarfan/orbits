@@ -252,7 +252,7 @@ class View3 extends View{
 		
 		// East of location from location
 		let east_sky = celestial_sphere_pos(
-			LST( Satellite.ctrl.GST, LAMBDA ) - PI / 2,
+			LST( Satellite.ctrl.GST, LAMBDA ) + PI / 2,
 			0,
 			LAMBDA,
 			PHI,

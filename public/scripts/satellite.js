@@ -7,11 +7,23 @@ class Satellite{
 	// Satélite controlado
 	static ctrl = null;
 	
-	// Parámetro gravitacional del cuerpo orbitado
-	static u = 0;
-	
 	// Cambio de parámetros
 	static moved = false;
+	
+	// Satélite particular
+	static get_sat(name){
+		let idx = -1;
+		Satellite.list.forEach(function(value, index, array){
+			if(value.name == name){
+				idx = index;
+			};
+		});
+		if(idx < 0){
+			return null
+		}else{
+			return Satellite.list[idx];
+		};
+	};
 	
 	// Rutina de control manual
 	static ctrl_rutine(){
@@ -59,11 +71,15 @@ class Satellite{
 	};
 	
 	// Satélite a partir de la órbita
-	static sat_from_orbit(name, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
+	static sat_from_orbit(name, orbited, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
 		
 		// Construir el satélite en el punto f0
+		let GM = 1;
+		if(orbited != null){
+			GM = Satellite.get_sat(orbited).u;
+		};
 		let sat_at_t0 = invariants_from_elements(
-			u,
+			GM,
 			a,
 			e,
 			rp,
@@ -74,6 +90,8 @@ class Satellite{
 		);
 		let sat = new Satellite(
 			name,
+			orbited,
+			u,
 			sat_at_t0.r,
 			sat_at_t0.v,
 			rot,
@@ -85,6 +103,15 @@ class Satellite{
 	// Nombre del satélite
 	name_set(name){
 		this.name = name;
+	};
+	
+	// Parámetro gravitatorio al que está sometido
+	get_gravity(){
+		if(this.orbited == null){
+			return 1;
+		}else{
+			return Satellite.get_sat( this.orbited ).u;
+		};
 	};
 	
 	// Control manual sobre el satélite
@@ -146,13 +173,13 @@ class Satellite{
 		this.h = norm_vec( this.h_vec );
 		
 		// Energía de órbita
-		this.E = orbital_energy( this.v, Satellite.u, this.r );
+		this.E = orbital_energy( this.v, this.get_gravity(), this.r );
 		
 		// Órbita
 		this.orbit = new Orbit(
 			this.h_vec,
 			this.E,
-			Satellite.u,
+			this.get_gravity(),
 			this.vel,
 			this.pos,
 			this.axial_tilt,
@@ -172,10 +199,10 @@ class Satellite{
 	};
 	
 	// Simmulación
-	sim(u){
+	sim(){
 		
 		// Acción
-		this.orbit.set_sim( u ); // Traslación
+		this.orbit.set_sim( this.get_gravity() ); // Traslación
 		this.rotate(); // Rotación
 	};
 	
@@ -338,8 +365,10 @@ class Satellite{
 	};
 	
 	// Variables del satélite
-	constructor(name, pos, vel, rot, dif, ctrl){
+	constructor(name, orbited, u, pos, vel, rot, dif, ctrl){
 		this.name_set(name);
+		this.orbited = orbited;
+		this.u = u;
 		this.ctrl_set(ctrl);
 		this.pos_set(pos);
 		this.vel_set(vel);

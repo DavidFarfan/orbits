@@ -22,9 +22,6 @@ var elem_curve_approx = [];
 
 //-------PARÁMETROS DE LA SIMULACIÓN-----------
 
-// Parámetros básicos
-Satellite.u = SUN_U; // Astro orbitado
-
 // Parámetros para el control manual
 var mousePos1 = { // Posicion del mouse sobre el lienzo 1
 	x: width_p( .5 ),
@@ -142,7 +139,7 @@ function orbitLoop(){
 	
 	// Simular movimiento de los satélites
 	Satellite.list.forEach(function(value, index, array){
-		value.sim( Satellite.u );
+		value.sim();
 	});
 	
 	//------------SELECCIÓN DE VISTA-----------
@@ -370,11 +367,11 @@ $(document).ready((data, status) => {
 	
 	// Efemérides (SE J2000)
 	$.get(
-		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text" + "&COMMAND='" + HORIZONS_CERES + "'&OBJ_DATA='NO'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='2100-01-01 12:00'&STOP_TIME='2100-12-01 12:00'&STEP_SIZE='1mo'",
+		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text" + "&COMMAND='" + HORIZONS_MARS + "'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='1800-01-01 12:00'&STOP_TIME='1800-07-01 12:00'&STEP_SIZE='1mo'",
 		(data, status) => {
 			log(data);
 			let formated_data = cartesian_horizons_ephem( data );
-			self.postMessage({ type: 'ephemeris', eph: formated_data });
+			//self.postMessage({ type: 'ephemeris', eph: formated_data });
 		}
 	);
 });
@@ -497,89 +494,37 @@ canvas1.addEventListener('click', () => {
 
 //------OBJETOS A SIMULAR--------------
 
-/*/ Venus
+// Sol (SE J2000)
 Satellite.sat_from_orbit(
-	'venus',
+	'sun',
+	null,
 	SUN_U,
-	108.210e6,
-	0.00677323,
-	107.480e6,
-	0.05924886665037670558078622288696,
-	0.95790650666456784499879844137729,
-	1.3383305132010906804591668547434,
+	1,
+	0,
+	1,
+	0,
+	0,
+	0,
 	{
-		T: v_sidereal_rotation_period,
+		T: 0,
 		t0: 0,
-		tilt: v_axial_tilt
+		tilt: 0
+	},
+	{
+		da: 0,
+		de: 0,
+		di: 0,
+		dupper_omega: 0,
+		dp: 0
 	},
 	0
-);
-
-// Marte
-Satellite.sat_from_orbit(
-	'mars',
-	SUN_U,
-	227.956e6,
-	0.0935,
-	206.650e6,
-	0.03225368457685521058154980540167,
-	5.0003683069637542378863740517199,
-	0.86530876133170948702694279713143,
-	{
-		T: m_sidereal_rotation_period,
-		t0: 0,
-		tilt: m_axial_tilt
-	},
-	0
-);
-
-// Ceres
-Satellite.sat_from_orbit(
-	'ceres',
-	SUN_U,
-	2.77 * AU,
-	0.0785,
-	2.55 * AU,
-	0.18500490071139893515391122145979,
-	1.2845623294678265686158364056076,
-	1.3962634015954636615389526147909,
-	{
-		T: c_sidereal_rotation_period,
-		t0: 0,
-		tilt: c_axial_tilt
-	},
-	0
-);*/
-
-// Tierra (SE J2000)
-Satellite.sat_from_orbit(
-	'earth',
-	SUN_U,
-	E_INITIAL_SEMI_MAJOR_AXIS,
-	E_INITIAL_ECCENTRICITY,
-	E_INITIAL_PERIAPSE,
-	E_INITIAL_INCLINATION,
-	E_INITIAL_ARGUMENT_OF_PERIHELION,
-	E_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
-	{
-		T: E_SIDEREAL_ROTATION_PERIOD,
-		t0: E_INITIAL_GST,
-		tilt: E_AXIAL_TILT
-	},
-	{
-		da: E_DIFF_SEMI_MAJOR_AXIS,
-		de: E_DIFF_ECCENTRICITY,
-		di: E_DIFF_INCLINATION,
-		dupper_omega: E_DIFF_LONGITUDE_OF_ASCENDING_NODE,
-		dp: E_DIFF_LONGITUDE_OF_PERIAPSE
-	},
-	E_INITIAL_TRUE_ANOMALY
 );
 
 // Ceres (SE J2000, no perturbations)
 Satellite.sat_from_orbit(
 	'ceres',
-	SUN_U,
+	'sun',
+	C_U,
 	C_INITIAL_SEMI_MAJOR_AXIS,
 	C_INITIAL_ECCENTRICITY,
 	C_INITIAL_PERIAPSE,
@@ -599,6 +544,84 @@ Satellite.sat_from_orbit(
 		dp: C_DIFF_LONGITUDE_OF_PERIAPSE
 	},
 	C_INITIAL_TRUE_ANOMALY
+);
+
+// Venus (SE J2000)
+Satellite.sat_from_orbit(
+	'venus',
+	'sun',
+	V_U,
+	V_INITIAL_SEMI_MAJOR_AXIS,
+	V_INITIAL_ECCENTRICITY,
+	V_INITIAL_PERIAPSE,
+	V_INITIAL_INCLINATION,
+	V_INITIAL_ARGUMENT_OF_PERIHELION,
+	V_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
+	{
+		T: V_SIDEREAL_ROTATION_PERIOD,
+		t0: V_INITIAL_GST,
+		tilt: V_AXIAL_TILT
+	},
+	{
+		da: V_DIFF_SEMI_MAJOR_AXIS,
+		de: V_DIFF_ECCENTRICITY,
+		di: V_DIFF_INCLINATION,
+		dupper_omega: V_DIFF_LONGITUDE_OF_ASCENDING_NODE,
+		dp: V_DIFF_LONGITUDE_OF_PERIAPSE
+	},
+	V_INITIAL_TRUE_ANOMALY
+);
+
+// Mars (SE J2000)
+Satellite.sat_from_orbit(
+	'mars',
+	'sun',
+	M_U,
+	M_INITIAL_SEMI_MAJOR_AXIS,
+	M_INITIAL_ECCENTRICITY,
+	M_INITIAL_PERIAPSE,
+	M_INITIAL_INCLINATION,
+	M_INITIAL_ARGUMENT_OF_PERIHELION,
+	M_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
+	{
+		T: M_SIDEREAL_ROTATION_PERIOD,
+		t0: M_INITIAL_GST,
+		tilt: M_AXIAL_TILT
+	},
+	{
+		da: M_DIFF_SEMI_MAJOR_AXIS,
+		de: M_DIFF_ECCENTRICITY,
+		di: M_DIFF_INCLINATION,
+		dupper_omega: M_DIFF_LONGITUDE_OF_ASCENDING_NODE,
+		dp: M_DIFF_LONGITUDE_OF_PERIAPSE
+	},
+	M_INITIAL_TRUE_ANOMALY
+);
+
+// Tierra (SE J2000)
+Satellite.sat_from_orbit(
+	'earth',
+	'sun',
+	E_U,
+	E_INITIAL_SEMI_MAJOR_AXIS,
+	E_INITIAL_ECCENTRICITY,
+	E_INITIAL_PERIAPSE,
+	E_INITIAL_INCLINATION,
+	E_INITIAL_ARGUMENT_OF_PERIHELION,
+	E_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
+	{
+		T: E_SIDEREAL_ROTATION_PERIOD,
+		t0: E_INITIAL_GST,
+		tilt: E_AXIAL_TILT
+	},
+	{
+		da: E_DIFF_SEMI_MAJOR_AXIS,
+		de: E_DIFF_ECCENTRICITY,
+		di: E_DIFF_INCLINATION,
+		dupper_omega: E_DIFF_LONGITUDE_OF_ASCENDING_NODE,
+		dp: E_DIFF_LONGITUDE_OF_PERIAPSE
+	},
+	E_INITIAL_TRUE_ANOMALY
 );
 
 // Comenzar loop del programa
