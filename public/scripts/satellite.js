@@ -74,7 +74,7 @@ class Satellite{
 	static sat_from_orbit(name, orbited, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
 		
 		// Construir el satélite en el punto f0
-		let GM = 1;
+		let GM = SUN_U;
 		if(orbited != null){
 			GM = Satellite.get_sat(orbited).u;
 		};

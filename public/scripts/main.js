@@ -1,37 +1,33 @@
 //---------ANIMADOR------------
 
 // Lienzo
-const canvas1 = document.getElementById('view1');
+const canvas = document.getElementById('view');
 
 // Vista
 var view = 1;
 
-// Información
+// P{agina de Información
 var info = 0;
 
 // Animador
-const animator1 = new Worker("/scripts/animador.js");
-const main_offscreen_1 = canvas1.transferControlToOffscreen();
+const animator = new Worker("/scripts/animador.js");
+const main_offscreen = canvas.transferControlToOffscreen();
 
 // Puesta en marcha del animador
-animator1.postMessage({ type: 'context', canvas: main_offscreen_1 }, [main_offscreen_1]);
+animator.postMessage({ type: 'context', canvas: main_offscreen }, [main_offscreen]);
 
-// Gráfica de elementos orbitales
+// Gráfica de elementos orbitales (Dev)
 var elem_curve = [];
 var elem_curve_approx = [];
 
 //-------PARÁMETROS DE LA SIMULACIÓN-----------
 
 // Parámetros para el control manual
-var mousePos1 = { // Posicion del mouse sobre el lienzo 1
+var mousePos = { // Posicion del mouse sobre el lienzo 1
 	x: width_p( .5 ),
 	y: height_p( .5 )
 };
-var mousePos2 = { // Posicion del mouse sobre el lienzo 2
-	x: width_p( .5 ),
-	y: height_p( .5 )
-};
-var sat = { // Condiciones iniciales del satélite controlado
+var sat = { // Condiciones iniciales del satélite controlado 
 	x: 0,
 	y: 0,
 	z: 0,
@@ -67,12 +63,12 @@ var ephemeris = null; // Efemérides
 
 // PORCENTAJE DE ANCHO DEL LIENZO
 function width_p(p){
-	return canvas1.width * p;
+	return canvas.width * p;
 };
 
 // PORCENTAJE DE ALTO DEL LIENZO
 function height_p(p){
-	return canvas1.height * p;
+	return canvas.height * p;
 };
 
 // CONVERSIÓN DE PIXELES A KILÓMETROS
@@ -128,12 +124,13 @@ function orbitLoop(){
 	
 	//------------SIMULACIÓN------------
 	
-	// Centrar la cámara en la simulación del satélite controlado
+	// Centrar la cámara en el satélite orbitado
+	let center_body = Satellite.get_sat( Satellite.ctrl.orbited );
 	if(Satellite.ctrl.orbit.r != undefined){
-		center = {
-			x: to_km( width_p( .5 ) ) - Satellite.ctrl.orbit.r.x,
-			y: to_km( width_p( .5 ) ) - Satellite.ctrl.orbit.r.y,
-			z: to_km( width_p( .5 ) ) - Satellite.ctrl.orbit.r.z
+		center = { 
+			x: to_km( width_p( .5 ) ) - center_body.orbit.r.x,
+			y: to_km( width_p( .5 ) ) - center_body.orbit.r.y,
+			z: to_km( width_p( .5 ) ) - center_body.orbit.r.z
 		};
 	};
 	
@@ -145,14 +142,14 @@ function orbitLoop(){
 	//------------SELECCIÓN DE VISTA-----------
 	switch(view){
 		case 1:
-			View1.show(animator1);
+			View1.show(animator);
 			break;
 		case 2:
-			View2.show(animator1);
+			View2.show(animator);
 			break;
 		case 3:
 			View3.show(
-				animator1, 
+				animator, 
 				{
 					x: width_p( .5 ),
 					y: height_p( .5 )
@@ -167,7 +164,7 @@ function orbitLoop(){
 //------I/O-------------
 
 // Recibir confirmación del animador
-animator1.addEventListener("message", (msg) => {
+animator.addEventListener("message", (msg) => {
   //log( msg.data );
 });
 
@@ -389,8 +386,8 @@ function getMousePos(canvas, evt) {
       y: mouseY
     };
 };
-canvas1.addEventListener('mousemove', evt => {
-	mousePos1 = getMousePos(canvas1, evt);
+canvas.addEventListener('mousemove', evt => {
+	mousePos = getMousePos(canvas, evt);
 }, false);
 
 // Captura de parámetros de escala de simulación
@@ -488,7 +485,7 @@ button_time_add.onclick = () => {
 };
 
 // Reiniciar el programa con un click
-canvas1.addEventListener('click', () => {
+canvas.addEventListener('click', () => {
 	view = ( view + 1 ) % 3 + 1;
 }, false);
 
@@ -499,9 +496,9 @@ Satellite.sat_from_orbit(
 	'sun',
 	null,
 	SUN_U,
-	1,
+	1e-10,
 	0,
-	1,
+	1e-10,
 	0,
 	0,
 	0,
