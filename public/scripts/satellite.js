@@ -31,7 +31,7 @@ class Satellite{
 		// Verificar cambios de parámetros
 		if(!Satellite.moved){
 			return;
-		};
+		};  
 		
 		// Cambiar posisición del satélite controlado
 		var pos = {
@@ -71,15 +71,49 @@ class Satellite{
 	};
 	
 	// Satélite a partir de la órbita
-	static sat_from_orbit(name, orbited, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
+	static sat_from_orbit(name, orbited, R, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
+		
+		// Caso base
+		if(orbited == null){
+			
+			// Crear un cuerpo "inmóvil"
+			let sat_at_t0 = invariants_from_elements(
+				u,
+				1e9,
+				0,
+				1e9,
+				0,
+				0,
+				0,
+				0
+			);
+			let sat = new Satellite(
+				name,
+				null,
+				R,
+				u,
+				sat_at_t0.r,
+				sat_at_t0.v,
+				{
+					T: 0,
+					t0: 0,
+					tilt: 0
+				},
+				{
+					da: 0,
+					de: 0,
+					di: 0,
+					dupper_omega: 0,
+					dp: 0
+				},
+				true
+			);
+			return;
+		};
 		
 		// Construir el satélite en el punto f0
-		let GM = SUN_U;
-		if(orbited != null){
-			GM = Satellite.get_sat(orbited).u;
-		};
 		let sat_at_t0 = invariants_from_elements(
-			GM,
+			Satellite.get_sat(orbited).u,
 			a,
 			e,
 			rp,
@@ -91,6 +125,7 @@ class Satellite{
 		let sat = new Satellite(
 			name,
 			orbited,
+			R,
 			u,
 			sat_at_t0.r,
 			sat_at_t0.v,
@@ -105,12 +140,30 @@ class Satellite{
 		this.name = name;
 	};
 	
+	// Radio del satélite
+	R_set(R){
+		this.R = R;
+	};
+	
 	// Parámetro gravitatorio al que está sometido
 	get_gravity(){
 		if(this.orbited == null){
-			return 1;
+			return this.u;
 		}else{
 			return Satellite.get_sat( this.orbited ).u;
+		};
+	};
+	
+	// Posición del satélite orbitado
+	get_orbited_pos(){
+		if(this.orbited == null){
+			return {
+				x: 0,
+				y: 0,
+				z: 0
+			};
+		}else{
+			return Satellite.get_sat( this.orbited ).orbit.r;
 		};
 	};
 	
@@ -127,15 +180,6 @@ class Satellite{
 		
 		// Dárselo/quitárselo al satélite indicado
 		this.ctrl = ctrl;
-	};
-	
-	// Posición absoluta
-	pos_get(){
-		return {
-			x: center.x + this.pos.x,
-			y: center.y + this.pos.y,
-			z: center.z + this.pos.z
-		};
 	};
 	
 	// Posición del satélite respecto al cuerpo celeste (km)
@@ -202,7 +246,7 @@ class Satellite{
 	sim(){
 		
 		// Acción
-		this.orbit.set_sim( this.get_gravity() ); // Traslación
+		this.orbit.sim( this.get_gravity() ); // Traslación
 		this.rotate(); // Rotación
 	};
 	
@@ -210,7 +254,13 @@ class Satellite{
 	view1(request){
 		
 		// Órbita
-		this.orbit.view1(request);
+		let orbited_pos = this.get_orbited_pos();
+		let relative_pos = {
+			x: center.x + orbited_pos.x,
+			y: center.y + orbited_pos.y,
+			z: center.z + orbited_pos.z
+		};
+		this.orbit.view1( request, relative_pos );
 		
 		// Control
 		let color;
@@ -223,8 +273,8 @@ class Satellite{
 		// Posición absoluta
 		request.push([
 			'circle',
-			to_px( this.pos_get().x ),
-			to_px( this.pos_get().y ),
+			to_px( relative_pos.x + this.pos.x ),
+			to_px( relative_pos.y + this.pos.y ),
 			1,
 			color
 		]);
@@ -232,46 +282,46 @@ class Satellite{
 		// Vector r
 		request.push([
 			'line', 
-			to_px( center.x ),
-			to_px( center.y ),  
-			to_px( this.pos_get().x ),
-			to_px( this.pos_get().y ),
+			to_px( relative_pos.x ),
+			to_px( relative_pos.y ),  
+			to_px( relative_pos.x + this.pos.x ),
+			to_px( relative_pos.y + this.pos.y ),
 			color
 		]);
 		
 		// Vector v
 		request.push([
 			'line',
-			to_px( this.pos_get().x ),
-			to_px( this.pos_get().y ),
+			to_px( relative_pos.x + this.pos.x ),
+			to_px( relative_pos.y + this.pos.y ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( this.pos_get().x ) + this.vel.x * 1e0,
-			to_px( this.pos_get().y ) + this.vel.y * 1e0,
+			to_px( relative_pos.x + this.pos.x ) + this.vel.x * 1e0,
+			to_px( relative_pos.y + this.pos.y ) + this.vel.y * 1e0,
 			color
 		]);
 		
 		// Vector h
 		request.push([
 			'line',
-			to_px( center.x ),
-			to_px( center.y ),
+			to_px( relative_pos.x ),
+			to_px( relative_pos.y ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( center.x ) + this.h_vec.x * 1e-5,
-			to_px( center.y ) + this.h_vec.y * 1e-5,
+			to_px( relative_pos.x ) + this.h_vec.x * 1e-5,
+			to_px( relative_pos.y ) + this.h_vec.y * 1e-5,
 			"CYAN"
 		]);
 		
 		// Eje de rotación
 		request.push([
 			'line',
-			to_px( center.x + this.orbit.r.x ),
-			to_px( center.y + this.orbit.r.y ),
+			to_px( relative_pos.x + this.orbit.r.x ),
+			to_px( relative_pos.y + this.orbit.r.y ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( center.x + this.orbit.r.x ) + this.orbit.perturbation.rot_axis.x * 1e-5,
-			to_px( center.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
+			to_px( relative_pos.x + this.orbit.r.x ) + this.orbit.perturbation.rot_axis.x * 1e-5,
+			to_px( relative_pos.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
 			"CYAN"
 		]);
 		
@@ -279,8 +329,8 @@ class Satellite{
 		request.push([ 
 			'print', 
 			this.name,
-			to_px( center.x + this.orbit.r.x ) - 10, 
-			to_px( center.y + this.orbit.r.y ) + 10,
+			to_px( relative_pos.x + this.orbit.r.x ) - 10, 
+			to_px( relative_pos.y + this.orbit.r.y ) + 10,
 			color
 		]);
 	};
@@ -289,7 +339,13 @@ class Satellite{
 	view2(request){
 		
 		// Órbita
-		this.orbit.view2(request);
+		let orbited_pos = this.get_orbited_pos();
+		let relative_pos = {
+			x: center.x + orbited_pos.x,
+			y: center.y + orbited_pos.y,
+			z: center.z + orbited_pos.z
+		};
+		this.orbit.view2( request, relative_pos );
 		
 		// Control
 		let color;
@@ -302,8 +358,8 @@ class Satellite{
 		// Posición absoluta
 		request.push([
 			'circle',
-			to_px( this.pos_get().y ),
-			to_px( this.pos_get().z ),
+			to_px( relative_pos.y + this.pos.y ),
+			to_px( relative_pos.z + this.pos.z ),
 			1,
 			color
 		]);
@@ -311,46 +367,46 @@ class Satellite{
 		// Vector r
 		request.push([
 			'line', 
-			to_px( center.y ),
-			to_px( center.z ),  
-			to_px( this.pos_get().y ),
-			to_px( this.pos_get().z ),
+			to_px( relative_pos.y ),
+			to_px( relative_pos.z ),  
+			to_px( relative_pos.y + this.pos.y ),
+			to_px( relative_pos.z + this.pos.z ),
 			color
 		]);
 		
 		// Vector v
 		request.push([
 			'line',
-			to_px( this.pos_get().y ),
-			to_px( this.pos_get().z ),
+			to_px( relative_pos.y + this.pos.y ),
+			to_px( relative_pos.z + this.pos.z ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( this.pos_get().y ) + this.vel.y * 1e0,
-			to_px( this.pos_get().z ) + this.vel.z * 1e0,
+			to_px( relative_pos.y + this.pos.y ) + this.vel.y * 1e0,
+			to_px( relative_pos.z + this.pos.z ) + this.vel.z * 1e0,
 			color
 		]);
 		
 		// Vector h
 		request.push([
 			'line',
-			to_px( center.y ),
-			to_px( center.z ),
+			to_px( relative_pos.y ),
+			to_px( relative_pos.z ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( center.y ) + this.h_vec.y * 1e-5,
-			to_px( center.z ) + this.h_vec.z * 1e-5,
+			to_px( relative_pos.y ) + this.h_vec.y * 1e-5,
+			to_px( relative_pos.z ) + this.h_vec.z * 1e-5,
 			"CYAN"
 		]);
 		
 		// Eje de rotación
 		request.push([
 			'line',
-			to_px( center.y + this.orbit.r.y ),
-			to_px( center.z + this.orbit.r.z ),
+			to_px( relative_pos.y + this.orbit.r.y ),
+			to_px( relative_pos.z + this.orbit.r.z ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( center.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
-			to_px( center.z + this.orbit.r.z ) + this.orbit.perturbation.rot_axis.z * 1e-5,
+			to_px( relative_pos.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
+			to_px( relative_pos.z + this.orbit.r.z ) + this.orbit.perturbation.rot_axis.z * 1e-5,
 			"CYAN"
 		]);
 		
@@ -358,16 +414,17 @@ class Satellite{
 		request.push([
 			'print', 
 			this.name,
-			to_px( center.y + this.orbit.r.y ) - 10, 
-			to_px( center.z + this.orbit.r.z ) + 10,
+			to_px( relative_pos.y + this.orbit.r.y ) - 10, 
+			to_px( relative_pos.z + this.orbit.r.z ) + 10,
 			color
 		]);
 	};
 	
 	// Variables del satélite
-	constructor(name, orbited, u, pos, vel, rot, dif, ctrl){
+	constructor(name, orbited, R, u, pos, vel, rot, dif, ctrl){
 		this.name_set(name);
 		this.orbited = orbited;
+		this.R = R;
 		this.u = u;
 		this.ctrl_set(ctrl);
 		this.pos_set(pos);

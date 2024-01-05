@@ -31,11 +31,11 @@ class Orbit{
 			inv.r,
 			tilt,
 			{	// La órbita ficticia no necesita los diferenciales, realmente.
-				da: this.da_dt,
-				de: this.de_dt,
-				di: this.di_dt,
-				dupper_omega: this.dupper_omega_dt,
-				dp: this.dp_dt
+				da: 0,
+				de: 0,
+				di: 0,
+				dupper_omega: 0,
+				dp: 0
 			},
 			adjust
 		);
@@ -214,7 +214,7 @@ class Orbit{
 	};
 	
 	// Simulation routine
-	set_sim(u){
+	sim(u){
 		
 		// Tiempo de órbita y diferenciales
 		this.t = s_time + this.t0;
@@ -238,7 +238,7 @@ class Orbit{
 		);
 		
 		// Posición y velocidad en el tiempo
-		let sim = r_v_vecs(
+		let sim_set = r_v_vecs(
 			this.perturbation.type,
 			this.t,
 			this.perturbation.a,
@@ -253,12 +253,12 @@ class Orbit{
 		);
 		
 		// Simulación
-		this.M = sim.M;
-		this.E = sim.E;
-		this.H = sim.H;
-		this.f = sim.f;
-		this.r = sim.r;
-		this.v = sim.v;
+		this.M = sim_set.M;
+		this.E = sim_set.E;
+		this.H = sim_set.H;
+		this.f = sim_set.f;
+		this.r = sim_set.r;
+		this.v = sim_set.v;
 		
 		// Curva
 		this.set_curve( this.r, this.perturbation );
@@ -268,7 +268,7 @@ class Orbit{
 	set_curve(r, fictional){
 		if(fictional.type != 'elliptic'){
 			
-			// Descartar la trayectoria ficticia
+			// Graficar solo aquello que tiene sentido físico
 			this.plot_inf_lim = - fictional.fo + 1e-2;
 			this.plot_sup_lim = fictional.fo - 1e-2;
 		}else{
@@ -296,7 +296,7 @@ class Orbit{
 			.1
 		));
 		
-		// Curva en el espacio en formato transferible
+		// Curva en el espacio en formato transferible (alrededor del sat. orbitado)
 		for(var k=0; k<this.curve.length; k++){
 			let space_point = orbit_planar_point_to_space_point(
 				this.curve[k],
@@ -313,35 +313,35 @@ class Orbit{
 	};
 	
 	// Vista 1
-	view1(request){
+	view1(request, orbited_pos){
 		
 		// Nodo ascendente
 		request.push([
 			'line',
-			to_px( center.x ),
-			to_px( center.y ),
-			to_px( center.x + this.perturbation.ascending_node.x ),
-			to_px( center.y + this.perturbation.ascending_node.y ),
+			to_px( orbited_pos.x ),
+			to_px( orbited_pos.y ),
+			to_px( orbited_pos.x + this.perturbation.ascending_node.x ),
+			to_px( orbited_pos.y + this.perturbation.ascending_node.y ),
 			"GREEN"
 		]);
 		
 		// Peripasis
 		request.push([
 			'line',
-			to_px( center.x ),
-			to_px( center.y ),
-			to_px( center.x + this.perturbation.periapse.x ),
-			to_px( center.y + this.perturbation.periapse.y ),
+			to_px( orbited_pos.x ),
+			to_px( orbited_pos.y ),
+			to_px( orbited_pos.x + this.perturbation.periapse.x ),
+			to_px( orbited_pos.y + this.perturbation.periapse.y ),
 			'RED'
 		]);
 		
 		// Semi-altura recta
 		request.push([
 			'line',
-			to_px( center.x ),
-			to_px( center.y ),
-			to_px( center.x + this.perturbation.semi_latus_rectum.x ),
-			to_px( center.y + this.perturbation.semi_latus_rectum.y ),
+			to_px( orbited_pos.x ),
+			to_px( orbited_pos.y ),
+			to_px( orbited_pos.x + this.perturbation.semi_latus_rectum.x ),
+			to_px( orbited_pos.y + this.perturbation.semi_latus_rectum.y ),
 			'BLUE'
 		]);
 		
@@ -349,7 +349,7 @@ class Orbit{
 		request.push([
 			'plot',
 			this.curve,
-			[ to_px( center.x ), to_px( center.y ), to_px( center.z ) ],
+			[ to_px( orbited_pos.x ), to_px( orbited_pos.y ), to_px( orbited_pos.z ) ],
 			0,
 			'GREY',
 			0,
@@ -359,56 +359,56 @@ class Orbit{
 		// Posición simulada
 		request.push([
 			'line',
-			to_px( center.x ),
-			to_px( center.y ),
-			to_px( center.x + this.r.x ),
-			to_px( center.y + this.r.y ),
+			to_px( orbited_pos.x ),
+			to_px( orbited_pos.y ),
+			to_px( orbited_pos.x + this.r.x ),
+			to_px( orbited_pos.y + this.r.y ),
 			'GREY'
 		]);
 		
 		// Velocidad simulada
 		request.push([
 			'line',
-			to_px( center.x + this.r.x ),
-			to_px( center.y + this.r.y ),
+			to_px( orbited_pos.x + this.r.x ),
+			to_px( orbited_pos.y + this.r.y ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( center.x + this.r.x ) + this.v.x * 1e0,
-			to_px( center.y + this.r.y ) + this.v.y * 1e0,
+			to_px( orbited_pos.x + this.r.x ) + this.v.x * 1e0,
+			to_px( orbited_pos.y + this.r.y ) + this.v.y * 1e0,
 			'MAGENTA'
 		]);
 	};
 	
 	// Vista 2
-	view2(request){
+	view2(request, orbited_pos){
 		
 		// Nodo ascendente
 		request.push([
 			'line',
-			to_px( center.y ),
-			to_px( center.z ),
-			to_px( center.y + this.perturbation.ascending_node.y ),
-			to_px( center.z + this.perturbation.ascending_node.z ),
+			to_px( orbited_pos.y ),
+			to_px( orbited_pos.z ),
+			to_px( orbited_pos.y + this.perturbation.ascending_node.y ),
+			to_px( orbited_pos.z + this.perturbation.ascending_node.z ),
 			"GREEN"
 		]);
 		
 		// Peripasis
 		request.push([
 			'line',
-			to_px( center.y ),
-			to_px( center.z ),
-			to_px( center.y + this.perturbation.periapse.y ),
-			to_px( center.z + this.perturbation.periapse.z ),
+			to_px( orbited_pos.y ),
+			to_px( orbited_pos.z ),
+			to_px( orbited_pos.y + this.perturbation.periapse.y ),
+			to_px( orbited_pos.z + this.perturbation.periapse.z ),
 			'RED'
 		]);
 		
 		// Semi-altura recta
 		request.push([
 			'line',
-			to_px( center.y ),
-			to_px( center.z ),
-			to_px( center.y + this.perturbation.semi_latus_rectum.y ),
-			to_px( center.z + this.perturbation.semi_latus_rectum.z ),
+			to_px( orbited_pos.y ),
+			to_px( orbited_pos.z ),
+			to_px( orbited_pos.y + this.perturbation.semi_latus_rectum.y ),
+			to_px( orbited_pos.z + this.perturbation.semi_latus_rectum.z ),
 			'BLUE'
 		]);
 		
@@ -416,7 +416,7 @@ class Orbit{
 		request.push([
 			'plot',
 			this.curve,
-			[ to_px( center.x ), to_px( center.y ), to_px( center.z ) ],
+			[ to_px( orbited_pos.x ), to_px( orbited_pos.y ), to_px( orbited_pos.z ) ],
 			0,
 			'GREY',
 			1,
@@ -426,22 +426,22 @@ class Orbit{
 		// Posición simulada
 		request.push([
 			'line',
-			to_px( center.y ),
-			to_px( center.z ),
-			to_px( center.y + this.r.y ),
-			to_px( center.z + this.r.z ),
+			to_px( orbited_pos.y ),
+			to_px( orbited_pos.z ),
+			to_px( orbited_pos.y + this.r.y ),
+			to_px( orbited_pos.z + this.r.z ),
 			'GREY'
 		]);
 		
 		// Velocidad simulada
 		request.push([
 			'line',
-			to_px( center.y + this.r.y ),
-			to_px( center.z + this.r.z ),
+			to_px( orbited_pos.y + this.r.y ),
+			to_px( orbited_pos.z + this.r.z ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( center.y + this.r.y ) + this.v.y * 1e0,
-			to_px( center.z + this.r.z ) + this.v.z * 1e0,
+			to_px( orbited_pos.y + this.r.y ) + this.v.y * 1e0,
+			to_px( orbited_pos.z + this.r.z ) + this.v.z * 1e0,
 			'MAGENTA'
 		]);
 	};

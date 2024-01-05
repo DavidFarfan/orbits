@@ -17,10 +17,13 @@ class View{
 		]);
 		
 		// Parámetro gravitacional (km^3/s^2)
+		let GM = 0;
+		if(Satellite.ctrl.orbited != null){
+			GM = Satellite.get_sat( Satellite.ctrl.orbited ).u;
+		};
 		request.push([
 			'print', 
-			"G (km^3/s^2) = " + str( significant( Satellite.get_sat(
-				Satellite.ctrl.orbited ).u, 4 ) ),
+			"G (km^3/s^2) = " + str( significant( GM, 4 ) ),
 			10, 
 			height_p( 1 ) - 20,
 			'WHITE'
