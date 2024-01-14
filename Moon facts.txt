@@ -1,0 +1,65 @@
+Desde el espacio, la Luna luce como una esfera gris-blanquecina, con cráteres de varios tamaños.
+Categoría	satélite natural planetario
+Orbita a	Tierra
+Distancia estelar	356 565 kilómetros
+Magnitud aparente	-12,6
+Elementos orbitales
+Inclinación	5,1454 °
+Excentricidad	0,0549
+Elementos orbitales derivados
+Periastro o perihelio	363 300 kilómetros
+Apoastro o afelio	405 500 kilómetros
+Período orbital sinódico	29 d 12 h 44 m 2.9 s 
+Radio orbital medio	384 403 km
+Satélite de	la Tierra
+Características físicas
+Masa	7,349 × 1022 kg
+Volumen	2,1958 × 1010 km³
+Densidad	3,34 g/cm³
+Área de superficie	38 millones de km²
+Radio	1737,1 kilómetros
+Diámetro	3474.8 km
+Diámetro angular	
+Perigeo	33' 28,8"
+Apogeo	29' 23,2"
+Medio	31' 5,2"
+Gravedad	1,62 m/s²
+Velocidad de escape	2,38 km/s
+Periodo de rotación	27d 7h 43,7min
+Inclinación axial	1,5424°
+Albedo	0,12
+Composición corteza	
+Oxígeno	43%
+Silicio	21%
+Aluminio	10%
+Calcio	9%
+Hierro	9%
+Magnesio	5%
+Titanio	2%
+Níquel	0,6%
+Sodio	0,3%
+Cromo	0,2%
+Potasio	0,1%
+Manganeso	0,1%
+Azufre	0,1%
+Fósforo	500 ppm
+Carbono	100 ppm
+Nitrógeno	100 ppm
+Hidrógeno	50 ppm
+Helio	20 ppm
+Características atmosféricas
+Presión	3 × 10-10 Pa
+Temperatura	
+Mínima	40 K (-233 °C)
+Media (día)	380 K (107 °C)
+Media (noche)	120 K (-153 °C)
+Máxima	396 K
+(123 °C)
+Composición	
+Helio	25%
+Neón	25%
+Hidrógeno	23%
+Argón	20%
+Metano	?
+Amoníaco	?
+Dióxido de carbono	trazas

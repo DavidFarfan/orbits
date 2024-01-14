@@ -122,13 +122,14 @@ class Satellite{
 			upper_omega,
 			f0
 		);
+		
 		let sat = new Satellite(
 			name,
 			orbited,
 			R,
 			u,
-			sat_at_t0.r,
-			sat_at_t0.v,
+			rotation_axis(sat_at_t0.r, Satellite.get_sat(orbited).axial_tilt, upper_omega),
+			rotation_axis(sat_at_t0.v, Satellite.get_sat(orbited).axial_tilt, upper_omega),
 			rot,
 			dif,
 			true
@@ -154,16 +155,50 @@ class Satellite{
 		};
 	};
 	
-	// Posición del satélite orbitado
-	get_orbited_pos(){
+	// Posicion de impresión
+	get_print_pos(){
+		let pos = this.get_absolute_pos();
+		return {
+			x: pos.x - center.x,
+			y: pos.y - center.y,
+			z: pos.z - center.z
+		};
+	};
+	
+	// Posición absoluta del satélite orbitado
+	get_absolute_pos(rel){
+		
+		// Posición del satélite orbitado
 		if(this.orbited == null){
-			return {
-				x: 0,
-				y: 0,
-				z: 0
+			if(rel == null){
+				return {
+					x: 0,
+					y: 0,
+					z: 0
+				};
+			}else{
+				return rel;
 			};
 		}else{
-			return Satellite.get_sat( this.orbited ).orbit.r;
+			var relative;
+			if(rel == null){
+				relative = {
+					x: 0,
+					y: 0,
+					z: 0
+				};
+			}else{
+				relative = rel;
+			};
+			var orbited_pos = Satellite.get_sat( this.orbited ).orbit.r;
+			if(orbited_pos != undefined){
+				relative = {
+					x: orbited_pos.x + relative.x,
+					y: orbited_pos.y + relative.y,
+					z: orbited_pos.z + relative.z
+				};
+			};
+			return Satellite.get_sat( this.orbited ).get_absolute_pos( relative );
 		};
 	};
 	
@@ -254,13 +289,8 @@ class Satellite{
 	view1(request){
 		
 		// Órbita
-		let orbited_pos = this.get_orbited_pos();
-		let relative_pos = {
-			x: center.x + orbited_pos.x,
-			y: center.y + orbited_pos.y,
-			z: center.z + orbited_pos.z
-		};
-		this.orbit.view1( request, relative_pos );
+		let print_pos = this.get_print_pos();
+		this.orbit.view1( request, print_pos );
 		
 		// Control
 		let color;
@@ -273,55 +303,68 @@ class Satellite{
 		// Posición absoluta
 		request.push([
 			'circle',
-			to_px( relative_pos.x + this.pos.x ),
-			to_px( relative_pos.y + this.pos.y ),
+			to_px( print_pos.x + this.pos.x ),
+			to_px( print_pos.y + this.pos.y ),
 			1,
 			color
 		]);
 		
+		// Vector prueba
+		if(this.name == center_body.name){
+			let apos = this.get_absolute_pos();
+			request.push([
+				'line', 
+				to_px( -center.x ),
+				to_px( -center.y ),  
+				to_px( -center.x + apos.x ),
+				to_px( -center.y + apos.y ),
+				'WHITE'
+			]);
+		};
+		
 		// Vector r
 		request.push([
 			'line', 
-			to_px( relative_pos.x ),
-			to_px( relative_pos.y ),  
-			to_px( relative_pos.x + this.pos.x ),
-			to_px( relative_pos.y + this.pos.y ),
+			to_px( print_pos.x ),
+			to_px( print_pos.y ),  
+			to_px( print_pos.x + this.pos.x ),
+			to_px( print_pos.y + this.pos.y ),
 			color
 		]);
 		
 		// Vector v
 		request.push([
 			'line',
-			to_px( relative_pos.x + this.pos.x ),
-			to_px( relative_pos.y + this.pos.y ),
+			to_px( print_pos.x + this.pos.x ),
+			to_px( print_pos.y + this.pos.y ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( relative_pos.x + this.pos.x ) + this.vel.x * 1e0,
-			to_px( relative_pos.y + this.pos.y ) + this.vel.y * 1e0,
+			to_px( print_pos.x + this.pos.x ) + this.vel.x * 1e0,
+			to_px( print_pos.y + this.pos.y ) + this.vel.y * 1e0,
 			color
 		]);
 		
 		// Vector h
 		request.push([
 			'line',
-			to_px( relative_pos.x ),
-			to_px( relative_pos.y ),
+			to_px( print_pos.x ),
+			to_px( print_pos.y ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( relative_pos.x ) + this.h_vec.x * 1e-5,
-			to_px( relative_pos.y ) + this.h_vec.y * 1e-5,
+			to_px( print_pos.x ) + this.h_vec.x * 1e-5,
+			to_px( print_pos.y ) + this.h_vec.y * 1e-5,
 			"CYAN"
 		]);
 		
 		// Eje de rotación
 		request.push([
 			'line',
-			to_px( relative_pos.x + this.orbit.r.x ),
-			to_px( relative_pos.y + this.orbit.r.y ),
+			to_px( print_pos.x + this.orbit.r.x ),
+			to_px( print_pos.y + this.orbit.r.y ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( relative_pos.x + this.orbit.r.x ) + this.orbit.perturbation.rot_axis.x * 1e-5,
-			to_px( relative_pos.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
+			to_px( print_pos.x + this.orbit.r.x ) + this.orbit.perturbation.rot_axis.x * 1e-5,
+			to_px( print_pos.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
 			"CYAN"
 		]);
 		
@@ -329,8 +372,8 @@ class Satellite{
 		request.push([ 
 			'print', 
 			this.name,
-			to_px( relative_pos.x + this.orbit.r.x ) - 10, 
-			to_px( relative_pos.y + this.orbit.r.y ) + 10,
+			to_px( print_pos.x + this.orbit.r.x ) - 10, 
+			to_px( print_pos.y + this.orbit.r.y ) + 10,
 			color
 		]);
 	};
@@ -339,13 +382,8 @@ class Satellite{
 	view2(request){
 		
 		// Órbita
-		let orbited_pos = this.get_orbited_pos();
-		let relative_pos = {
-			x: center.x + orbited_pos.x,
-			y: center.y + orbited_pos.y,
-			z: center.z + orbited_pos.z
-		};
-		this.orbit.view2( request, relative_pos );
+		let print_pos = this.get_print_pos();
+		this.orbit.view2( request, print_pos );
 		
 		// Control
 		let color;
@@ -358,55 +396,68 @@ class Satellite{
 		// Posición absoluta
 		request.push([
 			'circle',
-			to_px( relative_pos.y + this.pos.y ),
-			to_px( relative_pos.z + this.pos.z ),
+			to_px( print_pos.y + this.pos.y ),
+			to_px( print_pos.z + this.pos.z ),
 			1,
 			color
 		]);
 		
+		// Vector prueba
+		if(this.name == center_body.name){
+			let apos = this.get_absolute_pos();
+			request.push([
+				'line', 
+				to_px( -center.y ),
+				to_px( -center.z ),  
+				to_px( -center.y + apos.y ),
+				to_px( -center.z + apos.z ),
+				'WHITE'
+			]);
+		};
+		
 		// Vector r
 		request.push([
 			'line', 
-			to_px( relative_pos.y ),
-			to_px( relative_pos.z ),  
-			to_px( relative_pos.y + this.pos.y ),
-			to_px( relative_pos.z + this.pos.z ),
+			to_px( print_pos.y ),
+			to_px( print_pos.z ),  
+			to_px( print_pos.y + this.pos.y ),
+			to_px( print_pos.z + this.pos.z ),
 			color
 		]);
 		
 		// Vector v
 		request.push([
 			'line',
-			to_px( relative_pos.y + this.pos.y ),
-			to_px( relative_pos.z + this.pos.z ),
+			to_px( print_pos.y + this.pos.y ),
+			to_px( print_pos.z + this.pos.z ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( relative_pos.y + this.pos.y ) + this.vel.y * 1e0,
-			to_px( relative_pos.z + this.pos.z ) + this.vel.z * 1e0,
+			to_px( print_pos.y + this.pos.y ) + this.vel.y * 1e0,
+			to_px( print_pos.z + this.pos.z ) + this.vel.z * 1e0,
 			color
 		]);
 		
 		// Vector h
 		request.push([
 			'line',
-			to_px( relative_pos.y ),
-			to_px( relative_pos.z ),
+			to_px( print_pos.y ),
+			to_px( print_pos.z ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( relative_pos.y ) + this.h_vec.y * 1e-5,
-			to_px( relative_pos.z ) + this.h_vec.z * 1e-5,
+			to_px( print_pos.y ) + this.h_vec.y * 1e-5,
+			to_px( print_pos.z ) + this.h_vec.z * 1e-5,
 			"CYAN"
 		]);
 		
 		// Eje de rotación
 		request.push([
 			'line',
-			to_px( relative_pos.y + this.orbit.r.y ),
-			to_px( relative_pos.z + this.orbit.r.z ),
+			to_px( print_pos.y + this.orbit.r.y ),
+			to_px( print_pos.z + this.orbit.r.z ),
 			
 			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( relative_pos.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
-			to_px( relative_pos.z + this.orbit.r.z ) + this.orbit.perturbation.rot_axis.z * 1e-5,
+			to_px( print_pos.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
+			to_px( print_pos.z + this.orbit.r.z ) + this.orbit.perturbation.rot_axis.z * 1e-5,
 			"CYAN"
 		]);
 		
@@ -414,8 +465,8 @@ class Satellite{
 		request.push([
 			'print', 
 			this.name,
-			to_px( relative_pos.y + this.orbit.r.y ) - 10, 
-			to_px( relative_pos.z + this.orbit.r.z ) + 10,
+			to_px( print_pos.y + this.orbit.r.y ) - 10, 
+			to_px( print_pos.z + this.orbit.r.z ) + 10,
 			color
 		]);
 	};

@@ -61,7 +61,7 @@ class View3 extends View{
 		// Coordenadas (deg)
 		request.push([
 			'print', 
-			"Point coordinates of sun from " + Satellite.ctrl.name + 
+			"Point coordinates of orbited body from " + Satellite.ctrl.name + 
 			" -> lat: " + str( significant( rad_to_deg( PHI ), 4 ) ) + 
 			"° lon: " + str( significant( rad_to_deg( LAMBDA ), 4 ) ) + "°",
 			10, 
@@ -152,12 +152,12 @@ class View3 extends View{
 		]);
 		let color;
 		if(sun_sky.pos.z > 0){
-			color = 'YELLOW';
+			color = 'CYAN';
 		}else{
 			color = 'GREY'
 		};
 		
-		// Sun
+		// Center body
 		request.push([
 			'circle', 
 			origin.x + sun_sky.pos.x * 1e2,

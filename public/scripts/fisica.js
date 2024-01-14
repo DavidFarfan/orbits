@@ -144,6 +144,35 @@ const C_DIFF_INCLINATION = deg_to_rad( 0 ); // Cambio de la Inclinación J2000 (
 const C_DIFF_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 0 ); // Cambio de la RAAN J2000 (rad/Cy)
 const C_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0 ); // Cambio de la longitud de perihelio J2000 (rad/Cy)
 
+// Parámetros de La Luna
+const MOON_U = 4902.800066; // Parámetro gravitacional (km^3/s^2)
+const MOONR = 1737.53; // Radio volumétrico medio (km)
+const MOON_INITIAL_SEMI_MAJOR_AXIS = 3.818745248499886e+05; // Semi-eje mayor J2000 (km)
+const MOON_INITIAL_ECCENTRICITY = 6.314721685094304e-02; // Excentricidad J2000
+const MOON_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
+	MOON_INITIAL_SEMI_MAJOR_AXIS,
+	MOON_INITIAL_ECCENTRICITY
+);
+const MOON_INITIAL_INCLINATION = deg_to_rad( -18.28 ); // Inclinación J2000 (rad)
+const MOON_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 1.239580554371928e+02 ); // RAAN  J2000 (rad)
+const MOON_INITIAL_ARGUMENT_OF_PERIGEE = deg_to_rad( 3.089226727206595e+02 ); // Argumento de perihelio J2000 (rad)
+
+const MOON_AXIAL_TILT = deg_to_rad( 6.67 ); // Oblicuidad de la órbita (rad)
+const MOON_SIDEREAL_ROTATION_PERIOD = 27.3217 * EDAY; // Periodo rot. sideral (s)
+const MOON_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
+	period( MOON_INITIAL_SEMI_MAJOR_AXIS, E_U ),
+	11.39 * EDAY // Ángulo obtenido empíricamente (s)
+);
+const MOON_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0, i.e 12:00 aprox. (s)
+	MOON_SIDEREAL_ROTATION_PERIOD,
+	0 // Segundos desde FPOA en J2000, obtenido empíricamente (s)
+));
+const MOON_DIFF_SEMI_MAJOR_AXIS = 0; // Cambio del Semi-eje mayor J2000 (km/Cy)
+const MOON_DIFF_ECCENTRICITY = 0; // Cambio de la Excentricidad J2000 (1/Cy)
+const MOON_DIFF_INCLINATION = deg_to_rad( 0 ); // Cambio de la Inclinación J2000 (rad/Cy)
+const MOON_DIFF_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( -1935.49 ); // Cambio de la RAAN J2000 (rad/Cy)
+const MOON_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 4067.8 ); // Cambio de la longitud de perihelio J2000 (rad/Cy)
+
 //------BÁSICAS-------------
 
 // PARTE ENTERA
@@ -817,9 +846,9 @@ function rp_p_n_vecs(p, e, rp, i, upper_omega, omega){
 	);
 	
 	// Set en el espacio
-	rp_vec = orbit_planar_point_to_space_point(rp_vec, i, omega, upper_omega);
-	p_vec = orbit_planar_point_to_space_point(p_vec, i, omega, upper_omega);
-	n_vec = orbit_planar_point_to_space_point(n_vec, i, omega, upper_omega);
+	rp_vec = orbit_planar_point_to_space_point(rp_vec, i, omega, upper_omega );
+	p_vec = orbit_planar_point_to_space_point(p_vec, i, omega, upper_omega );
+	n_vec = orbit_planar_point_to_space_point(n_vec, i, omega, upper_omega );
 	return {
 		rp: rp_vec,
 		p: p_vec,

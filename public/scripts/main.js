@@ -44,6 +44,7 @@ var l_seconds = '0'; // Segundero local
 var s_base_time = 0; // Tiempo simulado base
 var s_time = 0; // Tiempo simulado
 var frac = 60; // Fracción de segundo real para el loop
+var syncro_time = true; // Sincronización al tiempo real
 
 // Cuerpo cetral
 var center_body = null;
@@ -52,9 +53,9 @@ var center_body = null;
 var s_scale = 1e7; // Escala del espacio (kilómetros por pixel de lienzo)
 var t_scale = 0; // Escala del tiempo (Segundos simulados por segundo real)
 var center = { // Centro del lienzo (kilómetros)
-	x: to_km( width_p( .5 ) ),
-	y: to_km( height_p( .5 ) ),
-	z: to_km( height_p( .5 ) )
+	x: 0,
+	y: 0,
+	z: 0
 };
 var PHI = 0; // Latitud sobre el satélite controlado
 var LAMBDA = 0; // Longitud sobre el satélite controlado
@@ -107,7 +108,7 @@ function orbitLoop(){
 	u_seconds = u_time.substr(-3).charAt(0);
 	
 	// Hacer un ajuste cada décima de segundo
-	if(u_seconds != l_seconds){
+	if(syncro_time && u_seconds != l_seconds){
 		
 		// El reloj local se sincroniza con el reloj universal
 		l_time += .1;
@@ -128,11 +129,14 @@ function orbitLoop(){
 	//------------SIMULACIÓN------------
 	
 	// Centrar la cámara en la simulación del cuerpo central
-	if(center_body.orbit.r != undefined){
-		center = { 
-			x: to_km( width_p( .5 ) ) - center_body.orbit.r.x,
-			y: to_km( width_p( .5 ) ) - center_body.orbit.r.y,
-			z: to_km( width_p( .5 ) ) - center_body.orbit.r.z
+	if(center_body != null){
+		let orbited_pos = center_body.get_absolute_pos();
+		if(center_body.orbit.r != undefined){
+			center = {
+				x: -to_km( width_p( .5 ) ) + orbited_pos.x + center_body.orbit.r.x,
+				y: -to_km( width_p( .5 ) ) + orbited_pos.y + center_body.orbit.r.y,
+				z: -to_km( width_p( .5 ) ) + orbited_pos.z + center_body.orbit.r.z
+			};
 		};
 	};
 	
@@ -173,7 +177,7 @@ Satellite.sat_from_orbit(
 	SUN_U
 );
 
-// Ceres (SE J2000, no perturbations)
+/*/ Ceres (SE J2000, no perturbations)
 Satellite.sat_from_orbit(
 	'ceres',
 	'sun',
@@ -253,6 +257,7 @@ Satellite.sat_from_orbit(
 	},
 	M_INITIAL_TRUE_ANOMALY
 );
+*/
 
 // Tierra (SE J2000)
 Satellite.sat_from_orbit(
@@ -281,7 +286,37 @@ Satellite.sat_from_orbit(
 	E_INITIAL_TRUE_ANOMALY
 );
 
-center_body = Satellite.get_sat('ceres');
+// Luna (SE J2000)
+Satellite.sat_from_orbit(
+	'moon',
+	'earth',
+	MOONR,
+	MOON_U,
+	MOON_INITIAL_SEMI_MAJOR_AXIS,
+	MOON_INITIAL_ECCENTRICITY,
+	MOON_INITIAL_PERIAPSE,
+	MOON_INITIAL_INCLINATION,
+	MOON_INITIAL_ARGUMENT_OF_PERIGEE,
+	MOON_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
+	{
+		T: MOON_SIDEREAL_ROTATION_PERIOD,
+		t0: MOON_INITIAL_GST,
+		tilt: MOON_AXIAL_TILT
+	},
+	{
+		da: MOON_DIFF_SEMI_MAJOR_AXIS,
+		de: MOON_DIFF_ECCENTRICITY,
+		di: MOON_DIFF_INCLINATION,
+		dupper_omega: MOON_DIFF_LONGITUDE_OF_ASCENDING_NODE,
+		dp: MOON_DIFF_LONGITUDE_OF_PERIAPSE
+	},
+	MOON_INITIAL_TRUE_ANOMALY
+);
+
+center_body = Satellite.get_sat('moon');
+log( center_body = Satellite.get_sat('sun') );
+log( center_body = Satellite.get_sat('earth') );
+log( center_body = Satellite.get_sat('moon') );
 
 //------I/O-------------
 
@@ -325,17 +360,17 @@ posz_slider.oninput = () => {
 };
 const velx_slider = document.getElementById("velx");
 velx_slider.oninput = () => {
-	sat.vx = velx_slider.value * ( 1 / velx_slider.max );
+	sat.vx = velx_slider.value * ( 1e2 / velx_slider.max );
 	Satellite.moved = true;
 };
 const vely_slider = document.getElementById("vely");
 vely_slider.oninput = () => {
-	sat.vy = vely_slider.value * ( 1 / vely_slider.max );
+	sat.vy = vely_slider.value * ( 1e2 / vely_slider.max );
 	Satellite.moved = true;
 };
 const velz_slider = document.getElementById("velz");
 velz_slider.oninput = () => {
-	sat.vz = velz_slider.value * ( 1 / velz_slider.max );
+	sat.vz = velz_slider.value * ( 1e2 / velz_slider.max );
 	Satellite.moved = true;
 };
 
@@ -384,7 +419,7 @@ button_time_add.onclick = () => {
 const s_scale_slider = document.getElementById("s_scale");
 s_scale_slider.value = s_scale_slider.min;
 s_scale_slider.oninput = () => {
-	s_scale = s_scale_slider.value * center_body.R;
+	s_scale = s_scale_slider.value * center_body.R * 1e0;
 };
 const t_scale_slider = document.getElementById("t_scale");
 t_scale_slider.value = to_eday( t_scale );

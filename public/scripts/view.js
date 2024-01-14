@@ -59,10 +59,10 @@ class View{
 		// Posición de la cámara (er)
 		request.push([
 			'print', 
-			"cam_corner (er) = [ "
-				+ str( significant( to_er( -center.x ), 4 ) ) + ", " 
-				+ str( significant( to_er( -center.y ), 4 ) ) + ", " 
-				+ str( significant( to_er( -center.z ), 4 ) ) 
+			"cam_center (er) = [ "
+				+ str( significant( to_er( center.x ), 4 ) ) + ", " 
+				+ str( significant( to_er( center.y ), 4 ) ) + ", " 
+				+ str( significant( to_er( center.z ), 4 ) ) 
 			+ " ]",
 			10, 
 			height_p( 1 ) - 60,

@@ -193,11 +193,14 @@ function elements_horizons_ephem(data){
 $(document).ready((data, status) => {
 	
 	// Efemérides (SE J2000)
+	let url = "https://ssd.jpl.nasa.gov/api/horizons.api?format=text" + "&COMMAND='" + HORIZONS_MOON + "'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@399'&START_TIME='1969-07-01 12:00'&STOP_TIME='1969-07-20 12:00'&STEP_SIZE='1d'";
+	log( url );
 	$.get(
-		"https://ssd.jpl.nasa.gov/api/horizons.api?format=text" + "&COMMAND='" + HORIZONS_MARS + "'&OBJ_DATA='YES'&MAKE_EPHEM='YES'&EPHEM_TYPE='VECTORS'&CENTER='500@10'&START_TIME='1800-01-01 12:00'&STOP_TIME='1800-07-01 12:00'&STEP_SIZE='1mo'",
+		url,
 		(data, status) => {
+			log( data );
 			let formated_data = cartesian_horizons_ephem( data );
-			//self.postMessage({ type: 'ephemeris', eph: formated_data });
+			self.postMessage({ type: 'ephemeris', eph: formated_data });
 		}
 	);
 });

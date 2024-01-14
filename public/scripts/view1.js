@@ -11,16 +11,6 @@ class View1 extends View{
 		
 		//-------OBJETOS-----------------
 		
-		// Sol
-		var sun_radius = max( 1, to_px( SUNR ) );
-		request.push([
-			'circle', 
-			to_px( center.x ),
-			to_px( center.y ), 
-			sun_radius,
-			'YELLOW'
-		]);
-		
 		// Satélites
 		Satellite.list.forEach(function(value, index, array){
 			value.view1(request);
@@ -30,13 +20,14 @@ class View1 extends View{
 		
 		// Dibujar efemérides si está disponible
 		if(ephemeris != null){
+			let print_pos = center_body.get_print_pos();
 			ephemeris.forEach(function(value, index, array){
 				
 				// Posición absoluta
 				request.push([
 					'circle',
-					to_px( center.x + value[0] ),
-					to_px( center.y + value[1] ),
+					to_px( print_pos.x + value[0] ),
+					to_px( print_pos.y + value[1] ),
 					1,
 					'YELLOW'
 				]);
@@ -44,22 +35,22 @@ class View1 extends View{
 				// Vector r
 				request.push([
 					'line', 
-					to_px( center.x ),
-					to_px( center.y ),  
-					to_px( center.x + value[0] ),
-					to_px( center.y + value[1] ),
+					to_px( print_pos.x ),
+					to_px( print_pos.y ),  
+					to_px( print_pos.x + value[0] ),
+					to_px( print_pos.y + value[1] ),
 					'YELLOW'
 				]);
 				
 				// Vector v
 				request.push([
 					'line',
-					to_px( center.x + value[0] ),
-					to_px( center.y + value[1] ),
+					to_px( print_pos.x + value[0] ),
+					to_px( print_pos.y + value[1] ),
 					
 					// La longitud del vector se dibuja sin tener en cuenta la escala
-					to_px( center.x + value[0] ) + value[3] * 1e0,
-					to_px( center.y + value[1] ) + value[4] * 1e0,
+					to_px( print_pos.x + value[0] ) + value[3] * 1e0,
+					to_px( print_pos.y + value[1] ) + value[4] * 1e0,
 					'YELLOW'
 				]);
 				
@@ -67,8 +58,8 @@ class View1 extends View{
 				request.push([
 					'print', 
 					index,
-					to_px( center.x + value[0] ) - 10, 
-					to_px( center.y + value[1] ) + 10,
+					to_px( print_pos.x + value[0] ) - 10, 
+					to_px( print_pos.y + value[1] ) + 10,
 					'YELLOW'
 				]);
 			});

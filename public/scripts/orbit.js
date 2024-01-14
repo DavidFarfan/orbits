@@ -249,7 +249,7 @@ class Orbit{
 			this.perturbation.T,
 			this.perturbation.i,
 			this.perturbation.omega,
-			this.perturbation.upper_omega
+			this.perturbation.upper_omega,
 		);
 		
 		// Simulación
