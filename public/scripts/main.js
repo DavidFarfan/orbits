@@ -177,7 +177,7 @@ Satellite.sat_from_orbit(
 	SUN_U
 );
 
-/*/ Ceres (SE J2000, no perturbations)
+// Ceres (SE J2000, no perturbations)
 Satellite.sat_from_orbit(
 	'ceres',
 	'sun',
@@ -257,7 +257,6 @@ Satellite.sat_from_orbit(
 	},
 	M_INITIAL_TRUE_ANOMALY
 );
-*/
 
 // Tierra (SE J2000)
 Satellite.sat_from_orbit(
@@ -313,10 +312,7 @@ Satellite.sat_from_orbit(
 	MOON_INITIAL_TRUE_ANOMALY
 );
 
-center_body = Satellite.get_sat('moon');
-log( center_body = Satellite.get_sat('sun') );
-log( center_body = Satellite.get_sat('earth') );
-log( center_body = Satellite.get_sat('moon') );
+center_body = Satellite.get_sat('earth');
 
 //------I/O-------------
 
@@ -377,17 +373,27 @@ velz_slider.oninput = () => {
 // Captura de parámetros del punto sobre la superficie del satélite controlado
 const lat_slider = document.getElementById("lat");
 lat_slider.oninput = () => {
-	PHI = lat_slider.value * 2 * PI * ( 1 / lat_slider.max );
+	PHI = lat_slider.value * PI * ( 1 / lat_slider.max );
 };
 const long_slider = document.getElementById("long");
 long_slider.oninput = () => {
-	LAMBDA = long_slider.value * PI * ( 1 / long_slider.max );
+	LAMBDA = long_slider.value * 2 * PI * ( 1 / long_slider.max );
 };
 
 // Captura de página de info. de simulación a desplegar
 const display_page_button = document.getElementById("page");
 display_page_button.onclick = () => {
 	info = ( info + 1 ) % 2;
+};
+
+// Targeting
+const targeting_button = document.getElementById("targeting");
+targeting_button.onclick = () => {
+	elliptic_targeting(
+		Satellite.get_sat("mars"),
+		Satellite.get_sat("ceres"),
+		30 * EDAY
+	);
 };
 
 // Captura de tiempo de simulación
@@ -426,7 +432,7 @@ t_scale_slider.value = to_eday( t_scale );
 t_scale_slider.oninput = () => {
 	
 	// Realizar el cambio de escala temporal
-	t_scale = EDAY * t_scale_slider.value;
+	t_scale = EDAY * t_scale_slider.value * 1e0;
 };
 const stop_button = document.getElementById("stop_button");
 stop_button.onclick = () => {

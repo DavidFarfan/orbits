@@ -213,52 +213,83 @@ class Orbit{
 		};
 	};
 	
-	// Simulation routine
-	sim(u){
+	// Fictional Position Calculation
+	fictional_pos(fic_time, t0, f0, u){
 		
 		// Tiempo de órbita y diferenciales
-		this.t = s_time + this.t0;
-		let dt = to_century( s_time );
-		this.da = this.da_dt * dt;
-		this.de = this.de_dt * dt;
-		this.di = this.di_dt * dt;
-		this.dupper_omega = this.dupper_omega_dt * dt;
-		this.domega = this.dp_dt * dt - this.dupper_omega;
+		let fic_t = fic_time + t0;
+		let dt = to_century( fic_time );
+		let fic_da = this.da_dt * dt;
+		let fic_de = this.de_dt * dt;
+		let fic_di = this.di_dt * dt;
+		let fic_dupper_omega = this.dupper_omega_dt * dt;
+		let fic_domega = this.dp_dt * dt - fic_dupper_omega;
 		
 		// Perturbación
-		this.perturbation = Orbit.fictional_orbit(
+		let fic_perturbation = Orbit.fictional_orbit(
 			u,
-			this.a + this.da,
-			this.e + this.de,
-			this.i + this.di,
-			this.omega + this.domega,
-			this.upper_omega + this.dupper_omega,
-			this.f0,
+			this.a + fic_da,
+			this.e + fic_de,
+			this.i + fic_di,
+			this.omega + fic_domega,
+			this.upper_omega + fic_dupper_omega,
+			f0,
 			this.axial_tilt
 		);
 		
 		// Posición y velocidad en el tiempo
 		let sim_set = r_v_vecs(
-			this.perturbation.type,
-			this.t,
-			this.perturbation.a,
-			this.perturbation.e,
+			fic_perturbation.type,
+			fic_t,
+			fic_perturbation.a,
+			fic_perturbation.e,
 			u,
-			this.perturbation.p,
-			this.perturbation.fo,
-			this.perturbation.T,
-			this.perturbation.i,
-			this.perturbation.omega,
-			this.perturbation.upper_omega,
+			fic_perturbation.p,
+			fic_perturbation.fo,
+			fic_perturbation.T,
+			fic_perturbation.i,
+			fic_perturbation.omega,
+			fic_perturbation.upper_omega,
+		);
+		return {
+			t: fic_t,
+			da: fic_da,
+			de: fic_de,
+			di: fic_di,
+			dupper_omega: fic_dupper_omega,
+			domega: fic_domega,
+			perturbation: fic_perturbation,
+			pos: sim_set
+		};
+	};
+	
+	// Simulation routine
+	sim(u){
+		let fic_pos = this.fictional_pos(
+			s_time,
+			this.t0,
+			this.f0,
+			u
 		);
 		
+		// Tiempo de órbita y diferenciales
+		this.t = fic_pos.t;
+		this.da = fic_pos.da;
+		this.de = fic_pos.de;
+		this.di = fic_pos.di;
+		this.dupper_omega = fic_pos.dupper_omega;
+		this.domega = fic_pos.domega;
+		
+		// Perturbación
+		this.perturbation = fic_pos.perturbation;
+		
 		// Simulación
-		this.M = sim_set.M;
-		this.E = sim_set.E;
-		this.H = sim_set.H;
-		this.f = sim_set.f;
-		this.r = sim_set.r;
-		this.v = sim_set.v;
+		this.M = fic_pos.pos.M;
+		this.E = fic_pos.pos.E;
+		this.H = fic_pos.pos.H;
+		this.f = fic_pos.pos.f;
+		this.r = fic_pos.pos.r;
+		this.v = fic_pos.pos.v;
 		
 		// Curva
 		this.set_curve( this.r, this.perturbation );

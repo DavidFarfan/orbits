@@ -158,7 +158,7 @@ const MOON_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 1.239580554371928e+
 const MOON_INITIAL_ARGUMENT_OF_PERIGEE = deg_to_rad( 3.089226727206595e+02 ); // Argumento de perihelio J2000 (rad)
 
 const MOON_AXIAL_TILT = deg_to_rad( 6.67 ); // Oblicuidad de la órbita (rad)
-const MOON_SIDEREAL_ROTATION_PERIOD = 27.3217 * EDAY; // Periodo rot. sideral (s)
+const MOON_SIDEREAL_ROTATION_PERIOD = 26.849 * EDAY; // Periodo rot. sideral (s)
 const MOON_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
 	period( MOON_INITIAL_SEMI_MAJOR_AXIS, E_U ),
 	11.39 * EDAY // Ángulo obtenido empíricamente (s)
@@ -1245,4 +1245,31 @@ function celestial_sphere_pos(ra, d, longitude, latitude, GST){
 		pos: pos,
 		hour: hour
 	};
+};
+
+//-------RENDEZVOUS/TARGETING------------------
+
+// Elliptical targeting
+function elliptic_targeting(sat, target, des_time){
+	
+	log("---TGT----");
+	log( sat.orbit );
+	log( target.orbit );
+	log("---r0----");
+	log( sat.orbit.r );
+	log( target.orbit.r );
+	log("---t0----");
+	log( sat.orbit.t );
+	log( target.orbit.t );
+	log("---f0----");
+	log( sat.orbit.f );
+	log( target.orbit.f );
+	log("---COMPUTATIONS----");
+	let comp = target.orbit.fictional_pos(
+			des_time,
+			target.orbit.t,
+			target.orbit.f,
+			target.get_gravity()
+	);
+	log(comp);
 };
