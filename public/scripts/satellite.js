@@ -136,6 +136,55 @@ class Satellite{
 		);
 	};
 	
+	// Elliptic targeting
+	elliptic_targeting(sat, des_time){
+		
+		// Calculate future position
+		log("---TGT----");
+		log( sat );
+		log( this );
+		log("---r0----");
+		log( sat.orbit.r );
+		log( this.orbit.r );
+		log("---t0----");
+		log( sat.orbit.t );
+		log( this.orbit.t );
+		log("---f0----");
+		log( sat.orbit.f );
+		log( this.orbit.f );
+		let comp = this.orbit.fictional_pos(
+				des_time,
+				this.orbit.t,
+				this.orbit.f,
+				this.get_gravity()
+		);
+		this.target = {
+			r: comp.pos.r,
+			v: comp.pos.v
+		};
+		
+		// Feasibility
+		log("---Chord, Semi perimeter----");
+		let cs = chord_semi_perimeter( sat.orbit.r, this.target.r );
+		log( cs );
+		log("---t---");
+		let mint = ell_min_flight_t( sat.orbit.r, this.target.r, sat.get_gravity() );
+		let maxt = dt_from_a( sat.orbit.r, this.target.r, cs.semi_perimeter / 2, sat.get_gravity() );
+		log( 'min t: ' + str( to_eday( mint ) ) );
+		log( 'des t: ' + str( to_eday( des_time ) ) );
+		log( 'max t: ' + str( to_eday( maxt ) ) );
+		log("---a---");
+		let min_a = a_from_dt( sat.orbit.r, this.target.r, mint, sat.get_gravity() );
+		let des_a = a_from_dt( sat.orbit.r, this.target.r, des_time, sat.get_gravity() );
+		let max_a = a_from_dt( sat.orbit.r, this.target.r, maxt, sat.get_gravity() );
+		log( 'min a: ' + str( min_a.a ) );
+		log( 'des a: ' + str( des_a.a ) );
+		log( 'max a: ' + str( max_a.a ) + " = s/2 = " + str( cs.semi_perimeter / 2 ) );
+		log("---delta v---");
+		log( max_a.v );
+		return comp;
+	};
+	
 	// Nombre del satélite
 	name_set(name){
 		this.name = name;
@@ -319,6 +368,35 @@ class Satellite{
 				to_px( -center.x + apos.x ),
 				to_px( -center.y + apos.y ),
 				'WHITE'
+			]);
+		};
+		
+		// Target (Future Position)
+		if(this.target != undefined){
+			
+			let target_r = this.target.r;
+			let target_v = this.target.v;
+			
+			// Vector r
+			request.push([
+				'line', 
+				to_px( print_pos.x ),
+				to_px( print_pos.y ),  
+				to_px( print_pos.x + target_r.x ),
+				to_px( print_pos.y + target_r.y ),
+				'CYAN'
+			]);
+			
+			// Vector v
+			request.push([
+				'line',
+				to_px( print_pos.x + target_r.x ),
+				to_px( print_pos.y + target_r.y ),
+				
+				// La longitud del vector se dibuja sin tener en cuenta la escala
+				to_px( print_pos.x + target_r.x ) + target_v.x * 1e0,
+				to_px( print_pos.y + target_r.y ) + target_v.y * 1e0,
+				'CYAN'
 			]);
 		};
 		

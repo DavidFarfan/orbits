@@ -313,6 +313,7 @@ Satellite.sat_from_orbit(
 );
 
 center_body = Satellite.get_sat('earth');
+Satellite.get_sat('earth').ctrl_set( true );
 
 //------I/O-------------
 
@@ -389,10 +390,12 @@ display_page_button.onclick = () => {
 // Targeting
 const targeting_button = document.getElementById("targeting");
 targeting_button.onclick = () => {
-	elliptic_targeting(
-		Satellite.get_sat("mars"),
-		Satellite.get_sat("ceres"),
-		30 * EDAY
+	log("---COMPUTATIONS----");
+	log(
+		Satellite.get_sat("venus").elliptic_targeting(
+			Satellite.get_sat("earth"),
+			50 * EDAY
+		).pos
 	);
 };
 
@@ -425,7 +428,7 @@ button_time_add.onclick = () => {
 const s_scale_slider = document.getElementById("s_scale");
 s_scale_slider.value = s_scale_slider.min;
 s_scale_slider.oninput = () => {
-	s_scale = s_scale_slider.value * center_body.R * 1e0;
+	s_scale = s_scale_slider.value * center_body.R * 1e1;
 };
 const t_scale_slider = document.getElementById("t_scale");
 t_scale_slider.value = to_eday( t_scale );

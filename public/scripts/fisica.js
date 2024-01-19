@@ -237,6 +237,11 @@ function atan(x){
 	return Math.atan(x);
 };
 
+// COTANGENTE 
+function cot(x){
+	return cos( x ) / sin( x );
+};
+
 //-------HIPERBÓLICAS---------------
 
 // SENO HIPERBÓLICO
@@ -1249,27 +1254,93 @@ function celestial_sphere_pos(ra, d, longitude, latitude, GST){
 
 //-------RENDEZVOUS/TARGETING------------------
 
-// Elliptical targeting
-function elliptic_targeting(sat, target, des_time){
+// CHORD Y SEMI-PERIMETER
+function chord_semi_perimeter(rt1, rt2){
+	let r1 = norm_vec( rt1 );
+	let r2 = norm_vec( rt2 );
+	let c = norm_vec( sum_vec( rt1, prod_by_sc( -1, rt2 ) ) );
+	let s = .5 * ( c + r2 + r1 );
+	return {
+		chord: c,
+		semi_perimeter: s
+	}; 
+};
+
+// ALPHA
+function transfer_alpha(s, a){
+	return 2 * asin( sqrt( s / ( 2 * a ) ) );
+};
+
+// BETA
+function transfer_beta(s, c, a){
+	return 2 * asin( sqrt( ( s - c ) / ( 2 * a ) ) );
+};
+
+// DELTA T DADO SEMIEJE MAYOR (ECUACIÓN DE LAMBERT)
+function dt_from_a(rt1, rt2, a, u){
+	let c_s = chord_semi_perimeter( rt1, rt2 );
+	let alpha = transfer_alpha(c_s.semi_perimeter, a);
+	let beta = transfer_beta(c_s.semi_perimeter, c_s.chord, a);
+	let factor = sqrt( pow( a, 3 ) / u );
+	return factor * ( alpha - beta - ( sin( alpha ) - sin( beta ) ) );
+};
+
+// SEMIEJE MAYOR DADO DELTA T (BISECCIÓN)
+function a_from_dt(rt1, rt2, dt, u){
+	let c_s = chord_semi_perimeter( rt1, rt2 );
 	
-	log("---TGT----");
-	log( sat.orbit );
-	log( target.orbit );
-	log("---r0----");
-	log( sat.orbit.r );
-	log( target.orbit.r );
-	log("---t0----");
-	log( sat.orbit.t );
-	log( target.orbit.t );
-	log("---f0----");
-	log( sat.orbit.f );
-	log( target.orbit.f );
-	log("---COMPUTATIONS----");
-	let comp = target.orbit.fictional_pos(
-			des_time,
-			target.orbit.t,
-			target.orbit.f,
-			target.get_gravity()
+	// Intervalo de búsqueda
+	let a1 = c_s.semi_perimeter / 2;
+	let a2 = 20 * c_s.semi_perimeter;
+	
+	// Auxiliares
+	let mid_a;
+	let dt_guess;
+	
+	// Iteración
+	for(var i=0; i<100; i++){
+		
+		// Middle
+		mid_a = ( a1 + a2 ) / 2;
+		
+		// dt_guess
+		dt_guess = dt_from_a( rt1, rt2, mid_a, u );
+		
+		// Corte del intervalo
+		if(dt_guess > dt){
+			a1 = mid_a;
+		}else{
+			a2 = mid_a;
+		};
+	};
+	
+	// Transfer orbit
+	let uc = prod_by_sc(
+		1 / c_s.chord,
+		sum_vec(
+			rt2,
+			prod_by_sc( -1, rt1 )
+		)
 	);
-	log(comp);
+	let f1 = sqrt( u / ( 4 * mid_a ) );
+	let f2 = cot( transfer_alpha( c_s.semi_perimeter, mid_a ) / 2 );
+	let f3 = cot( transfer_beta( c_s.semi_perimeter, c_s.chord, mid_a ) / 2 );
+	let A = f1 * f2;
+	let B = f1 * f3;
+	let v0 = sum_vec(
+		prod_by_sc( B + A, uc ),
+		prod_by_sc( B - A, normalize_vec( rt1 ) )
+	);
+	return {
+		a: mid_a,
+		v: v0
+	};
+};
+
+// Minimum Flight Time Elliptic Trip 
+function ell_min_flight_t(rt1, rt2, u){
+	let c_s = chord_semi_perimeter( rt1, rt2 );
+	let f1 = ( sqrt( 2 ) / 3 ) * sqrt( pow( c_s.semi_perimeter, 3 ) / u );
+	let f2 = 1 - pow( sqrt( ( c_s.semi_perimeter - c_s.chord ) / c_s.semi_perimeter ), 3 );
+	return f1 * f2;
 };
