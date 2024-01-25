@@ -200,7 +200,7 @@ $(document).ready((data, status) => {
 		(data, status) => {
 			log( data );
 			let formated_data = cartesian_horizons_ephem( data );
-			self.postMessage({ type: 'ephemeris', eph: formated_data });
+			//self.postMessage({ type: 'ephemeris', eph: formated_data });
 		}
 	);
 });

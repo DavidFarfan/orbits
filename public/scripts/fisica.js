@@ -21,11 +21,13 @@ const EPOCH_J2000 = new Date('January 01, 2000 12:00:00 GMT+00:00');
 // Parámetros del Sol
 const SUN_U = 1.3271283864171489e+11; // Parámetro gravitacional (km^3/s^2)
 const SUNR = 696000.0; // Radio (km)
+const SUNMASS = 1988500 * 1e24; // Masa (kg)
 
 // Parámetros de La Tierra
 const E_U = 398600.435436; // Parámetro gravitacional (km^3/s^2)
 const ER = 6371.01; // Radio volumétrico medio (km)
 const EDAY = 86400.002; // Día solar medio (s)
+const EMASS = 5.9722 * 1e24; // Masa (kg)
 const E_INITIAL_SEMI_MAJOR_AXIS = 1.00000261 * AU; // Semi-eje mayor J2000 (km)
 const E_INITIAL_ECCENTRICITY = 0.01671123; // Excentricidad J2000
 const E_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
@@ -56,6 +58,7 @@ const E_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0.31795260 ); // Cambio de la l
 // Parámetros de Venus
 const V_U = 324858.592; // Parámetro gravitacional (km^3/s^2)
 const VR = 6051.84; // Radio volumétrico medio (km)
+const VMASS = 4.8673 * 1e24; // Masa (kg)
 const V_INITIAL_SEMI_MAJOR_AXIS = 0.72332102 * AU; // Semi-eje mayor J2000 (km)
 const V_INITIAL_ECCENTRICITY = 0.00676399; // Excentricidad J2000
 const V_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
@@ -86,6 +89,7 @@ const V_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0.05679648 ); // Cambio de la l
 // Parámetros de Marte
 const M_U = 42828.375214; // Parámetro gravitacional (km^3/s^2)
 const MR = 3389.92; // Radio volumétrico medio (km)
+const MMASS = 0.64169 * 1e24; // Masa (kg)
 const M_INITIAL_SEMI_MAJOR_AXIS = 1.52371243 * AU; // Semi-eje mayor J2000 (km)
 const M_INITIAL_ECCENTRICITY = 0.09336511; // Excentricidad J2000
 const M_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
@@ -116,6 +120,7 @@ const M_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0.45223625 ); // Cambio de la l
 // Parámetros de Ceres
 const C_U = 62.6284; // Parámetro gravitacional (km^3/s^2)
 const CR = 469.7; // Radio volumétrico medio (km)
+const CMASS = 9.38392 * 1e20; // Masa (kg)
 const C_INITIAL_SEMI_MAJOR_AXIS = 413867951.4842377; // Semi-eje mayor J2000 (km)
 const C_INITIAL_ECCENTRICITY = 0.07870920149752186; // Excentricidad J2000
 const C_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
@@ -147,6 +152,7 @@ const C_DIFF_LONGITUDE_OF_PERIAPSE = deg_to_rad( 0 ); // Cambio de la longitud d
 // Parámetros de La Luna
 const MOON_U = 4902.800066; // Parámetro gravitacional (km^3/s^2)
 const MOONR = 1737.53; // Radio volumétrico medio (km)
+const MOONMASS = 0.07346 * 1e24; // Masa (kg)
 const MOON_INITIAL_SEMI_MAJOR_AXIS = 3.818745248499886e+05; // Semi-eje mayor J2000 (km)
 const MOON_INITIAL_ECCENTRICITY = 6.314721685094304e-02; // Excentricidad J2000
 const MOON_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 (km)
@@ -1195,6 +1201,35 @@ function f_from_H(H, e){
 	return 2 * atan( sqrt( ( e + 1 ) / ( e - 1 ) ) * tanh( H / 2 ) );
 };
 
+// TIEMPO DADA LA ANOMALIA VERDADERA
+function t_from_f(type, f, e, a, T){
+	if(type == 'elliptic'){
+		return t_from_M(
+			M_from_E(
+				E_from_f(
+					f,
+					e
+				),
+				e
+			),
+			e,
+			T
+		);
+	}else{
+		return ht_from_M(
+			M_from_H(
+				H_from_f(
+					f,
+					e
+				),
+				e
+			),
+			u,
+			a
+		);
+	};
+};
+
 //-------ROTACIÓN------------------
 
 // TIEMPO SIDERAL DEL MERIDIANO CERO
@@ -1337,10 +1372,18 @@ function a_from_dt(rt1, rt2, dt, u){
 	};
 };
 
-// Minimum Flight Time Elliptic Trip 
+// MINIMUM FLIGHT TIME ELLIPTIC TRIP 
 function ell_min_flight_t(rt1, rt2, u){
 	let c_s = chord_semi_perimeter( rt1, rt2 );
 	let f1 = ( sqrt( 2 ) / 3 ) * sqrt( pow( c_s.semi_perimeter, 3 ) / u );
 	let f2 = 1 - pow( sqrt( ( c_s.semi_perimeter - c_s.chord ) / c_s.semi_perimeter ), 3 );
 	return f1 * f2;
+};
+
+// ESFERA DE INFLUENCIA
+function r_soi(orbiting, orbited){
+	if(orbited == null){
+		return;
+	};
+	return orbiting.orbit.perturbation.a * pow( orbiting.m / orbited.m, 2 / 5 );
 };

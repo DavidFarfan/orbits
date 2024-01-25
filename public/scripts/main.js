@@ -174,6 +174,7 @@ Satellite.sat_from_orbit(
 	'sun',
 	null,
 	SUNR,
+	SUNMASS,
 	SUN_U
 );
 
@@ -182,6 +183,7 @@ Satellite.sat_from_orbit(
 	'ceres',
 	'sun',
 	CR,
+	CMASS,
 	C_U,
 	C_INITIAL_SEMI_MAJOR_AXIS,
 	C_INITIAL_ECCENTRICITY,
@@ -209,6 +211,7 @@ Satellite.sat_from_orbit(
 	'venus',
 	'sun',
 	VR,
+	VMASS,
 	V_U,
 	V_INITIAL_SEMI_MAJOR_AXIS,
 	V_INITIAL_ECCENTRICITY,
@@ -236,6 +239,7 @@ Satellite.sat_from_orbit(
 	'mars',
 	'sun',
 	MR,
+	MMASS,
 	M_U,
 	M_INITIAL_SEMI_MAJOR_AXIS,
 	M_INITIAL_ECCENTRICITY,
@@ -263,6 +267,7 @@ Satellite.sat_from_orbit(
 	'earth',
 	'sun',
 	ER,
+	EMASS,
 	E_U,
 	E_INITIAL_SEMI_MAJOR_AXIS,
 	E_INITIAL_ECCENTRICITY,
@@ -290,6 +295,7 @@ Satellite.sat_from_orbit(
 	'moon',
 	'earth',
 	MOONR,
+	MOONMASS,
 	MOON_U,
 	MOON_INITIAL_SEMI_MAJOR_AXIS,
 	MOON_INITIAL_ECCENTRICITY,
@@ -392,7 +398,7 @@ const targeting_button = document.getElementById("targeting");
 targeting_button.onclick = () => {
 	log("---COMPUTATIONS----");
 	log(
-		Satellite.get_sat("venus").elliptic_targeting(
+		Satellite.get_sat("moon").elliptic_targeting(
 			Satellite.get_sat("earth"),
 			50 * EDAY
 		).pos
@@ -428,7 +434,7 @@ button_time_add.onclick = () => {
 const s_scale_slider = document.getElementById("s_scale");
 s_scale_slider.value = s_scale_slider.min;
 s_scale_slider.oninput = () => {
-	s_scale = s_scale_slider.value * center_body.R * 1e1;
+	s_scale = s_scale_slider.value * center_body.R * 1e0;
 };
 const t_scale_slider = document.getElementById("t_scale");
 t_scale_slider.value = to_eday( t_scale );

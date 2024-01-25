@@ -152,31 +152,11 @@ class Orbit{
 	};
 	
 	// Tiempo inicial
-	set_t0(u){
-		if(this.type == 'elliptic'){
-			this.t0 = t_from_M(
-				M_from_E(
-					E_from_f(
-						this.f0,
-						this.e
-					),
-					this.e
-				),
-				this.e,
-				this.T
-			);
+	set_t0(u, t){
+		if(t == null){
+			this.t0 = t_from_f( this.type, this.f0, this.e, this.a, this.T );
 		}else{
-			this.t0 = ht_from_M(
-				M_from_H(
-					H_from_f(
-						this.f0,
-						this.e
-					),
-					this.e
-				),
-				u,
-				this.a
-			);
+			this.t0 = t;
 		};
 	};
 	

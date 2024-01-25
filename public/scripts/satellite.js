@@ -12,6 +12,9 @@ class Satellite{
 	
 	// Satélite particular
 	static get_sat(name){
+		if(name == null){
+			return null;
+		};
 		let idx = -1;
 		Satellite.list.forEach(function(value, index, array){
 			if(value.name == name){
@@ -71,7 +74,7 @@ class Satellite{
 	};
 	
 	// Satélite a partir de la órbita
-	static sat_from_orbit(name, orbited, R, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
+	static sat_from_orbit(name, orbited, R, m, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
 		
 		// Caso base
 		if(orbited == null){
@@ -91,6 +94,7 @@ class Satellite{
 				name,
 				null,
 				R,
+				m,
 				u,
 				sat_at_t0.r,
 				sat_at_t0.v,
@@ -127,6 +131,7 @@ class Satellite{
 			name,
 			orbited,
 			R,
+			m,
 			u,
 			rotation_axis(sat_at_t0.r, Satellite.get_sat(orbited).axial_tilt, upper_omega),
 			rotation_axis(sat_at_t0.v, Satellite.get_sat(orbited).axial_tilt, upper_omega),
@@ -180,8 +185,41 @@ class Satellite{
 		log( 'min a: ' + str( min_a.a ) );
 		log( 'des a: ' + str( des_a.a ) );
 		log( 'max a: ' + str( max_a.a ) + " = s/2 = " + str( cs.semi_perimeter / 2 ) );
-		log("---delta v---");
-		log( max_a.v );
+		let orbit_curve = new Orbit(
+			angular_momentum( sat.orbit.r, des_a.v ),
+			orbital_energy( norm_vec( des_a.v ), sat.get_gravity(), norm_vec( sat.orbit.r ) ),
+			sat.get_gravity(),
+			des_a.v,
+			sat.orbit.r,
+			sat.axial_tilt,
+			{	// La órbita ficticia no necesita los diferenciales, realmente.
+				da: 0,
+				de: 0,
+				di: 0,
+				dupper_omega: 0,
+				dp: 0
+			}
+		);
+		let f0_for_target_orbit = argument_of_periapse_f(
+			orbit_curve.eccentricity,
+			sat.orbit.r,
+			orbit_curve.upper_omega,
+			orbit_curve.i
+		).f;
+		orbit_curve.set_t0(null, t_from_f(
+									orbit_curve.type,
+									f0_for_target_orbit,
+									orbit_curve.e, 
+									orbit_curve.a, 
+									orbit_curve.T
+								) - s_time
+		);
+		this.orbit_to_me = {
+			sat: sat,
+			orbit: orbit_curve
+		};
+		log('trajectory');
+		log(this.orbit_to_me);
 		return comp;
 	};
 	
@@ -193,6 +231,11 @@ class Satellite{
 	// Radio del satélite
 	R_set(R){
 		this.R = R;
+	};
+	
+	// Masa del satélite
+	m_set(m){
+		this.m = m;
 	};
 	
 	// Parámetro gravitatorio al que está sometido
@@ -332,6 +375,12 @@ class Satellite{
 		// Acción
 		this.orbit.sim( this.get_gravity() ); // Traslación
 		this.rotate(); // Rotación
+		
+		if(this.orbit_to_me != undefined){
+			this.orbit_to_me.orbit.sim( this.orbit_to_me.sat.get_gravity() );
+		};
+		
+		this.rsoi = r_soi( this, Satellite.get_sat( this.orbited ) )
 	};
 	
 	// Vista 1
@@ -349,13 +398,30 @@ class Satellite{
 			color = 'YELLOW';
 		};
 		
-		// Posición absoluta
+		// Radio
+		let draw_radius = to_px( this.R );
+		if(draw_radius < 1){
+			draw_radius = 1;
+		};
 		request.push([
 			'circle',
-			to_px( print_pos.x + this.pos.x ),
-			to_px( print_pos.y + this.pos.y ),
-			1,
-			color
+			to_px( print_pos.x + this.orbit.r.x ),
+			to_px( print_pos.y + this.orbit.r.y ),
+			draw_radius,
+			'CYAN'
+		]);
+		
+		// SOI
+		let draw_rsoi = to_px( this.rsoi );
+		if(draw_rsoi < 1){
+			draw_rsoi = 1;
+		};
+		request.push([
+			'circle',
+			to_px( print_pos.x + this.orbit.r.x ),
+			to_px( print_pos.y + this.orbit.r.y ),
+			draw_rsoi,
+			'RED'
 		]);
 		
 		// Vector prueba
@@ -372,10 +438,14 @@ class Satellite{
 		};
 		
 		// Target (Future Position)
-		if(this.target != undefined){
+		if(this.target != undefined && this.orbit_to_me != undefined){
 			
 			let target_r = this.target.r;
 			let target_v = this.target.v;
+			this.orbit_to_me.orbit.view1(
+				request,
+				this.orbit_to_me.sat.get_print_pos()
+			);
 			
 			// Vector r
 			request.push([
@@ -471,13 +541,30 @@ class Satellite{
 			color = 'YELLOW';
 		};
 		
-		// Posición absoluta
+		// Radio
+		let draw_radius = to_px( this.R );
+		if(draw_radius < 1){
+			draw_radius = 1;
+		};
 		request.push([
 			'circle',
-			to_px( print_pos.y + this.pos.y ),
-			to_px( print_pos.z + this.pos.z ),
-			1,
-			color
+			to_px( print_pos.y + this.orbit.r.y ),
+			to_px( print_pos.z + this.orbit.r.z ),
+			draw_radius,
+			'CYAN'
+		]);
+		
+		// SOI
+		let draw_rsoi = to_px( this.rsoi );
+		if(draw_rsoi < 1){
+			draw_rsoi = 1;
+		};
+		request.push([
+			'circle',
+			to_px( print_pos.y + this.orbit.r.y ),
+			to_px( print_pos.z + this.orbit.r.z ),
+			draw_rsoi,
+			'RED'
 		]);
 		
 		// Vector prueba
@@ -490,6 +577,39 @@ class Satellite{
 				to_px( -center.y + apos.y ),
 				to_px( -center.z + apos.z ),
 				'WHITE'
+			]);
+		};
+		
+		// Target (Future Position)
+		if(this.target != undefined && this.orbit_to_me != undefined){
+			
+			let target_r = this.target.r;
+			let target_v = this.target.v;
+			this.orbit_to_me.orbit.view2(
+				request,
+				this.orbit_to_me.sat.get_print_pos()
+			);
+			
+			// Vector r
+			request.push([
+				'line', 
+				to_px( print_pos.y ),
+				to_px( print_pos.z ),  
+				to_px( print_pos.y + target_r.y ),
+				to_px( print_pos.z + target_r.z ),
+				'CYAN'
+			]);
+			
+			// Vector v
+			request.push([
+				'line',
+				to_px( print_pos.y + target_r.y ),
+				to_px( print_pos.z + target_r.z ),
+				
+				// La longitud del vector se dibuja sin tener en cuenta la escala
+				to_px( print_pos.y + target_r.y ) + target_v.y * 1e0,
+				to_px( print_pos.z + target_r.z ) + target_v.z * 1e0,
+				'CYAN'
 			]);
 		};
 		
@@ -550,10 +670,11 @@ class Satellite{
 	};
 	
 	// Variables del satélite
-	constructor(name, orbited, R, u, pos, vel, rot, dif, ctrl){
+	constructor(name, orbited, R, m, u, pos, vel, rot, dif, ctrl){
 		this.name_set(name);
 		this.orbited = orbited;
-		this.R = R;
+		this.R_set(R);
+		this.m_set(m);
 		this.u = u;
 		this.ctrl_set(ctrl);
 		this.pos_set(pos);
