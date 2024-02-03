@@ -1,0 +1,186 @@
+“The Eagle has landed…”
+
+Mission Objective
+The primary objective of Apollo 11 was to complete a national goal set by President John F. Kennedy on May 25, 1961: perform a crewed lunar landing and return to Earth.
+
+Additional flight objectives included scientific exploration by the lunar module, or LM, crew; deployment of a television camera to transmit signals to Earth; and deployment of a solar wind composition experiment, seismic experiment package and a Laser Ranging Retroreflector. During the exploration, the two astronauts were to gather samples of lunar-surface materials for return to Earth. They also were to extensively photograph the lunar terrain, the deployed scientific equipment, the LM spacecraft, and each other, both with still and motion picture cameras. This was to be the last Apollo mission to fly a “free-return” trajectory, which would enable a return to Earth with no engine firing, providing a ready abort of the mission at any time prior to lunar orbit insertion.
+
+Mission Highlights
+
+Apollo 11 launched from Cape Kennedy on July 16, 1969, carrying Commander Neil Armstrong, Command Module Pilot Michael Collins and Lunar Module Pilot Edwin “Buzz” Aldrin into an initial Earth-orbit of 114 by 116 miles. An estimated 650 million people watched Armstrong’s televised image and heard his voice describe the event as he took “…one small step for a man, one giant leap for mankind” on July 20, 1969.
+
+Two hours, 44 minutes and one-and-a-half revolutions after launch, the S-IVB stage reignited for a second burn of five minutes, 48 seconds, placing Apollo 11 into a translunar orbit. The command and service module, or CSM, Columbia separated from the stage, which included the spacecraft-lunar module adapter, or SLA, containing the lunar module, or LM, Eagle. After transposition and jettisoning of the SLA panels on the S-IVB stage, the CSM docked with the LM. The S-IVB stage separated and injected into heliocentric orbit four hours, 40 minutes into the flight.
+
+The first color TV transmission to Earth from Apollo 11 occurred during the translunar coast of the CSM/LM. Later, on July 17, a three-second burn of the SPS was made to perform the second of four scheduled midcourse corrections programmed for the flight. The launch had been so successful that the other three were not needed.
+
+On July 18, Armstrong and Aldrin put on their spacesuits and climbed through the docking tunnel from Columbia to Eagle to check out the LM, and to make the second TV transmission.
+
+On July 19, after Apollo 11 had flown behind the moon out of contact with Earth, came the first lunar orbit insertion maneuver. At about 75 hours, 50 minutes into the flight, a retrograde firing of the SPS for 357.5 seconds placed the spacecraft into an initial, elliptical-lunar orbit of 69 by 190 miles. Later, a second burn of the SPS for 17 seconds placed the docked vehicles into a lunar orbit of 62 by 70.5 miles, which was calculated to change the orbit of the CSM piloted by Collins. The change happened because of lunar-gravity perturbations to the nominal 69 miles required for subsequent LM rendezvous and docking after completion of the lunar landing. Before this second SPS firing, another TV transmission was made, this time from the surface of the moon.
+
+On July 20, Armstrong and Aldrin entered the LM again, made a final check, and at 100 hours, 12 minutes into the flight, the Eagle undocked and separated from Columbia for visual inspection. At 101 hours, 36 minutes, when the LM was behind the moon on its 13th orbit, the LM descent engine fired for 30 seconds to provide retrograde thrust and commence descent orbit insertion, changing to an orbit of 9 by 67 miles, on a trajectory that was virtually identical to that flown by Apollo 10. At 102 hours, 33 minutes, after Columbia and Eagle had reappeared from behind the moon and when the LM was about 300 miles uprange, powered descent initiation was performed with the descent engine firing for 756.3 seconds. After eight minutes, the LM was at “high gate” about 26,000 feet above the surface and about five miles from the landing site.
+
+The descent engine continued to provide braking thrust until about 102 hours, 45 minutes into the mission. Partially piloted manually by Armstrong, the Eagle landed in the Sea of Tranquility in Site 2 at 0 degrees, 41 minutes, 15 seconds north latitude and 23 degrees, 26 minutes east longitude. This was about four miles downrange from the predicted touchdown point and occurred almost one-and-a-half minutes earlier than scheduled. It included a powered descent that ran a mere nominal 40 seconds longer than preflight planning due to translation maneuvers to avoid a crater during the final phase of landing. Attached to the descent stage was a commemorative plaque signed by President Richard M. Nixon and the three astronauts.
+
+The flight plan called for the first EVA to begin after a four-hour rest period, but it was advanced to begin as soon as possible. Nonetheless, it was almost four hours later that Armstrong emerged from the Eagle and deployed the TV camera for the transmission of the event to Earth. At about 109 hours, 42 minutes after launch, Armstrong stepped onto the moon. About 20 minutes later, Aldrin followed him. The camera was then positioned on a tripod about 30 feet from the LM. Half an hour later, President Nixon spoke by telephone link with the astronauts.
+
+Commemorative medallions bearing the names of the three Apollo 1 astronauts who lost their lives in a launch pad fire, and two cosmonauts who also died in accidents, were left on the moon’s surface. A one-and-a-half inch silicon disk, containing micro miniaturized goodwill messages from 73 countries, and the names of congressional and NASA leaders, also stayed behind.
+
+During the EVA, in which they both ranged up to 300 feet from the Eagle, Aldrin deployed the Early Apollo Scientific Experiments Package, or EASEP, experiments, and Armstrong and Aldrin gathered and verbally reported on the lunar surface samples. After Aldrin had spent one hour, 33 minutes on the surface, he re-entered the LM, followed 41 minutes later by Armstrong. The entire EVA phase lasted more than two-and-a-half hours, ending at 111 hours, 39 minutes into the mission.
+
+Armstrong and Aldrin spent 21 hours, 36 minutes on the moon’s surface. After a rest period that included seven hours of sleep, the ascent stage engine fired at 124 hours, 22 minutes. It was shut down 435 seconds later when the Eagle reached an initial orbit of 11 by 55 miles above the moon, and when Columbia was on its 25th revolution. As the ascent stage reached apolune at 125 hours, 19 minutes, the reaction control system, or RCS, fired so as to nearly circularize the Eagle orbit at about 56 miles, some 13 miles below and slightly behind Columbia. Subsequent firings of the LM RCS changed the orbit to 57 by 72 miles. Docking with Columbia occurred on the CSM’s 27th revolution at 128 hours, three minutes into the mission. Armstrong and Aldrin returned to the CSM with Collins. Four hours later, the LM jettisoned and remained in lunar orbit.
+
+Trans-Earth injection of the CSM began July 21 as the SPS fired for two-and-a-half minutes when Columbia was behind the moon in its 59th hour of lunar orbit. Following this, the astronauts slept for about 10 hours. An 11.2 second firing of the SPS accomplished the only midcourse correction required on the return flight. The correction was made July 22 at about 150 hours, 30 minutes into the mission. Two more television transmissions were made during the trans-Earth coast.
+
+Re-entry procedures were initiated July 24, 44 hours after leaving lunar orbit. The SM separated from the CM, which was re-oriented to a heat-shield-forward position. Parachute deployment occurred at 195 hours, 13 minutes. After a flight of 195 hours, 18 minutes, 35 seconds – about 36 minutes longer than planned – Apollo 11 splashed down in the Pacific Ocean, 13 miles from the recovery ship USS Hornet. Because of bad weather in the target area, the landing point was changed by about 250 miles. Apollo 11 landed 13 degrees, 19 minutes north latitude and 169 degrees, nine minutes west longitude July 24, 1969.
+
+Crew
+Neil Armstrong, Commander
+Edwin E. “Buzz” Aldrin Jr., Lunar Module Pilot
+Michael Collins, Command Module Pilot
+
+Backup Crew
+James A. Lovell, Commander
+Fred W. Haise Jr., Lunar Module Pilot
+William A. Anders, Command Module Pilot
+
+Payload
+Columbia (CSM-107)
+Eagle (LM-5)
+
+Prelaunch Milestones
+11/21/68 – LM-5 integrated systems test
+12/6/68 – CSM-107 integrated systems test
+12/13/68 – LM-5 acceptance test
+1/8/69 – LM-5 ascent stage delivered to Kennedy
+1/12/69 – LM-5 descent stage delivered to Kennedy
+1/18/69 – S-IVB ondock at Kennedy
+1/23/69 – CSM ondock at Kennedy
+1/29/69 – command and service module mated
+2/6/69 – S-II ondock at Kennedy
+2/20/69 – S-IC ondock at Kennedy
+2/17/69 – combined CSM-107 systems tests
+2/27/69 – S-IU ondock at Kennedy
+3/24/69 – CSM-107 altitude testing
+4/14/69 – rollover of CSM from the Operations and Checkout Building to the Vehicle Assembly Building
+4/22/69 – integrated systems test
+5/5/69 – CSM electrical mate to Saturn V
+5/20/69 – rollout to Launch Pad 39A
+6/1/69 – flight readiness test
+6/26/69 – Countdown Demonstration Test
+
+Launch
+July 16, 1969; 9:32 a.m. EDT
+Launch Pad 39A
+Saturn-V AS-506
+High Bay 1
+Mobile Launcher Platform-1
+Firing Room 1
+
+Orbit
+Altitude: 118.65 miles
+Inclination: 32.521 degrees
+Orbits: 30 revolutions
+Duration: eight days, three hours, 18 min, 35 seconds
+Distance: 953,054 miles
+Lunar Location: Sea of Tranquility
+Lunar Coordinates: .71 degrees north, 23.63 degrees east
+
+Landing
+July 24, 1969; 12:50 p.m. EDT
+Pacific Ocean
+Recovery Ship: USS Hornet
+
+*************************************************
+
+"El Águila ha aterrizado..."
+
+Objetivo de la misión
+El objetivo principal del Apolo 11 era completar un objetivo nacional establecido por el presidente John F. Kennedy el 25 de mayo de 1961: realizar un alunizaje tripulado y regresar a la Tierra.
+
+Los objetivos adicionales del vuelo incluían la exploración científica por parte de la tripulación del módulo lunar, o LM; el despliegue de una cámara de televisión para transmitir señales a la Tierra; y el despliegue de un experimento de composición del viento solar, un paquete de experimentos sísmicos y un Retrorreflector de Alcance Láser. Durante la exploración, los dos astronautas debían recoger muestras de materiales de la superficie lunar para devolverlas a la Tierra. También debían fotografiar ampliamente el terreno lunar, el equipo científico desplegado, la nave LM y a los dos astronautas entre sí, tanto con cámaras fijas como de imagen en movimiento. Ésta iba a ser la última misión Apolo en volar con una trayectoria de "retorno libre", lo que permitiría regresar a la Tierra sin encender los motores y abortar la misión en cualquier momento antes de la inserción en la órbita lunar.
+
+Hechos destacados de la misión
+
+El Apolo 11 despegó de Cabo Kennedy el 16 de julio de 1969, llevando al comandante Neil Armstrong, al piloto del módulo de mando Michael Collins y al piloto del módulo lunar Edwin "Buzz" Aldrin a una órbita terrestre inicial de 114 por 116 millas. Se calcula que 650 millones de personas vieron la imagen televisada de Armstrong y escucharon su voz describiendo el acontecimiento mientras daba "...un pequeño paso para un hombre, un gran salto para la humanidad" el 20 de julio de 1969.
+
+Dos horas, 44 minutos y una revolución y media después del lanzamiento, la etapa S-IVB volvió a encenderse para un segundo encendido de cinco minutos y 48 segundos, colocando al Apolo 11 en una órbita translunar. El módulo de mando y servicio, o CSM, Columbia se separó de la etapa, que incluía el adaptador nave-módulo lunar, o SLA, que contenía el módulo lunar, o LM, Eagle. Tras la transposición y eyección de los paneles del SLA en la etapa S-IVB, el CSM se acopló al LM. La etapa S-IVB se separó y se inyectó en órbita heliocéntrica a las cuatro horas y 40 minutos de vuelo.
+
+La primera transmisión de TV en color a la Tierra desde el Apolo 11 se produjo durante la costa translunar del CSM/LM. Más tarde, el 17 de julio, se realizó un encendido de tres segundos del SPS para efectuar la segunda de las cuatro correcciones de rumbo programadas para el vuelo. El lanzamiento había sido tan exitoso que las otras tres no fueron necesarias.
+
+El 18 de julio, Armstrong y Aldrin se pusieron sus trajes espaciales y subieron por el túnel de acoplamiento del Columbia al Eagle para comprobar el LM y realizar la segunda transmisión de TV.
+
+El 19 de julio, después de que el Apolo 11 hubiera volado detrás de la Luna fuera de contacto con la Tierra, llegó la primera maniobra de inserción en órbita lunar. Alrededor de las 75 horas y 50 minutos de vuelo, un disparo retrógrado del SPS durante 357,5 segundos colocó a la nave en una órbita elíptico-lunar inicial de 69 por 190 millas. Posteriormente, un segundo encendido del SPS durante 17 segundos colocó a los vehículos acoplados en una órbita lunar de 62 por 70,5 millas, que se calculó para cambiar la órbita del CSM pilotado por Collins. El cambio se produjo debido a las perturbaciones de la gravedad lunar a las 69 millas nominales requeridas para el posterior encuentro y acoplamiento del LM tras completar el alunizaje. Antes de este segundo disparo del SPS, se realizó otra transmisión de TV, esta vez desde la superficie de la Luna.
+
+El 20 de julio, Armstrong y Aldrin entraron de nuevo en el LM, hicieron una comprobación final y, a las 100 horas y 12 minutos de vuelo, el Eagle se desacopló y se separó del Columbia para una inspección visual. A las 101 horas, 36 minutos, cuando el LM estaba detrás de la Luna en su 13ª órbita, el motor de descenso del LM se encendió durante 30 segundos para proporcionar empuje retrógrado y comenzar la inserción en la órbita de descenso, cambiando a una órbita de 9 por 67 millas, en una trayectoria que era prácticamente idéntica a la volada por el Apollo 10. A las 102 horas y 33 minutos, después de que el Columbia y el Eagle hubieran reaparecido por detrás de la Luna y cuando el LM estaba a unas 300 millas de distancia, se inició el descenso con el motor de descenso encendido durante 756,3 segundos. Al cabo de ocho minutos, el LM se encontraba en la "puerta alta" a unos 26.000 pies sobre la superficie y a unas cinco millas del lugar de aterrizaje.
+
+El motor de descenso continuó proporcionando empuje de frenado hasta aproximadamente las 102 horas y 45 minutos de la misión. Pilotado parcialmente de forma manual por Armstrong, el Eagle aterrizó en el Mar de la Tranquilidad en el Sitio 2 a 0 grados, 41 minutos, 15 segundos de latitud norte y 23 grados, 26 minutos de longitud este. El aterrizaje se produjo a unos seis kilómetros del punto previsto y casi un minuto y medio antes de lo previsto. Incluyó un descenso motorizado que se prolongó unos 40 segundos más de lo previsto debido a las maniobras de traslación para evitar un cráter durante la fase final del aterrizaje. En la etapa de descenso se colocó una placa conmemorativa firmada por el Presidente Richard M. Nixon y los tres astronautas.
+
+
+El plan de vuelo preveía que la primera EVA comenzara tras un período de descanso de cuatro horas, pero se adelantó para que empezara lo antes posible. No obstante, fue casi cuatro horas después cuando Armstrong salió del Eagle y desplegó la cámara de televisión para la transmisión del acontecimiento a la Tierra. Alrededor de las 109 horas y 42 minutos después del lanzamiento, Armstrong pisó la Luna. Unos 20 minutos después, le siguió Aldrin. La cámara se colocó en un trípode a unos 10 metros del LM. Media hora más tarde, el Presidente Nixon habló por enlace telefónico con los astronautas.
+
+En la superficie lunar se dejaron medallones conmemorativos con los nombres de los tres astronautas del Apolo 1 que perdieron la vida en un incendio en la plataforma de lanzamiento y de dos cosmonautas que también murieron en accidentes. También se dejó un disco de silicona de una pulgada y media, que contenía micro miniaturizados mensajes de buena voluntad de 73 países, y los nombres de líderes del Congreso y de la NASA.
+
+Durante la EVA, en la que ambos se alejaron hasta 300 pies del Eagle, Aldrin desplegó los experimentos del Early Apollo Scientific Experiments Package, o EASEP, y Armstrong y Aldrin recogieron e informaron verbalmente sobre las muestras de la superficie lunar. Tras pasar una hora y 33 minutos en la superficie, Aldrin volvió a entrar en el LM, seguido 41 minutos más tarde por Armstrong. La fase EVA completa duró más de dos horas y media y finalizó a las 111 horas y 39 minutos de la misión.
+
+Armstrong y Aldrin pasaron 21 horas y 36 minutos en la superficie lunar. Tras un período de descanso que incluyó siete horas de sueño, el motor de la etapa de ascenso se encendió a las 124 horas y 22 minutos. Se apagó 435 segundos después, cuando el Eagle alcanzó una órbita inicial de 11 por 55 millas sobre la Luna, y cuando el Columbia estaba en su 25ª revolución. Cuando la etapa de ascenso alcanzó la apoluna a las 125 horas y 19 minutos, el sistema de control de reacción, o RCS, se encendió para casi circular la órbita del Eagle a unas 56 millas, unas 13 millas por debajo y ligeramente por detrás del Columbia. Subsiguientes disparos del RCS del LM cambiaron la órbita a 57 por 72 millas. El acoplamiento con el Columbia se produjo en la 27ª revolución del CSM, a las 128 horas y tres minutos de la misión. Armstrong y Aldrin regresaron al CSM con Collins. Cuatro horas más tarde, el LM se eyectó y permaneció en órbita lunar.
+
+La inyección transterrestre del CSM comenzó el 21 de julio cuando el SPS se disparó durante dos minutos y medio cuando el Columbia estaba detrás de la Luna en su hora 59 de órbita lunar. A continuación, los astronautas durmieron unas 10 horas. Un disparo de 11,2 segundos del SPS efectuó la única corrección de rumbo requerida en el vuelo de regreso. La corrección se realizó el 22 de julio a las 150 horas y 30 minutos de la misión. Se efectuaron otras dos transmisiones de televisión durante la costa transterrestre.
+
+Los procedimientos de reentrada se iniciaron el 24 de julio, 44 horas después de abandonar la órbita lunar. El SM se separó del CM, que fue reorientado a una posición hacia delante del escudo térmico. El paracaídas se desplegó a las 195 horas y 13 minutos. Tras un vuelo de 195 horas, 18 minutos y 35 segundos -unos 36 minutos más de lo previsto- el Apollo 11 amerizó en el Océano Pacífico, a 13 millas del buque de recuperación USS Hornet. Debido al mal tiempo en la zona del objetivo, el punto de aterrizaje se modificó unas 250 millas. El Apolo 11 aterrizó a 13 grados, 19 minutos de latitud norte y 169 grados, nueve minutos de longitud oeste el 24 de julio de 1969.
+
+Tripulación
+Neil Armstrong, Comandante
+Edwin E. "Buzz" Aldrin Jr., piloto del módulo lunar
+Michael Collins, piloto del módulo de mando
+
+Tripulación de reserva
+James A. Lovell, comandante
+Fred W. Haise Jr., piloto del módulo lunar
+William A. Anders, piloto del módulo de mando
+
+Carga útil
+Columbia (CSM-107)
+Eagle (LM-5)
+
+Hitos previos al lanzamiento
+21/11/68 - Prueba de los sistemas integrados del LM-5
+6/12/68 - Prueba de los sistemas integrados del CSM-107
+13/12/68 - Prueba de aceptación del LM-5
+1/8/69 - Entrega de la etapa de ascenso del LM-5 en Kennedy
+1/12/69 - Entrega en Kennedy de la etapa de descenso del LM-5
+18/1/69 - Acoplamiento del S-IVB en Kennedy
+1/23/69 - Lanzamiento del CSM en Kennedy
+1/29/69 - acoplamiento de los módulos de mando y servicio
+2/6/69 - S-II acoplado en Kennedy
+20/2/69 - Embarque del S-IC en Kennedy
+17/2/69 - pruebas combinadas de los sistemas CSM-107
+27/2/69 - Embarque del S-IU en Kennedy
+24/3/69 - pruebas de altitud del CSM-107
+14/4/69 - traslado del CSM del Edificio de Operaciones y Revisión al Edificio de Ensamblaje del Vehículo
+4/22/69 - prueba de los sistemas integrados
+5/5/69 - acoplamiento eléctrico del CSM al Saturno V
+5/20/69 - traslado a la plataforma de lanzamiento 39A
+6/1/69 - prueba de preparación para el vuelo
+6/26/69 - prueba de demostración de cuenta atrás
+
+Lanzamiento
+16 de julio de 1969; 9:32 a.m. EDT (UTC-04)
+Plataforma de lanzamiento 39A
+Saturn-V AS-506
+Bahía alta 1
+Plataforma móvil de lanzamiento-1
+Sala de lanzamiento 1
+
+Órbita
+Altitud: 118,65 millas
+Inclinación 32.521 grados
+Órbitas: 30 revoluciones
+Duración: ocho días, tres horas, 18 min, 35 segundos
+Distancia: 953,054 millas
+Localización lunar: Mar de la Tranquilidad
+Coordenadas lunares: 0,71 grados norte, 23,63 grados este
+
+Aterrizaje
+24 de julio de 1969; 12:50 p.m. EDT
+Océano Pacífico
+Buque de recuperación: USS Hornet

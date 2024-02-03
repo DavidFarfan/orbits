@@ -318,8 +318,8 @@ Satellite.sat_from_orbit(
 	MOON_INITIAL_TRUE_ANOMALY
 );
 
-center_body = Satellite.get_sat('earth');
-Satellite.get_sat('earth').ctrl_set( true );
+center_body = Satellite.get_sat('moon');
+Satellite.get_sat('moon').ctrl_set( true );
 
 //------I/O-------------
 
@@ -346,45 +346,99 @@ canvas.addEventListener('mousemove', evt => {
 }, false);
 
 // Captura de parámetros del satélite controlado
-const posx_slider = document.getElementById("posx");
-posx_slider.oninput = () => {
-	sat.x = posx_slider.value;
+const posx_reduce = document.getElementById("posx_reduce");
+posx_reduce.onclick = () => {
+	sat.x = to_km( -1 );
+	sat.y = to_km( 0 );
+	sat.z = to_km( 0 );
 	Satellite.moved = true;
 };
-const posy_slider = document.getElementById("posy");
-posy_slider.oninput = () => {
-	sat.y = posy_slider.value;
+const posx_increase = document.getElementById("posx_increase");
+posx_increase.onclick = () => {
+	sat.x = to_km( 1 );
+	sat.y = to_km( 0 );
+	sat.z = to_km( 0 );
 	Satellite.moved = true;
 };
-const posz_slider = document.getElementById("posz");
-posz_slider.oninput = () => {
-	sat.z = posz_slider.value;
+const posy_reduce = document.getElementById("posy_reduce");
+posy_reduce.onclick = () => {
+	sat.x = to_km( 0 );
+	sat.y = to_km( -1 );
+	sat.z = to_km( 0 );
 	Satellite.moved = true;
 };
-const velx_slider = document.getElementById("velx");
-velx_slider.oninput = () => {
-	sat.vx = velx_slider.value * ( 1e2 / velx_slider.max );
+const posy_increase = document.getElementById("posy_increase");
+posy_increase.onclick = () => {
+	sat.x = to_km( 0 );
+	sat.y = to_km( 1 );
+	sat.z = to_km( 0 );
 	Satellite.moved = true;
 };
-const vely_slider = document.getElementById("vely");
-vely_slider.oninput = () => {
-	sat.vy = vely_slider.value * ( 1e2 / vely_slider.max );
+const posz_reduce = document.getElementById("posz_reduce");
+posz_reduce.onclick = () => {
+	sat.x = to_km( 0 );
+	sat.y = to_km( 0 );
+	sat.z = to_km( -1 );
 	Satellite.moved = true;
 };
-const velz_slider = document.getElementById("velz");
-velz_slider.oninput = () => {
-	sat.vz = velz_slider.value * ( 1e2 / velz_slider.max );
+const posz_increase = document.getElementById("posz_increase");
+posz_increase.onclick = () => {
+	sat.x = to_km( 0 );
+	sat.y = to_km( 0 );
+	sat.z = to_km( 1 );
+	Satellite.moved = true;
+};
+const velx_reduce = document.getElementById("velx_reduce");
+velx_reduce.onclick = () => {
+	sat.vx = -1e-1;
+	sat.vy = 0;
+	sat.vz = 0;
+	Satellite.moved = true;
+};
+const velx_increase = document.getElementById("velx_increase");
+velx_increase.onclick = () => {
+	sat.vx = 1e-1;
+	sat.vy = 0;
+	sat.vz = 0;
+	Satellite.moved = true;
+};
+const vely_reduce = document.getElementById("vely_reduce");
+vely_reduce.onclick = () => {
+	sat.vx = 0;
+	sat.vy = -1e-1;
+	sat.vz = 0;
+	Satellite.moved = true;
+};
+const vely_increase = document.getElementById("vely_increase");
+vely_increase.onclick = () => {
+	sat.vx = 0;
+	sat.vy = 1e-1;
+	sat.vz = 0;
+	Satellite.moved = true;
+};
+const velz_reduce = document.getElementById("velz_reduce");
+velz_reduce.onclick = () => {
+	sat.vx = 0;
+	sat.vy = 0;
+	sat.vz = -1e-1;
+	Satellite.moved = true;
+};
+const velz_increase = document.getElementById("velz_increase");
+velz_increase.onclick = () => {
+	sat.vx = 0;
+	sat.vy = 0;
+	sat.vz = 1e-1;
 	Satellite.moved = true;
 };
 
 // Captura de parámetros del punto sobre la superficie del satélite controlado
 const lat_slider = document.getElementById("lat");
 lat_slider.oninput = () => {
-	PHI = lat_slider.value * PI * ( 1 / lat_slider.max );
+	PHI = lat_slider.value * .5 * PI * ( 1 / lat_slider.max );
 };
 const long_slider = document.getElementById("long");
 long_slider.oninput = () => {
-	LAMBDA = long_slider.value * 2 * PI * ( 1 / long_slider.max );
+	LAMBDA = long_slider.value * PI * ( 1 / long_slider.max );
 };
 
 // Captura de página de info. de simulación a desplegar
@@ -396,12 +450,57 @@ display_page_button.onclick = () => {
 // Targeting
 const targeting_button = document.getElementById("targeting");
 targeting_button.onclick = () => {
-	log("---COMPUTATIONS----");
+	/*log("---COMPUTATIONS----");
 	log(
-		Satellite.get_sat("moon").elliptic_targeting(
-			Satellite.get_sat("earth"),
-			50 * EDAY
+		Satellite.get_sat("earth").elliptic_targeting(
+			Satellite.get_sat("venus"),
+			6 * EDAY
 		).pos
+	);*/
+	let vl = Satellite.get_sat('earth').launch_trajectory(
+			deg_to_rad( 0 ),
+			deg_to_rad( 45 ),
+			6
+	);
+	log( vl );
+	new Satellite(
+		'vehicle', 
+		'earth', 
+		1e0, 
+		1e0, 
+		1e0, 
+		vl.pos, 
+		vl.vel, 
+		{
+			T: 0,
+			t0: 0,
+			tilt: 0
+		},
+		{
+			da: 0,
+			de: 0,
+			di: 0,
+			dupper_omega: 0,
+			dp: 0
+		},
+		false
+	);
+	log( Satellite.get_sat('vehicle').orbit );
+	let f0_for_launch_orbit = argument_of_periapse_f(
+		Satellite.get_sat('vehicle').orbit.eccentricity,
+		vl.pos,
+		Satellite.get_sat('vehicle').orbit.upper_omega,
+		Satellite.get_sat('vehicle').orbit.i
+	).f;
+	log(f0_for_launch_orbit);
+	Satellite.get_sat('vehicle').orbit.set_t0(null, t_from_f(
+									Satellite.get_sat('vehicle').orbit.type,
+									f0_for_launch_orbit,
+									Satellite.get_sat('vehicle').orbit.e, 
+									Satellite.get_sat('vehicle').orbit.a, 
+									Satellite.get_sat('vehicle').orbit.T,
+									Satellite.get_sat('vehicle').get_gravity()
+								) - s_time
 	);
 };
 
@@ -434,14 +533,14 @@ button_time_add.onclick = () => {
 const s_scale_slider = document.getElementById("s_scale");
 s_scale_slider.value = s_scale_slider.min;
 s_scale_slider.oninput = () => {
-	s_scale = s_scale_slider.value * center_body.R * 1e0;
+	s_scale = s_scale_slider.value * center_body.R * 1e-0;
 };
 const t_scale_slider = document.getElementById("t_scale");
 t_scale_slider.value = to_eday( t_scale );
 t_scale_slider.oninput = () => {
 	
 	// Realizar el cambio de escala temporal
-	t_scale = EDAY * t_scale_slider.value * 1e0;
+	t_scale = EDAY * t_scale_slider.value * 1e-0;
 };
 const stop_button = document.getElementById("stop_button");
 stop_button.onclick = () => {

@@ -1202,7 +1202,7 @@ function f_from_H(H, e){
 };
 
 // TIEMPO DADA LA ANOMALIA VERDADERA
-function t_from_f(type, f, e, a, T){
+function t_from_f(type, f, e, a, T, u){
 	if(type == 'elliptic'){
 		return t_from_M(
 			M_from_E(
@@ -1244,14 +1244,76 @@ function LST(GST, longitude){
 	return GST + longitude;
 };
 
+// DIRECCIÓN DE LANZAMIENTO
+function launch_dir(ra, d, longitude, latitude, GST, radius, vel_mag){
+	
+	// Meridiano local
+	let ref = -1;	// Hacia el sur en latitud norte
+	let d_ra = LST(GST, longitude); // Diferencial del ángulo de rotación
+	if(latitude < 0){
+		ref *= -1;	// Hacia el norte en latitud sur
+	};
+	
+	// Punto de lanzamiento (en dirección al cenit)
+	let pos = x_rot( // Ascención recta
+		y_rot(	// declinación
+			{
+				x: 0,
+				y: 0,
+				z: ref
+			},
+			ref * deg_to_rad( 90 )
+		),
+		ref * deg_to_rad( 0 )
+	);
+	
+	// Fase de la rotación
+	pos = y_rot( pos, -latitude );
+	pos = z_rot( pos, PI + d_ra );
+	
+	// Norma
+	if(radius != null){
+		pos = prod_by_sc( radius, pos );
+	};
+	
+	// Dirección e lanzamiento (declinación, ascención recta desde la superficie)
+	let vel = x_rot( // Ascención recta
+		y_rot(	// declinación
+			{
+				x: 0,
+				y: 0,
+				z: ref
+			},
+			ref * d
+		),
+		ref * ra
+	);
+	
+	// Fase de la rotación
+	vel = y_rot( vel, -latitude );
+	vel = z_rot( vel, PI + d_ra );
+	
+	// Norma
+	if(vel_mag != null){
+		vel = prod_by_sc( vel_mag, vel );
+	};
+	return {
+		pos: pos,
+		vel: vel
+	};
+};
+
 // POSICIÓN EN LA ESFERA CELESTE
 function celestial_sphere_pos(ra, d, longitude, latitude, GST){
 	
-	// Punto más alto del ecuador
+	// Meridiano local
 	let ref = -1;	// Hacia el sur en latitud norte
+	let d_ra = -LST(GST, longitude); // Diferencial del ángulo de rotación
 	if(latitude < 0){
-		ref = 1;	// Hacia el norte en latitud sur
+		ref *= -1;	// Hacia el norte en latitud sur
 	};
+	
+	// Dirección
 	let pos = x_rot(	// Ecuador
 		z_rot(		// Dirección sur
 			x_rot(	// Altura
@@ -1262,7 +1324,7 @@ function celestial_sphere_pos(ra, d, longitude, latitude, GST){
 				},
 				ref * d
 			),
-			ref * ( ra - LST(GST, longitude) )
+			ref * ( ra + d_ra )
 		),
 		ref * ( PI / 2 - latitude )
 	);

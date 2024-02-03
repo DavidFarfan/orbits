@@ -38,16 +38,16 @@ class Satellite{
 		
 		// Cambiar posisición del satélite controlado
 		var pos = {
-			x: to_km( sat.x ),
-			y: to_km( sat.y ),
-			z: to_km( sat.z )
+			x: Satellite.ctrl.pos.x + sat.x,
+			y: Satellite.ctrl.pos.y + sat.y,
+			z: Satellite.ctrl.pos.z + sat.z
 		};
 		
 		// Cambiar velocidad del satélite controlado
 		var vel = {
-			x: sat.vx,
-			y: sat.vy,
-			z: sat.vz
+			x: Satellite.ctrl.vel.x + sat.vx,
+			y: Satellite.ctrl.vel.y + sat.vy,
+			z: Satellite.ctrl.vel.z + sat.vz
 		};
 		
 		// Nueva órbita
@@ -141,6 +141,39 @@ class Satellite{
 		);
 	};
 	
+	// Tarayectoria y punto de lanzamiento
+	launch_trajectory(ra, d, vel_mag){
+		
+		// Dirección del lanzamiento
+		let dir_rot = launch_dir(
+			ra,
+			d,
+			LAMBDA,
+			PHI,
+			this.GST,
+			this.R,
+			vel_mag
+		);
+		
+		//  Ajustar al plano ecuatorial
+		let tilt = this.axial_tilt;
+		if(this.orbit.perturbation.negative_inclination){
+			tilt *= -1;
+		};
+		dir_rot.pos = rotation_axis(
+			dir_rot.pos,
+			tilt,
+			this.orbit.perturbation.upper_omega
+		);
+		dir_rot.vel = rotation_axis(
+			dir_rot.vel,
+			tilt,
+			this.orbit.perturbation.upper_omega
+		);
+		
+		return dir_rot;
+	};
+	
 	// Elliptic targeting
 	elliptic_targeting(sat, des_time){
 		
@@ -211,7 +244,8 @@ class Satellite{
 									f0_for_target_orbit,
 									orbit_curve.e, 
 									orbit_curve.a, 
-									orbit_curve.T
+									orbit_curve.T,
+									sat.get_gravity()
 								) - s_time
 		);
 		this.orbit_to_me = {
@@ -388,9 +422,9 @@ class Satellite{
 		
 		// Órbita
 		let print_pos = this.get_print_pos();
-		this.orbit.view1( request, print_pos );
+		this.orbit.view1( request, print_pos, true );
 		
-		// Control
+		// Color inicativo del Control
 		let color;
 		if(this.ctrl){
 			color = 'WHITE';
@@ -423,19 +457,6 @@ class Satellite{
 			draw_rsoi,
 			'RED'
 		]);
-		
-		// Vector prueba
-		if(this.name == center_body.name){
-			let apos = this.get_absolute_pos();
-			request.push([
-				'line', 
-				to_px( -center.x ),
-				to_px( -center.y ),  
-				to_px( -center.x + apos.x ),
-				to_px( -center.y + apos.y ),
-				'WHITE'
-			]);
-		};
 		
 		// Target (Future Position)
 		if(this.target != undefined && this.orbit_to_me != undefined){
@@ -516,6 +537,62 @@ class Satellite{
 			"CYAN"
 		]);
 		
+		// Lanzamiento
+		let dir_rot = this.launch_trajectory(
+			deg_to_rad( 0 ),
+			deg_to_rad( 90 ),
+			this.rsoi
+		);
+		
+		// Impresión de lanzamiento
+		request.push([
+			'line',
+			to_px( print_pos.x + this.orbit.r.x + dir_rot.pos.x ),
+			to_px( print_pos.y + this.orbit.r.y + dir_rot.pos.y ),
+			
+			// La longitud del vector se dibuja sin tener en cuenta la escala
+			to_px( print_pos.x + this.orbit.r.x + dir_rot.pos.x + dir_rot.vel.x ) * 1e0,
+			to_px( print_pos.y + this.orbit.r.y + dir_rot.pos.y + dir_rot.vel.y ) * 1e0,
+			'RED'
+		]);
+		request.push([ 
+			'print', 
+			'negative_inclination: ' + str(
+				this.orbit.perturbation.negative_inclination
+			), 
+			to_px( print_pos.x + this.orbit.r.x ) - 10, 
+			to_px( print_pos.y + this.orbit.r.y ) + 60,
+			color
+		]);
+		request.push([ 
+			'print', 
+			'dir rot x: ' + str( dir_rot.vel.x ), 
+			to_px( print_pos.x + this.orbit.r.x ) - 10, 
+			to_px( print_pos.y + this.orbit.r.y ) + 50,
+			color
+		]);
+		request.push([ 
+			'print', 
+			'dir rot y: ' + str( dir_rot.vel.y ), 
+			to_px( print_pos.x + this.orbit.r.x ) - 10, 
+			to_px( print_pos.y + this.orbit.r.y ) + 40,
+			color
+		]);
+		request.push([ 
+			'print', 
+			'dir rot z: ' + str( dir_rot.vel.z ), 
+			to_px( print_pos.x + this.orbit.r.x ) - 10, 
+			to_px( print_pos.y + this.orbit.r.y ) + 30,
+			color
+		]);
+		request.push([ 
+			'print', 
+			this.GST,
+			to_px( print_pos.x + this.orbit.r.x ) - 10, 
+			to_px( print_pos.y + this.orbit.r.y ) + 20,
+			color
+		]);
+		
 		// Nombre
 		request.push([ 
 			'print', 
@@ -531,9 +608,9 @@ class Satellite{
 		
 		// Órbita
 		let print_pos = this.get_print_pos();
-		this.orbit.view2( request, print_pos );
+		this.orbit.view2( request, print_pos, true );
 		
-		// Control
+		// Color inicativo del Control
 		let color;
 		if(this.ctrl){
 			color = 'WHITE';
@@ -566,19 +643,6 @@ class Satellite{
 			draw_rsoi,
 			'RED'
 		]);
-		
-		// Vector prueba
-		if(this.name == center_body.name){
-			let apos = this.get_absolute_pos();
-			request.push([
-				'line', 
-				to_px( -center.y ),
-				to_px( -center.z ),  
-				to_px( -center.y + apos.y ),
-				to_px( -center.z + apos.z ),
-				'WHITE'
-			]);
-		};
 		
 		// Target (Future Position)
 		if(this.target != undefined && this.orbit_to_me != undefined){
@@ -657,6 +721,53 @@ class Satellite{
 			to_px( print_pos.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
 			to_px( print_pos.z + this.orbit.r.z ) + this.orbit.perturbation.rot_axis.z * 1e-5,
 			"CYAN"
+		]);
+		
+		// Lanzamiento
+		let dir_rot = this.launch_trajectory(
+			deg_to_rad( 0 ),
+			deg_to_rad( 90 ),
+			this.rsoi
+		);
+		
+		// Impresión de lanzamiento
+		request.push([
+			'line',
+			to_px( print_pos.y + this.orbit.r.y + dir_rot.pos.y ),
+			to_px( print_pos.z + this.orbit.r.z + dir_rot.pos.z ),
+			
+			// La longitud del vector se dibuja sin tener en cuenta la escala
+			to_px( print_pos.y + this.orbit.r.y + dir_rot.pos.y + dir_rot.vel.y ) * 1e0,
+			to_px( print_pos.z + this.orbit.r.z + dir_rot.pos.z + dir_rot.vel.z ) * 1e0,
+			'RED'
+		]);
+		request.push([ 
+			'print', 
+			'dir rot x: ' + str( dir_rot.vel.x ), 
+			to_px( print_pos.y + this.orbit.r.y ) - 10, 
+			to_px( print_pos.z + this.orbit.r.z ) + 50,
+			color
+		]);
+		request.push([ 
+			'print', 
+			'dir rot y: ' + str( dir_rot.vel.y ), 
+			to_px( print_pos.y + this.orbit.r.y ) - 10, 
+			to_px( print_pos.z + this.orbit.r.z ) + 40,
+			color
+		]);
+		request.push([ 
+			'print', 
+			'dir rot z: ' + str( dir_rot.vel.z ), 
+			to_px( print_pos.y + this.orbit.r.y ) - 10, 
+			to_px( print_pos.z + this.orbit.r.z ) + 30,
+			color
+		]);
+		request.push([ 
+			'print', 
+			this.GST,
+			to_px( print_pos.y + this.orbit.r.y ) - 10, 
+			to_px( print_pos.z + this.orbit.r.z ) + 20,
+			color
 		]);
 		
 		// Nombre 

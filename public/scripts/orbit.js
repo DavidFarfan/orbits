@@ -7,7 +7,7 @@ class Orbit{
 		// Corrección del eje de rot. para órbitas ficticias que alcanzan i<0
 		let adjust = false;
 		if(i<0){
-			adjust = true;
+			adjust = true; 
 		};
 		
 		// Invariantes
@@ -39,6 +39,11 @@ class Orbit{
 			},
 			adjust
 		);
+		if(i<0){
+			f_orbit.negative_inclination = true;
+		}else{
+			f_orbit.negative_inclination = false;
+		};
 		return f_orbit;
 	};
 	
@@ -113,7 +118,6 @@ class Orbit{
 		// Corrección para órbitas ficticias que alcanzan i<0
 		if(adjust_rot){
 			this.axial_tilt *= -1;
-			this.negative_inclination = true;
 		};
 		this.rot_axis = rotation_axis(
 			h,
@@ -324,37 +328,41 @@ class Orbit{
 	};
 	
 	// Vista 1
-	view1(request, orbited_pos){
+	view1(request, orbited_pos, print_elem){
 		
-		// Nodo ascendente
-		request.push([
-			'line',
-			to_px( orbited_pos.x ),
-			to_px( orbited_pos.y ),
-			to_px( orbited_pos.x + this.perturbation.ascending_node.x ),
-			to_px( orbited_pos.y + this.perturbation.ascending_node.y ),
-			"GREEN"
-		]);
-		
-		// Peripasis
-		request.push([
-			'line',
-			to_px( orbited_pos.x ),
-			to_px( orbited_pos.y ),
-			to_px( orbited_pos.x + this.perturbation.periapse.x ),
-			to_px( orbited_pos.y + this.perturbation.periapse.y ),
-			'RED'
-		]);
-		
-		// Semi-altura recta
-		request.push([
-			'line',
-			to_px( orbited_pos.x ),
-			to_px( orbited_pos.y ),
-			to_px( orbited_pos.x + this.perturbation.semi_latus_rectum.x ),
-			to_px( orbited_pos.y + this.perturbation.semi_latus_rectum.y ),
-			'BLUE'
-		]);
+		// Elementos orbitales
+		if(print_elem){
+			
+			// Nodo ascendente
+			request.push([
+				'line',
+				to_px( orbited_pos.x ),
+				to_px( orbited_pos.y ),
+				to_px( orbited_pos.x + this.perturbation.ascending_node.x ),
+				to_px( orbited_pos.y + this.perturbation.ascending_node.y ),
+				"GREEN"
+			]);
+			
+			// Peripasis
+			request.push([
+				'line',
+				to_px( orbited_pos.x ),
+				to_px( orbited_pos.y ),
+				to_px( orbited_pos.x + this.perturbation.periapse.x ),
+				to_px( orbited_pos.y + this.perturbation.periapse.y ),
+				'RED'
+			]);
+			
+			// Semi-altura recta
+			request.push([
+				'line',
+				to_px( orbited_pos.x ),
+				to_px( orbited_pos.y ),
+				to_px( orbited_pos.x + this.perturbation.semi_latus_rectum.x ),
+				to_px( orbited_pos.y + this.perturbation.semi_latus_rectum.y ),
+				'BLUE'
+			]);
+		};
 		
 		// Curva de la órbita
 		request.push([
@@ -391,37 +399,41 @@ class Orbit{
 	};
 	
 	// Vista 2
-	view2(request, orbited_pos){
+	view2(request, orbited_pos, print_elem){
 		
-		// Nodo ascendente
-		request.push([
-			'line',
-			to_px( orbited_pos.y ),
-			to_px( orbited_pos.z ),
-			to_px( orbited_pos.y + this.perturbation.ascending_node.y ),
-			to_px( orbited_pos.z + this.perturbation.ascending_node.z ),
-			"GREEN"
-		]);
-		
-		// Peripasis
-		request.push([
-			'line',
-			to_px( orbited_pos.y ),
-			to_px( orbited_pos.z ),
-			to_px( orbited_pos.y + this.perturbation.periapse.y ),
-			to_px( orbited_pos.z + this.perturbation.periapse.z ),
-			'RED'
-		]);
-		
-		// Semi-altura recta
-		request.push([
-			'line',
-			to_px( orbited_pos.y ),
-			to_px( orbited_pos.z ),
-			to_px( orbited_pos.y + this.perturbation.semi_latus_rectum.y ),
-			to_px( orbited_pos.z + this.perturbation.semi_latus_rectum.z ),
-			'BLUE'
-		]);
+		// Elementos orbitales
+		if(print_elem){
+			
+			// Nodo ascendente
+			request.push([
+				'line',
+				to_px( orbited_pos.y ),
+				to_px( orbited_pos.z ),
+				to_px( orbited_pos.y + this.perturbation.ascending_node.y ),
+				to_px( orbited_pos.z + this.perturbation.ascending_node.z ),
+				"GREEN"
+			]);
+			
+			// Peripasis
+			request.push([
+				'line',
+				to_px( orbited_pos.y ),
+				to_px( orbited_pos.z ),
+				to_px( orbited_pos.y + this.perturbation.periapse.y ),
+				to_px( orbited_pos.z + this.perturbation.periapse.z ),
+				'RED'
+			]);
+			
+			// Semi-altura recta
+			request.push([
+				'line',
+				to_px( orbited_pos.y ),
+				to_px( orbited_pos.z ),
+				to_px( orbited_pos.y + this.perturbation.semi_latus_rectum.y ),
+				to_px( orbited_pos.z + this.perturbation.semi_latus_rectum.z ),
+				'BLUE'
+			]);
+		};
 		
 		// Curva de la órbita
 		request.push([
