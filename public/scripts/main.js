@@ -49,6 +49,9 @@ var syncro_time = true; // Sincronización al tiempo real
 // Cuerpo cetral
 var center_body = null;
 
+// Trayectorias de vehículo
+var vehicles_trajectories = 0;
+
 // Parámetros de escala de la simulación
 var s_scale = 1e7; // Escala del espacio (kilómetros por pixel de lienzo)
 var t_scale = 0; // Escala del tiempo (Segundos simulados por segundo real)
@@ -96,6 +99,11 @@ function to_real_t(st){
 };
 
 //---------LOOP DE SIMULACIÓN------------
+function set_center_ctrl(name){
+	center_body = Satellite.get_sat( name );
+	Satellite.get_sat( name ).ctrl_set( true );
+};
+
 function orbitLoop(){
 	
 	//------------CONTEO DEL TIEMPO------------
@@ -318,9 +326,7 @@ Satellite.sat_from_orbit(
 	MOON_INITIAL_TRUE_ANOMALY
 );
 
-center_body = Satellite.get_sat('moon');
-Satellite.get_sat('moon').ctrl_set( true );
-
+set_center_ctrl('moon');
 //------I/O-------------
 
 // Recibir confirmación del animador
@@ -457,15 +463,16 @@ targeting_button.onclick = () => {
 			6 * EDAY
 		).pos
 	);*/
-	let vl = Satellite.get_sat('earth').launch_trajectory(
+	let vl = Satellite.ctrl.launch_trajectory(
 			deg_to_rad( 0 ),
 			deg_to_rad( 45 ),
 			6
 	);
 	log( vl );
+	let vehicle_name = 'vehicle trajectory No. ' + str( vehicles_trajectories );
 	new Satellite(
-		'vehicle', 
-		'earth', 
+		vehicle_name, 
+		Satellite.ctrl.name, 
 		1e0, 
 		1e0, 
 		1e0, 
@@ -485,23 +492,33 @@ targeting_button.onclick = () => {
 		},
 		false
 	);
-	log( Satellite.get_sat('vehicle').orbit );
+	log( Satellite.get_sat( vehicle_name ).orbit );
 	let f0_for_launch_orbit = argument_of_periapse_f(
-		Satellite.get_sat('vehicle').orbit.eccentricity,
+		Satellite.get_sat( vehicle_name ).orbit.eccentricity,
 		vl.pos,
-		Satellite.get_sat('vehicle').orbit.upper_omega,
-		Satellite.get_sat('vehicle').orbit.i
+		Satellite.get_sat( vehicle_name ).orbit.upper_omega,
+		Satellite.get_sat( vehicle_name ).orbit.i
 	).f;
 	log(f0_for_launch_orbit);
-	Satellite.get_sat('vehicle').orbit.set_t0(null, t_from_f(
-									Satellite.get_sat('vehicle').orbit.type,
+	Satellite.get_sat( vehicle_name ).orbit.set_t0(null, t_from_f(
+									Satellite.get_sat( vehicle_name ).orbit.type,
 									f0_for_launch_orbit,
-									Satellite.get_sat('vehicle').orbit.e, 
-									Satellite.get_sat('vehicle').orbit.a, 
-									Satellite.get_sat('vehicle').orbit.T,
-									Satellite.get_sat('vehicle').get_gravity()
+									Satellite.get_sat( vehicle_name ).orbit.e, 
+									Satellite.get_sat( vehicle_name ).orbit.a, 
+									Satellite.get_sat( vehicle_name ).orbit.T,
+									Satellite.get_sat( vehicle_name ).get_gravity()
 								) - s_time
 	);
+	vehicles_trajectories ++;
+};
+
+// Captura del satélite Controlado
+const ctrl_sat = document.getElementById("ctrl_sat");
+const ctrl_button = document.getElementById("ctrl_button");
+ctrl_button.onclick = () => {
+	if( Satellite.get_sat( ctrl_sat.value ) != null ){
+		set_center_ctrl( ctrl_sat.value );
+	};
 };
 
 // Captura de tiempo de simulación

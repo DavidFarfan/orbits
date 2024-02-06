@@ -67,7 +67,7 @@ class Satellite{
 		});
 		
 		// Reiniciar tiempo de simulación
-		s_base_time = 0;
+		s_base_time = Satellite.ctrl.epoch;
 		
 		// Esperar un nuevo cambio de parámetros
 		Satellite.moved = false;
@@ -782,6 +782,7 @@ class Satellite{
 	
 	// Variables del satélite
 	constructor(name, orbited, R, m, u, pos, vel, rot, dif, ctrl){
+		this.epoch = s_time;
 		this.name_set(name);
 		this.orbited = orbited;
 		this.R_set(R);
