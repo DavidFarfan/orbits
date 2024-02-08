@@ -72,7 +72,7 @@ class Satellite{
 		// Esperar un nuevo cambio de parámetros
 		Satellite.moved = false;
 	};
-	
+	 
 	// Satélite a partir de la órbita
 	static sat_from_orbit(name, orbited, R, m, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
 		
@@ -190,6 +190,8 @@ class Satellite{
 		log("---f0----");
 		log( sat.orbit.f );
 		log( this.orbit.f );
+		
+		// Target en el tiempo deseado de colisión
 		let comp = this.orbit.fictional_pos(
 				des_time,
 				this.orbit.t,
@@ -281,6 +283,10 @@ class Satellite{
 		};
 	};
 	
+	// Posición absoluta del satélite
+	get_absolute_pos(rel, print){
+	};
+	
 	// Posicion de impresión
 	get_print_pos(){
 		let pos = this.get_absolute_pos();
@@ -292,7 +298,7 @@ class Satellite{
 	};
 	
 	// Posición absoluta del satélite orbitado
-	get_absolute_pos(rel){
+	get_absolute_pos(rel, print){
 		
 		// Posición del satélite orbitado
 		if(this.orbited == null){
@@ -318,13 +324,17 @@ class Satellite{
 			};
 			var orbited_pos = Satellite.get_sat( this.orbited ).orbit.r;
 			if(orbited_pos != undefined){
+				if(print){
+					log('orbitado: ' + this.orbited );
+					log(orbited_pos);
+				};
 				relative = {
 					x: orbited_pos.x + relative.x,
 					y: orbited_pos.y + relative.y,
 					z: orbited_pos.z + relative.z
 				};
 			};
-			return Satellite.get_sat( this.orbited ).get_absolute_pos( relative );
+			return Satellite.get_sat( this.orbited ).get_absolute_pos( relative, print );
 		};
 	};
 	

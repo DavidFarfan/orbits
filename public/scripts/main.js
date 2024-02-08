@@ -52,6 +52,10 @@ var center_body = null;
 // Trayectorias de vehículo
 var vehicles_trajectories = 0;
 
+// Partida y Destino
+var depart = null;
+var destin = null;
+
 // Parámetros de escala de la simulación
 var s_scale = 1e7; // Escala del espacio (kilómetros por pixel de lienzo)
 var t_scale = 0; // Escala del tiempo (Segundos simulados por segundo real)
@@ -453,16 +457,9 @@ display_page_button.onclick = () => {
 	info = ( info + 1 ) % 2;
 };
 
-// Targeting
-const targeting_button = document.getElementById("targeting");
-targeting_button.onclick = () => {
-	/*log("---COMPUTATIONS----");
-	log(
-		Satellite.get_sat("earth").elliptic_targeting(
-			Satellite.get_sat("venus"),
-			6 * EDAY
-		).pos
-	);*/
+// Lanzamiento desde el satélite controlado
+const launch_button = document.getElementById("launch");
+launch_button.onclick = () => {
 	let vl = Satellite.ctrl.launch_trajectory(
 			deg_to_rad( 0 ),
 			deg_to_rad( 45 ),
@@ -473,7 +470,7 @@ targeting_button.onclick = () => {
 	new Satellite(
 		vehicle_name, 
 		Satellite.ctrl.name, 
-		1e0, 
+		1e0,
 		1e0, 
 		1e0, 
 		vl.pos, 
@@ -512,12 +509,38 @@ targeting_button.onclick = () => {
 	vehicles_trajectories ++;
 };
 
+// Targeting
+const targeting_button = document.getElementById("targeting");
+targeting_button.onclick = () => {
+	if(destin != null & depart != null){
+		log("---COMPUTATIONS----");
+		log(
+			Satellite.get_sat(destin).elliptic_targeting(
+				Satellite.get_sat(depart),
+				6 * EDAY
+			).pos
+		);
+	};
+	log( 'tierra' );
+	log( Satellite.get_sat('earth').orbit.r );
+	log( 'tierra abs' );
+	log( Satellite.get_sat('earth').get_absolute_pos( null, true ) );
+	log( 'luna' );
+	log( Satellite.get_sat('moon').orbit.r );
+	log( 'luna abs' );
+	log( Satellite.get_sat('moon').get_absolute_pos( null, true ) );
+};
+
 // Captura del satélite Controlado
 const ctrl_sat = document.getElementById("ctrl_sat");
 const ctrl_button = document.getElementById("ctrl_button");
 ctrl_button.onclick = () => {
 	if( Satellite.get_sat( ctrl_sat.value ) != null ){
 		set_center_ctrl( ctrl_sat.value );
+		
+		// Establecer partida y destino de un viaje
+		destin =  depart;
+		depart = ctrl_sat.value;
 	};
 };
 
@@ -550,7 +573,7 @@ button_time_add.onclick = () => {
 const s_scale_slider = document.getElementById("s_scale");
 s_scale_slider.value = s_scale_slider.min;
 s_scale_slider.oninput = () => {
-	s_scale = s_scale_slider.value * center_body.R * 1e-0;
+	s_scale = s_scale_slider.value * center_body.R * 1e+1;
 };
 const t_scale_slider = document.getElementById("t_scale");
 t_scale_slider.value = to_eday( t_scale );
@@ -573,4 +596,4 @@ canvas.addEventListener('click', () => {
 }, false);
 
 // Comenzar loop del programa
-setInterval(orbitLoop, s_to_ms( 1 / frac ) );
+setInterval( orbitLoop, s_to_ms( 1 / frac ) );
