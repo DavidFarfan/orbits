@@ -177,19 +177,32 @@ class Satellite{
 	// Elliptic targeting
 	elliptic_targeting(sat, des_time){
 		
-		// Calculate future position
-		log("---TGT----");
-		log( sat );
-		log( this );
-		log("---r0----");
+		// Coordenadas absolutas de los objetos involucrados
+		log( 'CENTER' );
+		let absolute_pos_center = Satellite.get_sat( this.orbited )
+			.get_absolute_r( true );
+		log( 'SAT' );
+		let absolute_pos_sat = sat.get_absolute_r( true );
+		log( 'TARGET' );
+		let absolute_pos_target = this.get_absolute_r( true );
+		
+		// Coordenadas ajustadas CENTRO/SATÉLITE/OBJETIVO
+		log( 'SAT_r' );
 		log( sat.orbit.r );
+		log( 'SAT_POS' );
+		let sat_dist = sum_vec(
+			absolute_pos_sat,
+			prod_by_sc( -1, absolute_pos_center )
+		);
+		log( sat_dist );
+		log( 'TARGET_r' );
 		log( this.orbit.r );
-		log("---t0----");
-		log( sat.orbit.t );
-		log( this.orbit.t );
-		log("---f0----");
-		log( sat.orbit.f );
-		log( this.orbit.f );
+		log( 'TARGET_POS' );
+		let target_dist = sum_vec(
+			absolute_pos_target,
+			prod_by_sc( -1, absolute_pos_center )
+		);
+		log( target_dist );
 		
 		// Target en el tiempo deseado de colisión
 		let comp = this.orbit.fictional_pos(
@@ -205,27 +218,27 @@ class Satellite{
 		
 		// Feasibility
 		log("---Chord, Semi perimeter----");
-		let cs = chord_semi_perimeter( sat.orbit.r, this.target.r );
+		let cs = chord_semi_perimeter( sat_dist, this.target.r );
 		log( cs );
 		log("---t---");
-		let mint = ell_min_flight_t( sat.orbit.r, this.target.r, sat.get_gravity() );
-		let maxt = dt_from_a( sat.orbit.r, this.target.r, cs.semi_perimeter / 2, sat.get_gravity() );
+		let mint = ell_min_flight_t( sat_dist, this.target.r, this.get_gravity() );
+		let maxt = dt_from_a( sat_dist, this.target.r, cs.semi_perimeter / 2, this.get_gravity() );
 		log( 'min t: ' + str( to_eday( mint ) ) );
 		log( 'des t: ' + str( to_eday( des_time ) ) );
 		log( 'max t: ' + str( to_eday( maxt ) ) );
 		log("---a---");
-		let min_a = a_from_dt( sat.orbit.r, this.target.r, mint, sat.get_gravity() );
-		let des_a = a_from_dt( sat.orbit.r, this.target.r, des_time, sat.get_gravity() );
-		let max_a = a_from_dt( sat.orbit.r, this.target.r, maxt, sat.get_gravity() );
+		let min_a = a_from_dt( sat_dist, this.target.r, mint, this.get_gravity() );
+		let des_a = a_from_dt( sat_dist, this.target.r, des_time, this.get_gravity() );
+		let max_a = a_from_dt( sat_dist, this.target.r, maxt, this.get_gravity() );
 		log( 'min a: ' + str( min_a.a ) );
 		log( 'des a: ' + str( des_a.a ) );
 		log( 'max a: ' + str( max_a.a ) + " = s/2 = " + str( cs.semi_perimeter / 2 ) );
 		let orbit_curve = new Orbit(
-			angular_momentum( sat.orbit.r, des_a.v ),
-			orbital_energy( norm_vec( des_a.v ), sat.get_gravity(), norm_vec( sat.orbit.r ) ),
-			sat.get_gravity(),
+			angular_momentum( sat_dist, des_a.v ),
+			orbital_energy( norm_vec( des_a.v ), this.get_gravity(), norm_vec( sat_dist ) ),
+			this.get_gravity(),
 			des_a.v,
-			sat.orbit.r,
+			sat_dist,
 			sat.axial_tilt,
 			{	// La órbita ficticia no necesita los diferenciales, realmente.
 				da: 0,
@@ -235,23 +248,40 @@ class Satellite{
 				dp: 0
 			}
 		);
+		
+		// Orbit Without f adjustment
+		log( 'Orbit without f adjustment' );
+		log( orbit_curve );
+		
+		// f ajustado
 		let f0_for_target_orbit = argument_of_periapse_f(
 			orbit_curve.eccentricity,
-			sat.orbit.r,
+			sat_dist,
 			orbit_curve.upper_omega,
 			orbit_curve.i
 		).f;
-		orbit_curve.set_t0(null, t_from_f(
-									orbit_curve.type,
-									f0_for_target_orbit,
-									orbit_curve.e, 
-									orbit_curve.a, 
-									orbit_curve.T,
-									sat.get_gravity()
-								) - s_time
+		log( 'f ajustado' );
+		log( f0_for_target_orbit );
+		
+		// Tiempo ajustado
+		let t_init = t_from_f(
+			orbit_curve.type,
+			f0_for_target_orbit,
+			orbit_curve.e, 
+			orbit_curve.a, 
+			orbit_curve.T,
+			this.get_gravity()
 		);
+		log( 'tiempo de partida' );
+		log( t_init );
+		log( 'tiempo' );
+		log( s_time );
+		log( 'ajuste' );
+		let t_adj = t_init - s_time;
+		log( t_adj );
+		orbit_curve.set_t0( null, t_adj );
 		this.orbit_to_me = {
-			sat: sat,
+			sat: this,
 			orbit: orbit_curve
 		};
 		log('trajectory');
@@ -283,8 +313,32 @@ class Satellite{
 		};
 	};
 	
+	// Velocidad absoluta del satélite
+	get_absolute_v(print){
+		
+		// Sumar el radio propio al cómputo recursivo hasta el Sol
+		let orbited_vel = this.get_absolute_vel( null, print );
+		return {
+			x: this.orbit.v.x + orbited_vel.x,
+			y: this.orbit.v.y + orbited_vel.y,
+			z: this.orbit.v.z + orbited_vel.z
+		};
+	};
+	
 	// Posición absoluta del satélite
-	get_absolute_pos(rel, print){
+	get_absolute_r(print){
+		
+		// Sumar el radio propio al cómputo recursivo hasta el Sol
+		let orbited_pos = this.get_absolute_pos( null, print );
+		let my_pos = {
+			x: this.orbit.r.x + orbited_pos.x,
+			y: this.orbit.r.y + orbited_pos.y,
+			z: this.orbit.r.z + orbited_pos.z
+		};
+		if(print){
+			log( my_pos );			
+		};
+		return my_pos;
 	};
 	
 	// Posicion de impresión
@@ -300,7 +354,7 @@ class Satellite{
 	// Posición absoluta del satélite orbitado
 	get_absolute_pos(rel, print){
 		
-		// Posición del satélite orbitado
+		// Recorrer recursivamente hasta el Sol
 		if(this.orbited == null){
 			if(rel == null){
 				return {
@@ -335,6 +389,47 @@ class Satellite{
 				};
 			};
 			return Satellite.get_sat( this.orbited ).get_absolute_pos( relative, print );
+		};
+	};
+	
+	// Velocidad absoluta del satélite orbitado
+	get_absolute_vel(rel, print){
+		
+		// Recorrer recursivamente hasta el Sol
+		if(this.orbited == null){
+			if(rel == null){
+				return {
+					x: 0,
+					y: 0,
+					z: 0
+				};
+			}else{
+				return rel;
+			};
+		}else{
+			var relative;
+			if(rel == null){
+				relative = {
+					x: 0,
+					y: 0,
+					z: 0
+				};
+			}else{
+				relative = rel;
+			};
+			var orbited_vel = Satellite.get_sat( this.orbited ).orbit.v;
+			if(orbited_vel != undefined){
+				if(print){
+					log('orbitado: ' + this.orbited );
+					log(orbited_vel);
+				};
+				relative = {
+					x: orbited_vel.x + relative.x,
+					y: orbited_vel.y + relative.y,
+					z: orbited_vel.z + relative.z
+				};
+			};
+			return Satellite.get_sat( this.orbited ).get_absolute_vel( relative, print );
 		};
 	};
 	

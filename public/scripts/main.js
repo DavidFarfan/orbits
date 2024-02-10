@@ -513,22 +513,12 @@ launch_button.onclick = () => {
 const targeting_button = document.getElementById("targeting");
 targeting_button.onclick = () => {
 	if(destin != null & depart != null){
-		log("---COMPUTATIONS----");
-		log(
-			Satellite.get_sat(destin).elliptic_targeting(
-				Satellite.get_sat(depart),
-				6 * EDAY
-			).pos
-		);
+		log("---TARGETING----");
+		Satellite.get_sat(destin).elliptic_targeting(
+			Satellite.get_sat(depart),
+			6 * EDAY
+		).pos
 	};
-	log( 'tierra' );
-	log( Satellite.get_sat('earth').orbit.r );
-	log( 'tierra abs' );
-	log( Satellite.get_sat('earth').get_absolute_pos( null, true ) );
-	log( 'luna' );
-	log( Satellite.get_sat('moon').orbit.r );
-	log( 'luna abs' );
-	log( Satellite.get_sat('moon').get_absolute_pos( null, true ) );
 };
 
 // Captura del satélite Controlado
