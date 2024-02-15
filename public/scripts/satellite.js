@@ -32,22 +32,52 @@ class Satellite{
 	static ctrl_rutine(){
 		
 		// Verificar cambios de parámetros
-		if(!Satellite.moved){
+		if(Satellite.moved == 0){
 			return;
 		};  
 		
-		// Cambiar posisición del satélite controlado
-		var pos = {
-			x: Satellite.ctrl.pos.x + sat.x,
-			y: Satellite.ctrl.pos.y + sat.y,
-			z: Satellite.ctrl.pos.z + sat.z
-		};
+		// Preparar nuevas condiciones iniciales del satélite
+		var pos = Satellite.ctrl.pos;
+		var vel = Satellite.ctrl.vel;
 		
-		// Cambiar velocidad del satélite controlado
-		var vel = {
-			x: Satellite.ctrl.vel.x + sat.vx,
-			y: Satellite.ctrl.vel.y + sat.vy,
-			z: Satellite.ctrl.vel.z + sat.vz
+		// Cambiar posisición/velocidad del satélite controlado según bandera
+		switch(Satellite.moved){
+			case -1:
+				pos.x -= sat.x;
+				break;
+			case 1:
+				pos.x += sat.x;
+				break;
+			case -2:
+				pos.y -= sat.y;
+				break;
+			case 2:
+				pos.y += sat.y;
+				break;
+			case -3:
+				pos.z -= sat.z;
+				break;
+			case 3:
+				pos.z += sat.z;
+				break;
+			case -4:
+				vel.x -= sat.vx;
+				break;
+			case 4:
+				vel.x += sat.vx;
+				break;
+			case -5:
+				vel.y -= sat.vy;
+				break;
+			case 5:
+				vel.y += sat.vy;
+				break;
+			case -6:
+				vel.z -= sat.vz;
+				break;
+			case 6:
+				vel.z += sat.vz;
+				break;
 		};
 		
 		// Nueva órbita
@@ -70,7 +100,7 @@ class Satellite{
 		s_base_time = Satellite.ctrl.epoch;
 		
 		// Esperar un nuevo cambio de parámetros
-		Satellite.moved = false;
+		Satellite.moved = 0;
 	};
 	 
 	// Satélite a partir de la órbita
@@ -81,10 +111,10 @@ class Satellite{
 			
 			// Crear un cuerpo "inmóvil"
 			let sat_at_t0 = invariants_from_elements(
-				u,
-				1e9,
+				1.9 * u,
+				1e18,
 				0,
-				1e9,
+				1e18,
 				0,
 				0,
 				0,
@@ -139,6 +169,83 @@ class Satellite{
 			dif,
 			true
 		);
+	};
+	
+	// Flight leg
+	static flight_leg(){
+		
+		// Coordenadas absolutas de los objetos involucrados
+		log( 'CENTER' );
+		let absolute_pos_center = Satellite.get_sat(
+			Satellite.ctrl.orbited
+		).get_absolute_r( true );
+		log( absolute_pos_center );
+		log( 'SAT' );
+		let absolute_pos_sat = Satellite.ctrl.get_absolute_r( true );
+		log( absolute_pos_sat );
+		
+		// Coordenadas ajustadas CENTRO/SATÉLITE
+		log( 'SAT_POS' );
+		let sat_dist = sum_vec(
+			absolute_pos_sat,
+			prod_by_sc( -1, absolute_pos_center )
+		);
+		log( sat_dist );
+		
+		// Crear un satélite con características idénticas
+		let vehicle_name = 'vehicle trajectory No. ' + str( vehicles_trajectories );
+		new Satellite(
+			vehicle_name, 
+			Satellite.ctrl.orbited, 
+			Satellite.ctrl.R,
+			Satellite.ctrl.m, 
+			Satellite.ctrl.u, 
+			sat_dist, 
+			Satellite.ctrl.orbit.v, 
+			{
+				T: 0,
+				t0: 0,
+				tilt: 0
+			},
+			{
+				da: 0,
+				de: 0,
+				di: 0,
+				dupper_omega: 0,
+				dp: 0
+			},
+			false
+		);
+		log( Satellite.get_sat( vehicle_name ).orbit );
+		
+		// Ajustar tiempo inicial
+		let f0_for_launch_orbit = argument_of_periapse_f(
+			Satellite.get_sat( vehicle_name ).orbit.eccentricity,
+			sat_dist,
+			Satellite.get_sat( vehicle_name ).orbit.upper_omega,
+			Satellite.get_sat( vehicle_name ).orbit.i
+		).f;
+		log(f0_for_launch_orbit);
+		Satellite.get_sat( vehicle_name ).orbit.set_t0(null, t_from_f(
+										Satellite.get_sat( vehicle_name ).orbit.type,
+										f0_for_launch_orbit,
+										Satellite.get_sat( vehicle_name ).orbit.e, 
+										Satellite.get_sat( vehicle_name ).orbit.a, 
+										Satellite.get_sat( vehicle_name ).orbit.T,
+										Satellite.get_sat( vehicle_name ).get_gravity()
+									) - s_time
+		);
+		vehicles_trajectories ++;
+		
+		// EPOCH
+		log( 'EPOCH' );
+		log( Satellite.get_sat( vehicle_name ).epoch );
+		log( 'TIME' );
+		log( s_time );
+		
+		// TRASPASO
+		Satellite.ctrl.alive = false;
+		Satellite.get_sat( vehicle_name ).ctrl_set( true );
 	};
 	
 	// Tarayectoria y punto de lanzamiento
@@ -249,11 +356,7 @@ class Satellite{
 			}
 		);
 		
-		// Orbit Without f adjustment
-		log( 'Orbit without f adjustment' );
-		log( orbit_curve );
-		
-		// f ajustado
+		// f inicial
 		let f0_for_target_orbit = argument_of_periapse_f(
 			orbit_curve.eccentricity,
 			sat_dist,
@@ -279,7 +382,9 @@ class Satellite{
 		log( 'ajuste' );
 		let t_adj = t_init - s_time;
 		log( t_adj );
-		orbit_curve.set_t0( null, t_adj );
+		orbit_curve.set_t0( null, t_adj ); 
+		
+		// Transfer orbit se dibuja alrededor del cuerpo orbitado por target
 		this.orbit_to_me = {
 			sat: this,
 			orbit: orbit_curve
@@ -525,6 +630,11 @@ class Satellite{
 	// Vista 1
 	view1(request){
 		
+		// Ocultar vista
+		if(!this.alive){
+			return;
+		};
+		
 		// Órbita
 		let print_pos = this.get_print_pos();
 		this.orbit.view1( request, print_pos, true );
@@ -711,6 +821,11 @@ class Satellite{
 	// Vista 2
 	view2(request){
 		
+		// Ocultar vista
+		if(!this.alive){
+			return;
+		};
+		
 		// Órbita
 		let print_pos = this.get_print_pos();
 		this.orbit.view2( request, print_pos, true );
@@ -887,8 +1002,10 @@ class Satellite{
 	
 	// Variables del satélite
 	constructor(name, orbited, R, m, u, pos, vel, rot, dif, ctrl){
-		this.epoch = s_time;
+		this.alive = true;
+		this.epoch = s_base_time;
 		this.name_set(name);
+		log( this.name + ' ' + str( this.epoch ) );
 		this.orbited = orbited;
 		this.R_set(R);
 		this.m_set(m);

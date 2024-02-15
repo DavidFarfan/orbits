@@ -28,9 +28,9 @@ var mousePos = { // Posicion del mouse sobre el lienzo 1
 	y: height_p( .5 )
 };
 var sat = { // Condiciones iniciales del satélite controlado 
-	x: 0,
-	y: 0,
-	z: 0,
+	x: to_km( 0 ),
+	y: to_km( 0 ),
+	z: to_km( 0 ),
 	vx: 0,
 	vy: 0,
 	vz: 0
@@ -133,6 +133,16 @@ function orbitLoop(){
 		
 		// El segundero local sincroniza con el segundero universal
 		l_seconds = u_seconds;
+	};
+	
+	//------------VARIABLES DEPENDIENTES DE LA ESCALA---------
+	sat = { // Condiciones iniciales del satélite controlado 
+		x: to_km( 1 ),
+		y: to_km( 1 ),
+		z: to_km( 1 ),
+		vx: 1e-1,
+		vy: 1e-1,
+		vz: 1e-1
 	};
 	
 	//------------CONTROL MANUAL---------
@@ -358,87 +368,51 @@ canvas.addEventListener('mousemove', evt => {
 // Captura de parámetros del satélite controlado
 const posx_reduce = document.getElementById("posx_reduce");
 posx_reduce.onclick = () => {
-	sat.x = to_km( -1 );
-	sat.y = to_km( 0 );
-	sat.z = to_km( 0 );
-	Satellite.moved = true;
+	Satellite.moved = -1;
 };
 const posx_increase = document.getElementById("posx_increase");
 posx_increase.onclick = () => {
-	sat.x = to_km( 1 );
-	sat.y = to_km( 0 );
-	sat.z = to_km( 0 );
-	Satellite.moved = true;
+	Satellite.moved = 1;
 };
 const posy_reduce = document.getElementById("posy_reduce");
 posy_reduce.onclick = () => {
-	sat.x = to_km( 0 );
-	sat.y = to_km( -1 );
-	sat.z = to_km( 0 );
-	Satellite.moved = true;
+	Satellite.moved = -2;
 };
 const posy_increase = document.getElementById("posy_increase");
 posy_increase.onclick = () => {
-	sat.x = to_km( 0 );
-	sat.y = to_km( 1 );
-	sat.z = to_km( 0 );
-	Satellite.moved = true;
+	Satellite.moved = 2;
 };
 const posz_reduce = document.getElementById("posz_reduce");
 posz_reduce.onclick = () => {
-	sat.x = to_km( 0 );
-	sat.y = to_km( 0 );
-	sat.z = to_km( -1 );
-	Satellite.moved = true;
+	Satellite.moved = -3;
 };
 const posz_increase = document.getElementById("posz_increase");
 posz_increase.onclick = () => {
-	sat.x = to_km( 0 );
-	sat.y = to_km( 0 );
-	sat.z = to_km( 1 );
-	Satellite.moved = true;
+	Satellite.moved = 3;
 };
 const velx_reduce = document.getElementById("velx_reduce");
 velx_reduce.onclick = () => {
-	sat.vx = -1e-1;
-	sat.vy = 0;
-	sat.vz = 0;
-	Satellite.moved = true;
+	Satellite.moved = -4;
 };
 const velx_increase = document.getElementById("velx_increase");
 velx_increase.onclick = () => {
-	sat.vx = 1e-1;
-	sat.vy = 0;
-	sat.vz = 0;
-	Satellite.moved = true;
+	Satellite.moved = 4;
 };
 const vely_reduce = document.getElementById("vely_reduce");
 vely_reduce.onclick = () => {
-	sat.vx = 0;
-	sat.vy = -1e-1;
-	sat.vz = 0;
-	Satellite.moved = true;
+	Satellite.moved = -5;
 };
 const vely_increase = document.getElementById("vely_increase");
 vely_increase.onclick = () => {
-	sat.vx = 0;
-	sat.vy = 1e-1;
-	sat.vz = 0;
-	Satellite.moved = true;
+	Satellite.moved = 5;
 };
 const velz_reduce = document.getElementById("velz_reduce");
 velz_reduce.onclick = () => {
-	sat.vx = 0;
-	sat.vy = 0;
-	sat.vz = -1e-1;
-	Satellite.moved = true;
+	Satellite.moved = -6;
 };
 const velz_increase = document.getElementById("velz_increase");
 velz_increase.onclick = () => {
-	sat.vx = 0;
-	sat.vy = 0;
-	sat.vz = 1e-1;
-	Satellite.moved = true;
+	Satellite.moved = 6;
 };
 
 // Captura de parámetros del punto sobre la superficie del satélite controlado
@@ -455,6 +429,15 @@ long_slider.oninput = () => {
 const display_page_button = document.getElementById("page");
 display_page_button.onclick = () => {
 	info = ( info + 1 ) % 2;
+};
+
+// Tramo de vuelo
+const phase = document.getElementById("phase");
+phase.onclick = () => {
+	log( 'New phase from: ' + Satellite.ctrl.name );
+	
+	// Crear un vehículo ditinto que parta de la posición simulada ctrl
+	Satellite.flight_leg();
 };
 
 // Lanzamiento desde el satélite controlado
@@ -563,7 +546,7 @@ button_time_add.onclick = () => {
 const s_scale_slider = document.getElementById("s_scale");
 s_scale_slider.value = s_scale_slider.min;
 s_scale_slider.oninput = () => {
-	s_scale = s_scale_slider.value * center_body.R * 1e+1;
+	s_scale = s_scale_slider.value * center_body.R * 1e0;
 };
 const t_scale_slider = document.getElementById("t_scale");
 t_scale_slider.value = to_eday( t_scale );
@@ -584,6 +567,11 @@ stop_button.onclick = () => {
 canvas.addEventListener('click', () => {
 	view = ( view + 1 ) % 3 + 1;
 }, false);
+
+log( 'v_min, visviva' );
+log( sqrt( E_U / ER ) );
+log( 'v_max, E fornula' );
+log( sqrt( 2 * E_U / ER ) );
 
 // Comenzar loop del programa
 setInterval( orbitLoop, s_to_ms( 1 / frac ) );
