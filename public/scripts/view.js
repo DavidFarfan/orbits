@@ -16,10 +16,10 @@ class View{
 			'WHITE'
 		]);
 		
-		// Parámetro gravitacional (km^3/s^2)
+		// Parámetro gravitacional del cuerpo orbitado (km^3/s^2)
 		let GM = 0;
 		if(Satellite.ctrl.orbited != null){
-			GM = Satellite.get_sat( Satellite.ctrl.orbited ).u;
+			GM = Satellite.ctrl.get_gravity();
 		};
 		request.push([
 			'print', 
@@ -50,7 +50,7 @@ class View{
 		// Tiempo de órbita (eday)
 		request.push([
 			'print', 
-			"orbit time (eday) = " + str( significant( to_eday( Satellite.ctrl.orbit.t ), 4 ) ),
+			"orbit sim. time (eday) = " + str( significant( to_eday( Satellite.ctrl.orbit.t ), 4 ) ),
 			10, 
 			height_p( 1 ) - 50,
 			'WHITE'
@@ -194,7 +194,7 @@ class View{
 		// Energía orbital (km^2/s^2)
 		let E_sim = orbital_energy(
 			norm_vec( Satellite.ctrl.orbit.v ),
-			Satellite.u,
+			Satellite.ctrl.get_gravity(),
 			norm_vec( Satellite.ctrl.orbit.r )
 		);
 		request.push([
@@ -268,7 +268,7 @@ class View{
 			'GREEN'
 		]);
 		
-		// Ascending node (er)
+		// Magnitud del nodo ascendente (er)
 		request.push([
 			'print', 
 			"|| n || (er) = " +
@@ -315,7 +315,7 @@ class View{
 			'RED'
 		]);
 		
-		// Periapse (er)
+		// Magnitud el periapsis (er)
 		request.push([
 			'print', 
 			"|| rp || (er) = " +

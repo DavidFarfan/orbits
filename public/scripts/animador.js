@@ -16,13 +16,13 @@ const colors = { // Paleta
 
 //-----DIBUJO------------
 
-// BORRAR TODO EL LIENZO
+// Borrar el lienzo
 function erase(){
 	ctx.fillStyle = colors['BLACK'];
 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
 
-// SEGMENTO
+// Segmento
 function line(x1, y1, x2, y2, c){
 	ctx.strokeStyle = colors[c];
 	ctx.beginPath();
@@ -31,7 +31,7 @@ function line(x1, y1, x2, y2, c){
 	ctx.stroke();
 }
 
-// CURVA
+// Curva
 function plot(points, center, angle, color, axis1, axis2){
 	
 	// Verificar que hay puntos
@@ -73,7 +73,7 @@ function plot(points, center, angle, color, axis1, axis2){
 	ctx.restore();
 };
 
-// ELIPSE
+// Elipse
 function ellipse(cx, cy, rx, ry, c){
 	ctx.strokeStyle = colors[c];
 	ctx.fillStyle = colors[c];
@@ -82,7 +82,7 @@ function ellipse(cx, cy, rx, ry, c){
 	ctx.stroke();
 }
 
-// TEXTO
+// Texto
 function print(txt, x, y, c){
 	
 	// Reflejar texto (está al revés)
@@ -99,7 +99,7 @@ function print(txt, x, y, c){
 
 //-----COMUNICACIÓN--------
 
-// INSTRUCCIONES DE MAIN
+// Instrucciones del hilo principal
 self.onmessage = (e) => {
 	switch (e.data.type) {
 		
@@ -123,7 +123,7 @@ self.onmessage = (e) => {
 	}
 };
 
-// LOOP DE ANIMACIÓN
+// Loop de animación
 function animate(){
 	
 	// Verificar que haya algún pedido
@@ -153,7 +153,7 @@ function animate(){
 	requestAnimationFrame(animate);
 };
 
-// RESOLVER UN ÍTEM
+// Resolver un ítem
 function solve(req){
 	switch(req[0]){
 		case 'plot':

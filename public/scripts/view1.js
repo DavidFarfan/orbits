@@ -4,21 +4,8 @@ class View1 extends View{
 		return;
 	};
 	
-	static show(animator){
-		
-		// Construir pedido para el animador
-		var request = [];
-		
-		//-------OBJETOS-----------------
-		
-		// Satélites
-		Satellite.list.forEach(function(value, index, array){
-			value.view1(request);
-		});
-		
-		//------EFEMÉRIDES----------------
-		
-		// Dibujar efemérides si está disponible
+	// Dibujar Efemérides en formato vector
+	static draw_ephemeris(request){
 		if(ephemeris != null){
 			let print_pos = center_body.get_print_pos();
 			ephemeris.forEach(function(value, index, array){
@@ -64,10 +51,27 @@ class View1 extends View{
 				]);
 			});
 		};
+	};
+	
+	// Dibujar objetos e información en vista de planta
+	static show(animator){
 		
+		// Construir pedido para el animador
+		var request = [];
+		
+		//-------OBJETOS-----------------
+		
+		// Satélites
+		Satellite.list.forEach(function(value, index, array){
+			value.view1(request);
+		});
+		
+		// Efemérides
+		View1.draw_ephemeris(request);
+	
 		// Imprimir info. solicitada
 		super.print_basic(request);
-		super.print_info(request, info);
+		super.print_info(request, info_page);
 
 		// Enviar pedido al animador
 		animator.postMessage({

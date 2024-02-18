@@ -430,16 +430,21 @@ class Satellite{
 		};
 	};
 	
-	// Posición absoluta del satélite
+	// Posición absoluta actual del satélite
 	get_absolute_r(print){
 		
-		// Sumar el radio propio al cómputo recursivo hasta el Sol
+		// Sumar la pos abs. de la sim. propia a la del cuerpo orbitado
 		let orbited_pos = this.get_absolute_pos( null, print );
-		let my_pos = {
-			x: this.orbit.r.x + orbited_pos.x,
-			y: this.orbit.r.y + orbited_pos.y,
-			z: this.orbit.r.z + orbited_pos.z
+		let my_pos = null;
+		if(orbited_pos != undefined && this.orbit.r != undefined){
+			my_pos = {
+				x: this.orbit.r.x + orbited_pos.x,
+				y: this.orbit.r.y + orbited_pos.y,
+				z: this.orbit.r.z + orbited_pos.z
+			};
 		};
+		
+		// Imprimir el resultado de ser necesario
 		if(print){
 			log( my_pos );			
 		};
@@ -456,7 +461,7 @@ class Satellite{
 		};
 	};
 	
-	// Posición absoluta del satélite orbitado
+	// Posición absoluta actual de la sim. del cuerpo orbitado
 	get_absolute_pos(rel, print){
 		
 		// Recorrer recursivamente hasta el Sol
@@ -483,10 +488,14 @@ class Satellite{
 			};
 			var orbited_pos = Satellite.get_sat( this.orbited ).orbit.r;
 			if(orbited_pos != undefined){
+				
+				// Imprimir el paso de ser necesario
 				if(print){
 					log('orbitado: ' + this.orbited );
 					log(orbited_pos);
 				};
+				
+				// Sumar la posición sim. del cuerpo orbitado en cada paso
 				relative = {
 					x: orbited_pos.x + relative.x,
 					y: orbited_pos.y + relative.y,

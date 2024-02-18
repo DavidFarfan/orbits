@@ -4,7 +4,7 @@ class View3 extends View{
 		return;
 	};
 	
-	static show(animator, origin, PHI, LAMBDA){
+	static show(animator){
 	
 		// Construir pedido para el animador
 		var request = [];

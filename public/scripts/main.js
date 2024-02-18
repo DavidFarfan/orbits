@@ -4,10 +4,10 @@
 const canvas = document.getElementById('view');
 
 // Vista
-var view = 1;
+var view_page = 1;
 
-// P{agina de Información
-var info = 0;
+// Página de Información
+var info_page = 0;
 
 // Animador
 const animator = new Worker("/scripts/animador.js");
@@ -16,18 +16,15 @@ const main_offscreen = canvas.transferControlToOffscreen();
 // Puesta en marcha del animador
 animator.postMessage({ type: 'context', canvas: main_offscreen }, [main_offscreen]);
 
-// Gráfica de elementos orbitales (Dev)
-var elem_curve = [];
-var elem_curve_approx = [];
-
 //-------PARÁMETROS DE LA SIMULACIÓN-----------
 
-// Parámetros para el control manual
-var mousePos = { // Posicion del mouse sobre el lienzo 1
+// Posición del mouse
+var mousePos = { // Posicion inicial del mouse sobre el lienzo
 	x: width_p( .5 ),
 	y: height_p( .5 )
 };
-var sat = { // Condiciones iniciales del satélite controlado 
+
+var sat = { // Diferencial para el control de los satélites 
 	x: to_km( 0 ),
 	y: to_km( 0 ),
 	z: to_km( 0 ),
@@ -41,53 +38,63 @@ var u_time; // Reloj universal
 var u_seconds; // Segundero universal
 var l_time = 0; // Reloj local
 var l_seconds = '0'; // Segundero local
-var s_base_time = 0; // Tiempo simulado base
-var s_time = 0; // Tiempo simulado
+var s_base_time = 0; // Tiempo sim. base: Se cuenta por syncro: 1/10 de s
+var s_time = 0; // Tiempo sim.: Se cuenta por fracción definida: 1/60 de s
 var frac = 60; // Fracción de segundo real para el loop
-var syncro_time = true; // Sincronización al tiempo real
+var syncro_time = true; // Permitir syncro con el tiempo real
 
-// Cuerpo cetral
+// Cuerpo central: centro de la cámara
 var center_body = null;
 
-// Trayectorias de vehículo
+// Contador de trayectorias creadas
 var vehicles_trajectories = 0;
 
-// Partida y Destino
+// Partida y Destino del targeting
 var depart = null;
 var destin = null;
 
 // Parámetros de escala de la simulación
-var s_scale = 1e7; // Escala del espacio (kilómetros por pixel de lienzo)
+var s_scale = 0; // Escala del espacio (kilómetros por pixel de lienzo)
 var t_scale = 0; // Escala del tiempo (Segundos simulados por segundo real)
-var center = { // Centro del lienzo (kilómetros)
+var center = { // Centro del lienzo (kilómetros): variable dep. el tiempo
 	x: 0,
 	y: 0,
 	z: 0
 };
 var PHI = 0; // Latitud sobre el satélite controlado
 var LAMBDA = 0; // Longitud sobre el satélite controlado
+const origin = { // Coordenadas del origen en la pantalla
+	x: width_p( .5 ),
+	y: height_p( .5 )
+};
 
 // Recursos de Horizons system
 var ephemeris = null; // Efemérides
 
-//--------UNIDADES DE SIMULACIÓN------------
+//--------UTILIDADES------------
 
-// PORCENTAJE DE ANCHO DEL LIENZO
+// Poner satélite en el centro y controlarlo
+function set_center_ctrl(name){
+	center_body = Satellite.get_sat( name );
+	Satellite.get_sat( name ).ctrl_set( true );
+};
+
+// Porcentaje del ancho de lienzo
 function width_p(p){
 	return canvas.width * p;
 };
 
-// PORCENTAJE DE ALTO DEL LIENZO
+// Porcentaje del alto de lienzo
 function height_p(p){
 	return canvas.height * p;
 };
 
-// CONVERSIÓN DE PIXELES A KILÓMETROS
+// Converisión: Pixeles a Kilómetros
 function to_km(px){
 	return s_scale * px;
 };
 
-// CONVERSIÓN DE KILÓMETROS A PIXELES
+// Converisión: Kilómetros a Pixeles
 function to_px(x){
 	return x / s_scale;
 };
@@ -103,11 +110,6 @@ function to_real_t(st){
 };
 
 //---------LOOP DE SIMULACIÓN------------
-function set_center_ctrl(name){
-	center_body = Satellite.get_sat( name );
-	Satellite.get_sat( name ).ctrl_set( true );
-};
-
 function orbitLoop(){
 	
 	//------------CONTEO DEL TIEMPO------------
@@ -122,21 +124,21 @@ function orbitLoop(){
 	// Hacer un ajuste cada décima de segundo
 	if(syncro_time && u_seconds != l_seconds){
 		
-		// El reloj local se sincroniza con el reloj universal
+		// Conteo del reloj local
 		l_time += .1;
 		
-		// Agregar el equivalente de tiempo simulado que corresponde
+		// Equivalente del reloj local en tiempo sim.
 		s_base_time += to_sim_t( .1 );
 		
-		// Corregir el tiempo que usa la simulación de órbitas
+		// Syncro de sim. con el tiempo real
 		s_time = s_base_time;
 		
-		// El segundero local sincroniza con el segundero universal
+		// Esperar otra décima de segundo
 		l_seconds = u_seconds;
 	};
 	
 	//------------VARIABLES DEPENDIENTES DE LA ESCALA---------
-	sat = { // Condiciones iniciales del satélite controlado 
+	sat = { // Ajustar diferencial de distancia para el control de satélites.
 		x: to_km( 1 ),
 		y: to_km( 1 ),
 		z: to_km( 1 ),
@@ -145,30 +147,30 @@ function orbitLoop(){
 		vz: 1e-1
 	};
 	
-	//------------CONTROL MANUAL---------
-	Satellite.ctrl_rutine();
-	
 	//------------SIMULACIÓN------------
 	
-	// Centrar la cámara en la simulación del cuerpo central
-	if(center_body != null){
-		let orbited_pos = center_body.get_absolute_pos();
-		if(center_body.orbit.r != undefined){
-			center = {
-				x: -to_km( width_p( .5 ) ) + orbited_pos.x + center_body.orbit.r.x,
-				y: -to_km( width_p( .5 ) ) + orbited_pos.y + center_body.orbit.r.y,
-				z: -to_km( width_p( .5 ) ) + orbited_pos.z + center_body.orbit.r.z
-			};
-		};
-	};
+	// Control manual
+	Satellite.ctrl_rutine();
 	
 	// Simular movimiento de los satélites
 	Satellite.list.forEach(function(value, index, array){
 		value.sim();
 	});
 	
+	// Centrar la cámara en la sim. del cuerpo central
+	if(center_body != null){
+		let orbited_pos = center_body.get_absolute_r();
+		if(orbited_pos != null){
+			center = {
+				x: orbited_pos.x - to_km( width_p( .5 ) ),
+				y: orbited_pos.y - to_km( width_p( .5 ) ),
+				z: orbited_pos.z - to_km( width_p( .5 ) )
+			};
+		};
+	};
+	
 	//------------SELECCIÓN DE VISTA-----------
-	switch(view){
+	switch(view_page){
 		case 1:
 			View1.show(animator);
 			break;
@@ -176,18 +178,237 @@ function orbitLoop(){
 			View2.show(animator);
 			break;
 		case 3:
-			View3.show(
-				animator, 
-				{
-					x: width_p( .5 ),
-					y: height_p( .5 )
-				},
-				PHI,
-				LAMBDA
-			);
+			View3.show(animator);
 			break;
 	};
 };
+
+//------I/O-------------
+
+// Recibir confirmación del animador (dev)
+animator.addEventListener("message", (msg) => {
+	//...
+});
+
+// Captura de posición del mouse
+function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+	var root = document.documentElement;
+	
+	// Posición relativa del mouse
+    var mouseX = evt.clientX - rect.left - root.scrollLeft;
+    var mouseY = evt.clientY - rect.top - root.scrollTop;
+    return {
+      x: mouseX,
+      y: mouseY
+    };
+};
+canvas.addEventListener('mousemove', evt => {
+	mousePos = getMousePos(canvas, evt);
+}, false);
+
+// CONTROL DEL SATÉLITE
+const posx_reduce = document.getElementById("posx_reduce");
+posx_reduce.onclick = () => {
+	Satellite.moved = -1;
+};
+const posx_increase = document.getElementById("posx_increase");
+posx_increase.onclick = () => {
+	Satellite.moved = 1;
+};
+const posy_reduce = document.getElementById("posy_reduce");
+posy_reduce.onclick = () => {
+	Satellite.moved = -2;
+};
+const posy_increase = document.getElementById("posy_increase");
+posy_increase.onclick = () => {
+	Satellite.moved = 2;
+};
+const posz_reduce = document.getElementById("posz_reduce");
+posz_reduce.onclick = () => {
+	Satellite.moved = -3;
+};
+const posz_increase = document.getElementById("posz_increase");
+posz_increase.onclick = () => {
+	Satellite.moved = 3;
+};
+const velx_reduce = document.getElementById("velx_reduce");
+velx_reduce.onclick = () => {
+	Satellite.moved = -4;
+};
+const velx_increase = document.getElementById("velx_increase");
+velx_increase.onclick = () => {
+	Satellite.moved = 4;
+};
+const vely_reduce = document.getElementById("vely_reduce");
+vely_reduce.onclick = () => {
+	Satellite.moved = -5;
+};
+const vely_increase = document.getElementById("vely_increase");
+vely_increase.onclick = () => {
+	Satellite.moved = 5;
+};
+const velz_reduce = document.getElementById("velz_reduce");
+velz_reduce.onclick = () => {
+	Satellite.moved = -6;
+};
+const velz_increase = document.getElementById("velz_increase");
+velz_increase.onclick = () => {
+	Satellite.moved = 6;
+};
+const ctrl_sat = document.getElementById("ctrl_sat");
+const ctrl_button = document.getElementById("ctrl_button");
+ctrl_button.onclick = () => {
+	if( Satellite.get_sat( ctrl_sat.value ) != null ){
+		set_center_ctrl( ctrl_sat.value );
+		
+		// Establecer partida y destino del targeting
+		destin =  depart;
+		depart = ctrl_sat.value;
+	};
+};
+
+// Captura de parámetros del punto sobre la superficie del satélite controlado
+const lat_slider = document.getElementById("lat");
+lat_slider.oninput = () => {
+	PHI = lat_slider.value * .5 * PI * ( 1 / lat_slider.max );
+};
+const long_slider = document.getElementById("long");
+long_slider.oninput = () => {
+	LAMBDA = long_slider.value * PI * ( 1 / long_slider.max );
+};
+
+// Captura de página de info. de simulación a desplegar
+const display_page_button = document.getElementById("page");
+display_page_button.onclick = () => {
+	info_page = ( info_page + 1 ) % 2;
+};
+
+// Captura de tiempo de simulación
+const text_time = document.getElementById("text_time");
+const select_date = document.getElementById("select_date");
+const button_time = document.getElementById("button_time");
+button_time.onclick = () => {
+	
+	// Calcular días transcurridos de la fecha ingresada
+	let date_in = new Date( select_date.value + " 12:00:00 GMT+00:00" );
+	let dif_days = to_eday( ms_to_s( date_in.getTime() - EPOCH_J2000.getTime() ) );
+	
+	// Aplicar tiempo simulado 
+	// (days from epoch)
+	if(text_time.value == ''){
+		s_base_time = eday_to_s( dif_days );
+		
+	// (selected date)
+	}else{
+		s_base_time = eday_to_s( Number( text_time.value ) );
+	};
+};
+const button_time_add = document.getElementById("button_time_add");
+button_time_add.onclick = () => {
+	s_base_time += eday_to_s( Number( text_time.value ) );
+};
+
+// Captura de parámetros de escala de simulación
+const s_scale_slider = document.getElementById("s_scale");
+s_scale_slider.value = s_scale_slider.min;
+s_scale_slider.oninput = () => {
+	s_scale = s_scale_slider.value * center_body.R * 1e0;
+};
+const t_scale_slider = document.getElementById("t_scale");
+t_scale_slider.value = to_eday( t_scale );
+t_scale_slider.oninput = () => {
+	
+	// Realizar el cambio de escala temporal
+	t_scale = EDAY * t_scale_slider.value * 1e-0;
+};
+const stop_button = document.getElementById("stop_button");
+stop_button.onclick = () => {
+	
+	// Detener el tiempo
+	t_scale = 0;
+	t_scale_slider.value = 0;
+};
+
+// Seleccionar vista con un click en el lienzo
+canvas.addEventListener('click', () => {
+	view_page = ( view_page + 1 ) % 3 + 1;
+}, false);
+
+// Tramo de vuelo
+const phase = document.getElementById("phase");
+phase.onclick = () => {
+	log( 'New phase from: ' + Satellite.ctrl.name );
+	
+	// Crear un vehículo ditinto que parta de la posición simulada ctrl
+	Satellite.flight_leg();
+};
+
+// Lanzamiento desde el satélite controlado
+const launch_button = document.getElementById("launch");
+launch_button.onclick = () => {
+	let vl = Satellite.ctrl.launch_trajectory(
+			deg_to_rad( 0 ),
+			deg_to_rad( 45 ),
+			6
+	);
+	log( vl );
+	let vehicle_name = 'vehicle trajectory No. ' + str( vehicles_trajectories );
+	new Satellite(
+		vehicle_name, 
+		Satellite.ctrl.name, 
+		1e0,
+		1e0, 
+		1e0, 
+		vl.pos, 
+		vl.vel, 
+		{
+			T: 0,
+			t0: 0,
+			tilt: 0
+		},
+		{
+			da: 0,
+			de: 0,
+			di: 0,
+			dupper_omega: 0,
+			dp: 0
+		},
+		false
+	);
+	log( Satellite.get_sat( vehicle_name ).orbit );
+	let f0_for_launch_orbit = argument_of_periapse_f(
+		Satellite.get_sat( vehicle_name ).orbit.eccentricity,
+		vl.pos,
+		Satellite.get_sat( vehicle_name ).orbit.upper_omega,
+		Satellite.get_sat( vehicle_name ).orbit.i
+	).f;
+	log(f0_for_launch_orbit);
+	Satellite.get_sat( vehicle_name ).orbit.set_t0(null, t_from_f(
+									Satellite.get_sat( vehicle_name ).orbit.type,
+									f0_for_launch_orbit,
+									Satellite.get_sat( vehicle_name ).orbit.e, 
+									Satellite.get_sat( vehicle_name ).orbit.a, 
+									Satellite.get_sat( vehicle_name ).orbit.T,
+									Satellite.get_sat( vehicle_name ).get_gravity()
+								) - s_time
+	);
+	vehicles_trajectories ++;
+};
+
+// Targeting
+const targeting_button = document.getElementById("targeting");
+targeting_button.onclick = () => {
+	if(destin != null & depart != null){
+		log("---TARGETING----");
+		Satellite.get_sat(destin).elliptic_targeting(
+			Satellite.get_sat(depart),
+			6 * EDAY
+		).pos
+	};
+};
+
+//-------PROGRAMA PRINCIPAL-----------
 
 //------OBJETOS A SIMULAR--------------
 
@@ -340,237 +561,13 @@ Satellite.sat_from_orbit(
 	MOON_INITIAL_TRUE_ANOMALY
 );
 
+// Asignar y controlar el satélite central
 set_center_ctrl('moon');
-//------I/O-------------
 
-// Recibir confirmación del animador
-animator.addEventListener("message", (msg) => {
-	//...
-});
-
-// Captura de posición del mouse
-function getMousePos(canvas, evt) {
-    var rect = canvas.getBoundingClientRect();
-	var root = document.documentElement;
-	
-	// Posición relativa del mouse
-    var mouseX = evt.clientX - rect.left - root.scrollLeft;
-    var mouseY = evt.clientY - rect.top - root.scrollTop;
-    return {
-      x: mouseX,
-      y: mouseY
-    };
-};
-canvas.addEventListener('mousemove', evt => {
-	mousePos = getMousePos(canvas, evt);
-}, false);
-
-// Captura de parámetros del satélite controlado
-const posx_reduce = document.getElementById("posx_reduce");
-posx_reduce.onclick = () => {
-	Satellite.moved = -1;
-};
-const posx_increase = document.getElementById("posx_increase");
-posx_increase.onclick = () => {
-	Satellite.moved = 1;
-};
-const posy_reduce = document.getElementById("posy_reduce");
-posy_reduce.onclick = () => {
-	Satellite.moved = -2;
-};
-const posy_increase = document.getElementById("posy_increase");
-posy_increase.onclick = () => {
-	Satellite.moved = 2;
-};
-const posz_reduce = document.getElementById("posz_reduce");
-posz_reduce.onclick = () => {
-	Satellite.moved = -3;
-};
-const posz_increase = document.getElementById("posz_increase");
-posz_increase.onclick = () => {
-	Satellite.moved = 3;
-};
-const velx_reduce = document.getElementById("velx_reduce");
-velx_reduce.onclick = () => {
-	Satellite.moved = -4;
-};
-const velx_increase = document.getElementById("velx_increase");
-velx_increase.onclick = () => {
-	Satellite.moved = 4;
-};
-const vely_reduce = document.getElementById("vely_reduce");
-vely_reduce.onclick = () => {
-	Satellite.moved = -5;
-};
-const vely_increase = document.getElementById("vely_increase");
-vely_increase.onclick = () => {
-	Satellite.moved = 5;
-};
-const velz_reduce = document.getElementById("velz_reduce");
-velz_reduce.onclick = () => {
-	Satellite.moved = -6;
-};
-const velz_increase = document.getElementById("velz_increase");
-velz_increase.onclick = () => {
-	Satellite.moved = 6;
-};
-
-// Captura de parámetros del punto sobre la superficie del satélite controlado
-const lat_slider = document.getElementById("lat");
-lat_slider.oninput = () => {
-	PHI = lat_slider.value * .5 * PI * ( 1 / lat_slider.max );
-};
-const long_slider = document.getElementById("long");
-long_slider.oninput = () => {
-	LAMBDA = long_slider.value * PI * ( 1 / long_slider.max );
-};
-
-// Captura de página de info. de simulación a desplegar
-const display_page_button = document.getElementById("page");
-display_page_button.onclick = () => {
-	info = ( info + 1 ) % 2;
-};
-
-// Tramo de vuelo
-const phase = document.getElementById("phase");
-phase.onclick = () => {
-	log( 'New phase from: ' + Satellite.ctrl.name );
-	
-	// Crear un vehículo ditinto que parta de la posición simulada ctrl
-	Satellite.flight_leg();
-};
-
-// Lanzamiento desde el satélite controlado
-const launch_button = document.getElementById("launch");
-launch_button.onclick = () => {
-	let vl = Satellite.ctrl.launch_trajectory(
-			deg_to_rad( 0 ),
-			deg_to_rad( 45 ),
-			6
-	);
-	log( vl );
-	let vehicle_name = 'vehicle trajectory No. ' + str( vehicles_trajectories );
-	new Satellite(
-		vehicle_name, 
-		Satellite.ctrl.name, 
-		1e0,
-		1e0, 
-		1e0, 
-		vl.pos, 
-		vl.vel, 
-		{
-			T: 0,
-			t0: 0,
-			tilt: 0
-		},
-		{
-			da: 0,
-			de: 0,
-			di: 0,
-			dupper_omega: 0,
-			dp: 0
-		},
-		false
-	);
-	log( Satellite.get_sat( vehicle_name ).orbit );
-	let f0_for_launch_orbit = argument_of_periapse_f(
-		Satellite.get_sat( vehicle_name ).orbit.eccentricity,
-		vl.pos,
-		Satellite.get_sat( vehicle_name ).orbit.upper_omega,
-		Satellite.get_sat( vehicle_name ).orbit.i
-	).f;
-	log(f0_for_launch_orbit);
-	Satellite.get_sat( vehicle_name ).orbit.set_t0(null, t_from_f(
-									Satellite.get_sat( vehicle_name ).orbit.type,
-									f0_for_launch_orbit,
-									Satellite.get_sat( vehicle_name ).orbit.e, 
-									Satellite.get_sat( vehicle_name ).orbit.a, 
-									Satellite.get_sat( vehicle_name ).orbit.T,
-									Satellite.get_sat( vehicle_name ).get_gravity()
-								) - s_time
-	);
-	vehicles_trajectories ++;
-};
-
-// Targeting
-const targeting_button = document.getElementById("targeting");
-targeting_button.onclick = () => {
-	if(destin != null & depart != null){
-		log("---TARGETING----");
-		Satellite.get_sat(destin).elliptic_targeting(
-			Satellite.get_sat(depart),
-			6 * EDAY
-		).pos
-	};
-};
-
-// Captura del satélite Controlado
-const ctrl_sat = document.getElementById("ctrl_sat");
-const ctrl_button = document.getElementById("ctrl_button");
-ctrl_button.onclick = () => {
-	if( Satellite.get_sat( ctrl_sat.value ) != null ){
-		set_center_ctrl( ctrl_sat.value );
-		
-		// Establecer partida y destino de un viaje
-		destin =  depart;
-		depart = ctrl_sat.value;
-	};
-};
-
-// Captura de tiempo de simulación
-const text_time = document.getElementById("text_time");
-const select_date = document.getElementById("select_date");
-const button_time = document.getElementById("button_time");
-button_time.onclick = () => {
-	
-	// Calcular días transcurridos de la fecha ingresada
-	let date_in = new Date( select_date.value + " 12:00:00 GMT+00:00" );
-	let dif_days = to_eday( ms_to_s( date_in.getTime() - EPOCH_J2000.getTime() ) );
-	
-	// Aplicar tiempo simulado 
-	// (days from epoch)
-	if(text_time.value == ''){
-		s_base_time = eday_to_s( dif_days );
-		
-	// (selected date)
-	}else{
-		s_base_time = eday_to_s( Number( text_time.value ) );
-	};
-};
-const button_time_add = document.getElementById("button_time_add");
-button_time_add.onclick = () => {
-	s_base_time += eday_to_s( Number( text_time.value ) );
-};
-
-// Captura de parámetros de escala de simulación
-const s_scale_slider = document.getElementById("s_scale");
-s_scale_slider.value = s_scale_slider.min;
-s_scale_slider.oninput = () => {
-	s_scale = s_scale_slider.value * center_body.R * 1e0;
-};
-const t_scale_slider = document.getElementById("t_scale");
-t_scale_slider.value = to_eday( t_scale );
-t_scale_slider.oninput = () => {
-	
-	// Realizar el cambio de escala temporal
-	t_scale = EDAY * t_scale_slider.value * 1e-0;
-};
-const stop_button = document.getElementById("stop_button");
-stop_button.onclick = () => {
-	
-	// Detener el tiempo
-	t_scale = 0;
-	t_scale_slider.value = 0;
-};
-
-// Seleccionar vista con un click en el lienzo
-canvas.addEventListener('click', () => {
-	view = ( view + 1 ) % 3 + 1;
-}, false);
-
+// Para lo de la órbita culo 
 log( 'v_min, visviva' );
 log( sqrt( E_U / ER ) );
-log( 'v_max, E fornula' );
+log( 'v_max, E formula' );
 log( sqrt( 2 * E_U / ER ) );
 
 // Comenzar loop del programa
