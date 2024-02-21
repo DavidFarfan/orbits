@@ -43,7 +43,7 @@ const E_AXIAL_TILT = deg_to_rad( 23.4392911 ); // Oblicuidad de la órbita (rad)
 const E_SIDEREAL_ROTATION_PERIOD = h_to_s( 23.9344695944 ); // Periodo rot. sideral (s)
 const E_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
 	period( E_INITIAL_SEMI_MAJOR_AXIS, SUN_U ),
-	-225000 // Ángulo obtenido empíricamente (s)
+	-2.59 * EDAY // Ángulo obtenido empíricamente (s)
 );
 const E_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0, i.e 12:00 aprox. (s)
 	E_SIDEREAL_ROTATION_PERIOD,
@@ -159,15 +159,15 @@ const MOON_INITIAL_PERIAPSE = periapse_from_semi_major_axis( // Periapsis J2000 
 	MOON_INITIAL_SEMI_MAJOR_AXIS,
 	MOON_INITIAL_ECCENTRICITY
 );
-const MOON_INITIAL_INCLINATION = deg_to_rad( -18.28 ); // Inclinación J2000 (rad)
+const MOON_INITIAL_INCLINATION = deg_to_rad( 5.145 ); // Inclinación J2000 (rad)
 const MOON_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 1.239580554371928e+02 ); // RAAN  J2000 (rad)
 const MOON_INITIAL_ARGUMENT_OF_PERIGEE = deg_to_rad( 3.089226727206595e+02 ); // Argumento de perihelio J2000 (rad)
 
-const MOON_AXIAL_TILT = deg_to_rad( 6.67 ); // Oblicuidad de la órbita (rad)
+const MOON_AXIAL_TILT = deg_to_rad( 6.68 ); // Oblicuidad de la órbita (rad)
 const MOON_SIDEREAL_ROTATION_PERIOD = 26.849 * EDAY; // Periodo rot. sideral (s)
 const MOON_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
 	period( MOON_INITIAL_SEMI_MAJOR_AXIS, E_U ),
-	11.39 * EDAY // Ángulo obtenido empíricamente (s)
+	11.35 * EDAY // Ángulo obtenido empíricamente (s)
 );
 const MOON_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0, i.e 12:00 aprox. (s)
 	MOON_SIDEREAL_ROTATION_PERIOD,
@@ -805,7 +805,7 @@ function rotation_axis(h, axial_tilt, upper_omega){
 	// Llevar el nodo ascendente a x
 	let rot_axis = z_rot( h, -upper_omega );
 	
-	// Aplicar el ángulo de oblicuidad en el plano generado por el nodo ascendente
+	// Aplicar la oblicuidad
 	rot_axis = x_rot( rot_axis, axial_tilt );
 	
 	// Dejar el nodo ascendente en su sitio
@@ -867,10 +867,10 @@ function rp_p_n_vecs(p, e, rp, i, upper_omega, omega){
 	};
 };
 
-// SET OF VECTORS: R AND V IN TIME
+// Vectores posición y velocidad en el tiempo
 function r_v_vecs(type, t, a, e, u, p, fo, T, i, omega, upper_omega){
 	
-	// Anomalía verdadera en el tiempo t
+	// Hallar anomalía verdadera
 	let M = 0;
 	let E = 0;
 	let H = 0;
@@ -878,14 +878,14 @@ function r_v_vecs(type, t, a, e, u, p, fo, T, i, omega, upper_omega){
 	if(type != 'elliptic'){
 		M = M_from_ht(a, u, t); // Anomalía media
 		H = H_from_M(M, e, fo); // Anomalía hiperbólica
-		f = f_from_H(H, e);
+		f = f_from_H(H, e); // Animalía verdadera
 	}else{
 		M = M_from_t(T, t); // Anomalía media
 		E = E_from_M(M, e); // Anomalía excéntrica
-		f = f_from_E(E, e);
+		f = f_from_E(E, e); // Animalía verdadera
 	};
 	
-	// Radio en el tiempo t
+	// Hallar radio
 	let r = r_from_f(p, e, f);
 	
 	// Set en el plano orbital
@@ -900,7 +900,7 @@ function r_v_vecs(type, t, a, e, u, p, fo, T, i, omega, upper_omega){
 		z: 0
 	};
 	
-	// Set en el espacio
+	// Set en el espacio respecto al plano de referencia
 	r_vec = orbit_planar_point_to_space_point(r_vec, i, omega, upper_omega);
 	v_vec = orbit_planar_point_to_space_point(v_vec, i, omega, upper_omega);
 	return {
@@ -916,66 +916,31 @@ function r_v_vecs(type, t, a, e, u, p, fo, T, i, omega, upper_omega){
 // INVARIANTS FROM ELEMENTS
 function invariants_from_elements(u, a, e, rp, i, omega, upper_omega, f0){
 
-	// Invariantes orbitales y anomalías en el punto especificado
-	let p = semi_latus_rectum_from_periapse(rp, e);
-	let fo;
-	let T;
-	let t0;
-	let sat_at_t0;
+	// Preparar todos los elementos orbitales para hallar los vectores
+	let p, type, fo, T;
+	p = semi_latus_rectum_from_periapse(rp, e);
 	if(e >= 1){
+		type = 'hyperbolic';
 		fo = outgoing_angle(e);
-		t0 = ht_from_M(
-			M_from_H(
-				H_from_f(
-					f0, 
-					e
-				),
-				e
-			),
-			u,
-			a
-		);
-		sat_at_t0 = r_v_vecs(
-			'hyperbolic',
-			t0,
-			a,
-			e,
-			u,
-			p,
-			fo,
-			T,
-			i,
-			omega,
-			upper_omega
-		);
 	}else{
+		type = 'elliptic';
 		T = period(a, u);
-		t0 = t_from_M(
-			M_from_E(
-				E_from_f(
-					f0, 
-					e
-				),
-				e
-			),
-			e,
-			T
-		);
-		sat_at_t0 = r_v_vecs(
-			'elliptic',
-			t0,
-			a,
-			e,
-			u,
-			p,
-			fo,
-			T,
-			i,
-			omega,
-			upper_omega
-		);
 	};
-	return sat_at_t0;
+	
+	// Hallar los vectores
+	return r_v_vecs(
+		type,
+		t_from_f(type, f0, e, a, T, u),
+		a,
+		e,
+		u,
+		p,
+		fo,
+		T,
+		i,
+		omega,
+		upper_omega
+	);
 };
 
 // VIS-VIVA EQUATION

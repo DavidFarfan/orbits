@@ -6,51 +6,8 @@ class View1 extends View{
 	
 	// Dibujar Efemérides en formato vector
 	static draw_ephemeris(request){
-		if(ephemeris != null){
-			let print_pos = center_body.get_print_pos();
-			ephemeris.forEach(function(value, index, array){
-				
-				// Posición absoluta
-				request.push([
-					'circle',
-					to_px( print_pos.x + value[0] ),
-					to_px( print_pos.y + value[1] ),
-					1,
-					'YELLOW'
-				]);
-				
-				// Vector r
-				request.push([
-					'line', 
-					to_px( print_pos.x ),
-					to_px( print_pos.y ),  
-					to_px( print_pos.x + value[0] ),
-					to_px( print_pos.y + value[1] ),
-					'YELLOW'
-				]);
-				
-				// Vector v
-				request.push([
-					'line',
-					to_px( print_pos.x + value[0] ),
-					to_px( print_pos.y + value[1] ),
-					
-					// La longitud del vector se dibuja sin tener en cuenta la escala
-					to_px( print_pos.x + value[0] ) + value[3] * 1e0,
-					to_px( print_pos.y + value[1] ) + value[4] * 1e0,
-					'YELLOW'
-				]);
-				
-				// Secuencia
-				request.push([
-					'print', 
-					index,
-					to_px( print_pos.x + value[0] ) - 10, 
-					to_px( print_pos.y + value[1] ) + 10,
-					'YELLOW'
-				]);
-			});
-		};
+		let print_pos = center_body.get_print_pos();
+		super.draw_ephemeris( request, print_pos, 1 );
 	};
 	
 	// Dibujar objetos e información en vista de planta

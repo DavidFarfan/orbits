@@ -4,6 +4,86 @@ class View{
 		return;
 	};
 	
+	// Dibujar Efemérides en formato vector
+	static draw_ephemeris(request, print_pos, view_no){
+		
+		// Seleccionar vista para las Efemérides
+		let coord1 = null;
+		let coord2 = null;
+		let eph_r_1 = null;
+		let eph_r_2 = null;
+		let eph_v_1 = null;
+		let eph_v_2 = null;
+		switch(view_no){
+			
+			// Planta
+			case 1:
+				coord1 = print_pos.x;
+				coord2 = print_pos.y;
+				eph_r_1 = 0;
+				eph_r_2 = 1;
+				eph_v_1 = 3;
+				eph_v_2 = 4;
+				break;
+			
+			// Elevación
+			case 2:
+				coord1 = print_pos.y;
+				coord2 = print_pos.z;
+				eph_r_1 = 1;
+				eph_r_2 = 2;
+				eph_v_1 = 4;
+				eph_v_2 = 5;
+				break;
+		};
+		
+		// Dibujo
+		if(ephemeris != null){
+			ephemeris.forEach(function(value, index, array){
+				
+				// Posición absoluta
+				request.push([
+					'circle',
+					to_px( coord1 + value[eph_r_1] ),
+					to_px( coord2 + value[eph_r_2] ),
+					1,
+					'YELLOW'
+				]);
+				
+				// Vector r
+				request.push([
+					'line', 
+					to_px( coord1 ),
+					to_px( coord2 ),  
+					to_px( coord1 + value[eph_r_1] ),
+					to_px( coord2 + value[eph_r_2] ),
+					'YELLOW'
+				]);
+				
+				// Vector v
+				request.push([
+					'line',
+					to_px( coord1 + value[eph_r_1] ),
+					to_px( coord2 + value[eph_r_2] ),
+					
+					// La longitud del vector se dibuja sin tener en cuenta la escala
+					to_px( coord1 + value[eph_r_1] ) + value[eph_v_1] * 1e0,
+					to_px( coord2 + value[eph_r_2] ) + value[eph_v_2] * 1e0,
+					'YELLOW'
+				]);
+				
+				// Secuencia
+				request.push([
+					'print', 
+					index,
+					to_px( coord1 + value[eph_r_1] ) - 10, 
+					to_px( coord2 + value[eph_r_2] ) + 10,
+					'YELLOW'
+				]);
+			});
+		};
+	};
+	
 	// Info. Básica de simulación
 	static print_basic(request){
 		
@@ -533,5 +613,4 @@ class View{
 			'WHITE'
 		]);
 	};
-	
 };

@@ -409,8 +409,7 @@ targeting_button.onclick = () => {
 };
 
 //-------PROGRAMA PRINCIPAL-----------
-
-//------OBJETOS A SIMULAR--------------
+// OBJETOS A SIMULAR
 
 // Sol (Cuerpo inicial)
 Satellite.sat_from_orbit(
@@ -421,6 +420,63 @@ Satellite.sat_from_orbit(
 	SUN_U
 );
 
+// Tierra (SE J2000)
+Satellite.sat_from_orbit(
+	'earth',
+	'sun',
+	ER,
+	EMASS,
+	E_U,
+	E_INITIAL_SEMI_MAJOR_AXIS,
+	E_INITIAL_ECCENTRICITY,
+	E_INITIAL_PERIAPSE,
+	E_INITIAL_INCLINATION,
+	E_INITIAL_ARGUMENT_OF_PERIHELION,
+	E_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
+	{
+		T: E_SIDEREAL_ROTATION_PERIOD,
+		t0: E_INITIAL_GST,
+		tilt: E_AXIAL_TILT
+	},
+	{
+		da: E_DIFF_SEMI_MAJOR_AXIS,
+		de: E_DIFF_ECCENTRICITY,
+		di: E_DIFF_INCLINATION,
+		dupper_omega: E_DIFF_LONGITUDE_OF_ASCENDING_NODE,
+		dp: E_DIFF_LONGITUDE_OF_PERIAPSE
+	},
+	E_INITIAL_TRUE_ANOMALY
+);
+
+// Luna (SE J2000)
+Satellite.sat_from_orbit(
+	'moon',
+	'earth',
+	MOONR,
+	MOONMASS,
+	MOON_U,
+	MOON_INITIAL_SEMI_MAJOR_AXIS,
+	MOON_INITIAL_ECCENTRICITY,
+	MOON_INITIAL_PERIAPSE,
+	MOON_INITIAL_INCLINATION,
+	MOON_INITIAL_ARGUMENT_OF_PERIGEE,
+	MOON_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
+	{
+		T: MOON_SIDEREAL_ROTATION_PERIOD,
+		t0: MOON_INITIAL_GST,
+		tilt: MOON_AXIAL_TILT
+	},
+	{
+		da: MOON_DIFF_SEMI_MAJOR_AXIS,
+		de: MOON_DIFF_ECCENTRICITY,
+		di: MOON_DIFF_INCLINATION,
+		dupper_omega: MOON_DIFF_LONGITUDE_OF_ASCENDING_NODE,
+		dp: MOON_DIFF_LONGITUDE_OF_PERIAPSE
+	},
+	MOON_INITIAL_TRUE_ANOMALY
+);
+
+/*
 // Ceres (SE J2000, no perturbations)
 Satellite.sat_from_orbit(
 	'ceres',
@@ -504,71 +560,10 @@ Satellite.sat_from_orbit(
 	},
 	M_INITIAL_TRUE_ANOMALY
 );
-
-// Tierra (SE J2000)
-Satellite.sat_from_orbit(
-	'earth',
-	'sun',
-	ER,
-	EMASS,
-	E_U,
-	E_INITIAL_SEMI_MAJOR_AXIS,
-	E_INITIAL_ECCENTRICITY,
-	E_INITIAL_PERIAPSE,
-	E_INITIAL_INCLINATION,
-	E_INITIAL_ARGUMENT_OF_PERIHELION,
-	E_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
-	{
-		T: E_SIDEREAL_ROTATION_PERIOD,
-		t0: E_INITIAL_GST,
-		tilt: E_AXIAL_TILT
-	},
-	{
-		da: E_DIFF_SEMI_MAJOR_AXIS,
-		de: E_DIFF_ECCENTRICITY,
-		di: E_DIFF_INCLINATION,
-		dupper_omega: E_DIFF_LONGITUDE_OF_ASCENDING_NODE,
-		dp: E_DIFF_LONGITUDE_OF_PERIAPSE
-	},
-	E_INITIAL_TRUE_ANOMALY
-);
-
-// Luna (SE J2000)
-Satellite.sat_from_orbit(
-	'moon',
-	'earth',
-	MOONR,
-	MOONMASS,
-	MOON_U,
-	MOON_INITIAL_SEMI_MAJOR_AXIS,
-	MOON_INITIAL_ECCENTRICITY,
-	MOON_INITIAL_PERIAPSE,
-	MOON_INITIAL_INCLINATION,
-	MOON_INITIAL_ARGUMENT_OF_PERIGEE,
-	MOON_INITIAL_LONGITUDE_OF_ASCENDING_NODE,
-	{
-		T: MOON_SIDEREAL_ROTATION_PERIOD,
-		t0: MOON_INITIAL_GST,
-		tilt: MOON_AXIAL_TILT
-	},
-	{
-		da: MOON_DIFF_SEMI_MAJOR_AXIS,
-		de: MOON_DIFF_ECCENTRICITY,
-		di: MOON_DIFF_INCLINATION,
-		dupper_omega: MOON_DIFF_LONGITUDE_OF_ASCENDING_NODE,
-		dp: MOON_DIFF_LONGITUDE_OF_PERIAPSE
-	},
-	MOON_INITIAL_TRUE_ANOMALY
-);
+*/
 
 // Asignar y controlar el satélite central
 set_center_ctrl('moon');
-
-// Para lo de la órbita culo 
-log( 'v_min, visviva' );
-log( sqrt( E_U / ER ) );
-log( 'v_max, E formula' );
-log( sqrt( 2 * E_U / ER ) );
 
 // Comenzar loop del programa
 setInterval( orbitLoop, s_to_ms( 1 / frac ) );

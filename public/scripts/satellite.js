@@ -10,12 +10,14 @@ class Satellite{
 	// Cambio de parámetros
 	static moved = false;
 	
-	// Satélite particular
+	// Busqueda de un satélite por su nombre
 	static get_sat(name){
 		if(name == null){
 			return null;
 		};
 		let idx = -1;
+		
+		// Iterar lista y comprobar los nombres
 		Satellite.list.forEach(function(value, index, array){
 			if(value.name == name){
 				idx = index;
@@ -27,146 +29,69 @@ class Satellite{
 			return Satellite.list[idx];
 		};
 	};
-	
-	// Rutina de control manual
-	static ctrl_rutine(){
-		
-		// Verificar cambios de parámetros
-		if(Satellite.moved == 0){
-			return;
-		};  
-		
-		// Preparar nuevas condiciones iniciales del satélite
-		var pos = Satellite.ctrl.pos;
-		var vel = Satellite.ctrl.vel;
-		
-		// Cambiar posisición/velocidad del satélite controlado según bandera
-		switch(Satellite.moved){
-			case -1:
-				pos.x -= sat.x;
-				break;
-			case 1:
-				pos.x += sat.x;
-				break;
-			case -2:
-				pos.y -= sat.y;
-				break;
-			case 2:
-				pos.y += sat.y;
-				break;
-			case -3:
-				pos.z -= sat.z;
-				break;
-			case 3:
-				pos.z += sat.z;
-				break;
-			case -4:
-				vel.x -= sat.vx;
-				break;
-			case 4:
-				vel.x += sat.vx;
-				break;
-			case -5:
-				vel.y -= sat.vy;
-				break;
-			case 5:
-				vel.y += sat.vy;
-				break;
-			case -6:
-				vel.z -= sat.vz;
-				break;
-			case 6:
-				vel.z += sat.vz;
-				break;
-		};
-		
-		// Nueva órbita
-		Satellite.ctrl.pos_set(pos);
-		Satellite.ctrl.vel_set(vel);
-		Satellite.ctrl.rotation_set({
-			T: Satellite.ctrl.sidereal_rotation_period,
-			t0: Satellite.ctrl.GST0,
-			tilt: Satellite.ctrl.axial_tilt
-		});
-		Satellite.ctrl.physics({
-			da: Satellite.ctrl.orbit.da_dt,
-			de: Satellite.ctrl.orbit.de_dt,
-			di: Satellite.ctrl.orbit.di_dt,
-			dupper_omega: Satellite.ctrl.orbit.dupper_omega_dt,
-			dp: Satellite.ctrl.orbit.dp_dt
-		});
-		
-		// Reiniciar tiempo de simulación
-		s_base_time = Satellite.ctrl.epoch;
-		
-		// Esperar un nuevo cambio de parámetros
-		Satellite.moved = 0;
-	};
 	 
 	// Satélite a partir de la órbita
 	static sat_from_orbit(name, orbited, R, m, u, a, e, rp, i, omega, upper_omega, rot, dif, f0){
+		let sat_at_t0, rotation_set, differential_set;
 		
-		// Caso base
+		// Posición inicial del primer satélite
 		if(orbited == null){
 			
-			// Crear un cuerpo "inmóvil"
-			let sat_at_t0 = invariants_from_elements(
-				1.9 * u,
-				1e18,
-				0,
-				1e18,
-				0,
-				0,
-				0,
-				0
-			);
-			let sat = new Satellite(
-				name,
-				null,
-				R,
-				m,
+			// Crear un cuerpo "que no orbita ningún otro"
+			sat_at_t0 = invariants_from_elements(
 				u,
-				sat_at_t0.r,
-				sat_at_t0.v,
-				{
-					T: 0,
-					t0: 0,
-					tilt: 0
-				},
-				{
-					da: 0,
-					de: 0,
-					di: 0,
-					dupper_omega: 0,
-					dp: 0
-				},
-				true
+				1e9,
+				0,
+				1e9,
+				deg_to_rad( 45 ),
+				deg_to_rad( 0 ),
+				deg_to_rad( 0 ),
+				deg_to_rad( 0 )
 			);
-			return;
+							
+			// No es relevante la rotación del primer cuerpo
+			rotation_set = {
+				T: 0,
+				t0: 0,
+				tilt: deg_to_rad( 0 )
+			},
+				
+			// No es relevante la traslación del primer cuerpo
+			differential_set = {
+				da: deg_to_rad( 0 ),
+				de: deg_to_rad( 0 ),
+				di: deg_to_rad( 0 ),
+				dupper_omega: deg_to_rad( 0 ),
+				dp: deg_to_rad( 0 )
+			}
+		
+		// Posición inicial de los satélites posteriores
+		}else{
+			sat_at_t0 = invariants_from_elements(
+				Satellite.get_sat(orbited).u,
+				a,
+				e,
+				rp,
+				i,
+				omega,
+				upper_omega,
+				f0
+			);
+			rotation_set = rot;
+			differential_set = dif;
 		};
 		
-		// Construir el satélite en el punto f0
-		let sat_at_t0 = invariants_from_elements(
-			Satellite.get_sat(orbited).u,
-			a,
-			e,
-			rp,
-			i,
-			omega,
-			upper_omega,
-			f0
-		);
-		
+		// Crear el nuevo satélite con la posición inicial
 		let sat = new Satellite(
 			name,
 			orbited,
 			R,
 			m,
 			u,
-			rotation_axis(sat_at_t0.r, Satellite.get_sat(orbited).axial_tilt, upper_omega),
-			rotation_axis(sat_at_t0.v, Satellite.get_sat(orbited).axial_tilt, upper_omega),
-			rot,
-			dif,
+			sat_at_t0.r,
+			sat_at_t0.v,
+			rotation_set,
+			differential_set,
 			true
 		);
 	};
@@ -248,7 +173,82 @@ class Satellite{
 		Satellite.get_sat( vehicle_name ).ctrl_set( true );
 	};
 	
-	// Tarayectoria y punto de lanzamiento
+	// Rutina de control manual
+	static ctrl_rutine(){
+		
+		// Verificar cambios de parámetros
+		if(Satellite.moved == 0){
+			return;
+		};  
+		
+		// Preparar nuevas condiciones iniciales del satélite
+		var pos = Satellite.ctrl.pos;
+		var vel = Satellite.ctrl.vel;
+		
+		// Cambiar posisición/velocidad del satélite controlado según bandera
+		switch(Satellite.moved){
+			case -1:
+				pos.x -= sat.x;
+				break;
+			case 1:
+				pos.x += sat.x;
+				break;
+			case -2:
+				pos.y -= sat.y;
+				break;
+			case 2:
+				pos.y += sat.y;
+				break;
+			case -3:
+				pos.z -= sat.z;
+				break;
+			case 3:
+				pos.z += sat.z;
+				break;
+			case -4:
+				vel.x -= sat.vx;
+				break;
+			case 4:
+				vel.x += sat.vx;
+				break;
+			case -5:
+				vel.y -= sat.vy;
+				break;
+			case 5:
+				vel.y += sat.vy;
+				break;
+			case -6:
+				vel.z -= sat.vz;
+				break;
+			case 6:
+				vel.z += sat.vz;
+				break;
+		};
+		
+		// Nueva órbita
+		Satellite.ctrl.pos_set(pos);
+		Satellite.ctrl.vel_set(vel);
+		Satellite.ctrl.rotation_set({
+			T: Satellite.ctrl.sidereal_rotation_period,
+			t0: Satellite.ctrl.GST0,
+			tilt: Satellite.ctrl.axial_tilt
+		});
+		Satellite.ctrl.physics({
+			da: Satellite.ctrl.orbit.da_dt,
+			de: Satellite.ctrl.orbit.de_dt,
+			di: Satellite.ctrl.orbit.di_dt,
+			dupper_omega: Satellite.ctrl.orbit.dupper_omega_dt,
+			dp: Satellite.ctrl.orbit.dp_dt
+		});
+		
+		// Reiniciar tiempo de simulación
+		s_base_time = Satellite.ctrl.epoch;
+		
+		// Esperar un nuevo cambio de parámetros
+		Satellite.moved = 0;
+	};
+	
+	// Trayectoria y punto de lanzamiento
 	launch_trajectory(ra, d, vel_mag){
 		
 		// Dirección del lanzamiento
@@ -451,7 +451,7 @@ class Satellite{
 		return my_pos;
 	};
 	
-	// Posicion de impresión
+	// Distancia entre sim. del satélite y sim. del cuerpo orbitado
 	get_print_pos(){
 		let pos = this.get_absolute_pos();
 		return {
@@ -1014,7 +1014,6 @@ class Satellite{
 		this.alive = true;
 		this.epoch = s_base_time;
 		this.name_set(name);
-		log( this.name + ' ' + str( this.epoch ) );
 		this.orbited = orbited;
 		this.R_set(R);
 		this.m_set(m);
