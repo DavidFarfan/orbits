@@ -1,30 +1,24 @@
-//---------ANIMADOR------------
 
+//---------ANIMADOR------------
 // Lienzo
 const canvas = document.getElementById('view');
-
-// Vista
-var view_page = 1;
-
-// Página de Información
-var info_page = 0;
-
-// Animador
-const animator = new Worker("/scripts/animador.js");
 const main_offscreen = canvas.transferControlToOffscreen();
 
-// Puesta en marcha del animador
+// Definición
+const animator = new Worker("/scripts/animador.js");
+
+// Puesta en marcha
 animator.postMessage({ type: 'context', canvas: main_offscreen }, [main_offscreen]);
 
 //-------PARÁMETROS DE LA SIMULACIÓN-----------
-
 // Posición del mouse
 var mousePos = { // Posicion inicial del mouse sobre el lienzo
 	x: width_p( .5 ),
 	y: height_p( .5 )
 };
 
-var sat = { // Diferencial para el control de los satélites 
+// Diferencial para el control de los satélites 
+var sat = { 
 	x: to_km( 0 ),
 	y: to_km( 0 ),
 	z: to_km( 0 ),
@@ -32,6 +26,12 @@ var sat = { // Diferencial para el control de los satélites
 	vy: 0,
 	vz: 0
 };
+
+// Variables de Vista
+var view_page = 1; // Número de vista
+var c1, c2; // Coordenadas de vista
+var request; // Pedido al animador
+var info_page = 0; // Página de Información
 
 // Parámetros para la simulación del tiempo
 var u_time; // Reloj universal
@@ -72,7 +72,6 @@ const origin = { // Coordenadas del origen en la pantalla
 var ephemeris = null; // Efemérides
 
 //--------UTILIDADES------------
-
 // Poner satélite en el centro y controlarlo
 function set_center_ctrl(name){
 	center_body = Satellite.get_sat( name );
@@ -107,6 +106,32 @@ function to_sim_t(t){
 // CONVERSIÓN DE SEGUNDOS SIMULADOS A SEGUNDOS REALES
 function to_real_t(st){
 	return st / t_scale;
+};
+
+// Pedir un vector escalado al animador
+function view_vec(o, vec, color){
+	request.push([
+		'line', 
+		to_px( o[c1] ),
+		to_px( o[c2] ),  
+		to_px( o[c1] + vec[c1] ),
+		to_px( o[c2] + vec[c2] ),
+		color
+	]);
+};
+
+// Pedir un vector no escalado al animador
+function view_vec_abs(o, vec, mag, color){
+	request.push([
+		'line',
+		to_px( o[c1] ),
+		to_px( o[c2] ),
+		
+		// La longitud del vector se dibuja sin tener en cuenta la escala
+		to_px( o[c1] ) + vec[c1] * pow( 10, mag ),
+		to_px( o[c2] ) + vec[c2] * pow( 10, mag ),
+		color
+	]);
 };
 
 //---------LOOP DE SIMULACIÓN------------
@@ -169,18 +194,8 @@ function orbitLoop(){
 		};
 	};
 	
-	//------------SELECCIÓN DE VISTA-----------
-	switch(view_page){
-		case 1:
-			View1.show(animator);
-			break;
-		case 2:
-			View2.show(animator);
-			break;
-		case 3:
-			View3.show(animator);
-			break;
-	};
+	// Gráficos
+	View.show();
 };
 
 //------I/O-------------

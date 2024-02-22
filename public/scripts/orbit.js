@@ -197,10 +197,10 @@ class Orbit{
 		};
 	};
 	
-	// Fictional Position Calculation
+	// Posicion ficticia que corresponde al tiempo simulado
 	fictional_pos(fic_time, t0, f0, u){
 		
-		// Tiempo de órbita y diferenciales
+		// Tiempo particular de órbita y diferenciales
 		let fic_t = fic_time + t0;
 		let dt = to_century( fic_time );
 		let fic_da = this.da_dt * dt;
@@ -221,7 +221,7 @@ class Orbit{
 			this.axial_tilt
 		);
 		
-		// Posición y velocidad en el tiempo
+		// Posición y velocidad en el tiempo calculados sobre la perturbación
 		let sim_set = r_v_vecs(
 			fic_perturbation.type,
 			fic_t,
@@ -237,11 +237,6 @@ class Orbit{
 		);
 		return {
 			t: fic_t,
-			da: fic_da,
-			de: fic_de,
-			di: fic_di,
-			dupper_omega: fic_dupper_omega,
-			domega: fic_domega,
 			perturbation: fic_perturbation,
 			pos: sim_set
 		};
@@ -256,18 +251,13 @@ class Orbit{
 			u
 		);
 		
-		// Tiempo de órbita y diferenciales
+		// Tiempo de órbita
 		this.t = fic_pos.t;
-		this.da = fic_pos.da;
-		this.de = fic_pos.de;
-		this.di = fic_pos.di;
-		this.dupper_omega = fic_pos.dupper_omega;
-		this.domega = fic_pos.domega;
 		
 		// Perturbación
 		this.perturbation = fic_pos.perturbation;
 		
-		// Simulación
+		// Punto de Simulación
 		this.M = fic_pos.pos.M;
 		this.E = fic_pos.pos.E;
 		this.H = fic_pos.pos.H;
@@ -327,41 +317,20 @@ class Orbit{
 		};
 	};
 	
-	// Vista 1
-	view1(request, orbited_pos, print_elem){
+	// Vista
+	view(orbited_pos, print_elem){
 		
 		// Elementos orbitales
 		if(print_elem){
 			
 			// Nodo ascendente
-			request.push([
-				'line',
-				to_px( orbited_pos.x ),
-				to_px( orbited_pos.y ),
-				to_px( orbited_pos.x + this.perturbation.ascending_node.x ),
-				to_px( orbited_pos.y + this.perturbation.ascending_node.y ),
-				"GREEN"
-			]);
+			view_vec( orbited_pos, this.perturbation.ascending_node, 'GREEN' );
 			
 			// Peripasis
-			request.push([
-				'line',
-				to_px( orbited_pos.x ),
-				to_px( orbited_pos.y ),
-				to_px( orbited_pos.x + this.perturbation.periapse.x ),
-				to_px( orbited_pos.y + this.perturbation.periapse.y ),
-				'RED'
-			]);
+			view_vec( orbited_pos, this.perturbation.periapse, 'RED' );
 			
 			// Semi-altura recta
-			request.push([
-				'line',
-				to_px( orbited_pos.x ),
-				to_px( orbited_pos.y ),
-				to_px( orbited_pos.x + this.perturbation.semi_latus_rectum.x ),
-				to_px( orbited_pos.y + this.perturbation.semi_latus_rectum.y ),
-				'BLUE'
-			]);
+			view_vec( orbited_pos, this.perturbation.semi_latus_rectum, 'BLUE' );
 		};
 		
 		// Curva de la órbita
@@ -371,102 +340,15 @@ class Orbit{
 			[ to_px( orbited_pos.x ), to_px( orbited_pos.y ), to_px( orbited_pos.z ) ],
 			0,
 			'GREY',
-			0,
-			1
+			view_page - 1,
+			view_page
 		]);
 		
 		// Posición simulada
-		request.push([
-			'line',
-			to_px( orbited_pos.x ),
-			to_px( orbited_pos.y ),
-			to_px( orbited_pos.x + this.r.x ),
-			to_px( orbited_pos.y + this.r.y ),
-			'GREY'
-		]);
+		view_vec( orbited_pos, this.r, 'GREY' );
 		
 		// Velocidad simulada
-		request.push([
-			'line',
-			to_px( orbited_pos.x + this.r.x ),
-			to_px( orbited_pos.y + this.r.y ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( orbited_pos.x + this.r.x ) + this.v.x * 1e0,
-			to_px( orbited_pos.y + this.r.y ) + this.v.y * 1e0,
-			'MAGENTA'
-		]);
-	};
-	
-	// Vista 2
-	view2(request, orbited_pos, print_elem){
-		
-		// Elementos orbitales
-		if(print_elem){
-			
-			// Nodo ascendente
-			request.push([
-				'line',
-				to_px( orbited_pos.y ),
-				to_px( orbited_pos.z ),
-				to_px( orbited_pos.y + this.perturbation.ascending_node.y ),
-				to_px( orbited_pos.z + this.perturbation.ascending_node.z ),
-				"GREEN"
-			]);
-			
-			// Peripasis
-			request.push([
-				'line',
-				to_px( orbited_pos.y ),
-				to_px( orbited_pos.z ),
-				to_px( orbited_pos.y + this.perturbation.periapse.y ),
-				to_px( orbited_pos.z + this.perturbation.periapse.z ),
-				'RED'
-			]);
-			
-			// Semi-altura recta
-			request.push([
-				'line',
-				to_px( orbited_pos.y ),
-				to_px( orbited_pos.z ),
-				to_px( orbited_pos.y + this.perturbation.semi_latus_rectum.y ),
-				to_px( orbited_pos.z + this.perturbation.semi_latus_rectum.z ),
-				'BLUE'
-			]);
-		};
-		
-		// Curva de la órbita
-		request.push([
-			'plot',
-			this.curve,
-			[ to_px( orbited_pos.x ), to_px( orbited_pos.y ), to_px( orbited_pos.z ) ],
-			0,
-			'GREY',
-			1,
-			2
-		]);
-		
-		// Posición simulada
-		request.push([
-			'line',
-			to_px( orbited_pos.y ),
-			to_px( orbited_pos.z ),
-			to_px( orbited_pos.y + this.r.y ),
-			to_px( orbited_pos.z + this.r.z ),
-			'GREY'
-		]);
-		
-		// Velocidad simulada
-		request.push([
-			'line',
-			to_px( orbited_pos.y + this.r.y ),
-			to_px( orbited_pos.z + this.r.z ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( orbited_pos.y + this.r.y ) + this.v.y * 1e0,
-			to_px( orbited_pos.z + this.r.z ) + this.v.z * 1e0,
-			'MAGENTA'
-		]);
+		view_vec_abs( sum_vec( orbited_pos, this.r ), this.v, 0, 'MAGENTA' );
 	};
 	
 	// Variables de la órbita (a partir del satélite que la recorre)

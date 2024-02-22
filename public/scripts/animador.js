@@ -11,7 +11,8 @@ const colors = { // Paleta
 	BLUE: '#0000FF',
 	YELLOW: '#FFFF00',
 	MAGENTA: '#FF00FF',
-	CYAN: '#00FFFF'
+	CYAN: '#00FFFF',
+	PURPLE: '#8800AA'
 };
 
 //-----DIBUJO------------

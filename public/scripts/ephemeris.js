@@ -17,7 +17,7 @@ self.onmessage = (e) => {
 	};
 };
 
-// Tratamiento de la hoja de datos: Vectores pos, vel, formato lista
+// Tratamiento de los datos: Dar formato de lista a vectores pos y vel
 function cartesian_horizons_ephem(data){
 	
 	// Construir lista de vectores cartesianos

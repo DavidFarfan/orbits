@@ -1408,9 +1408,6 @@ function ell_min_flight_t(rt1, rt2, u){
 };
 
 // ESFERA DE INFLUENCIA
-function r_soi(orbiting, orbited){
-	if(orbited == null){
-		return;
-	};
-	return orbiting.orbit.perturbation.a * pow( orbiting.m / orbited.m, 2 / 5 );
+function r_soi(orbiting_a, orbiting_m, orbited_m){
+	return orbiting_a * pow( orbiting_m / orbited_m, 2 / 5 );
 };

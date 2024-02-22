@@ -5,21 +5,20 @@ class View{
 	};
 	
 	// Dibujar Efemérides en formato vector
-	static draw_ephemeris(request, print_pos, view_no){
+	static draw_ephemeris(){
 		
 		// Seleccionar vista para las Efemérides
-		let coord1 = null;
-		let coord2 = null;
+		let print_pos = center_body.get_print_pos();
+		let coord1 = print_pos[c1];
+		let coord2 = print_pos[c2];
 		let eph_r_1 = null;
 		let eph_r_2 = null;
 		let eph_v_1 = null;
 		let eph_v_2 = null;
-		switch(view_no){
+		switch(view_page){
 			
 			// Planta
 			case 1:
-				coord1 = print_pos.x;
-				coord2 = print_pos.y;
 				eph_r_1 = 0;
 				eph_r_2 = 1;
 				eph_v_1 = 3;
@@ -28,16 +27,16 @@ class View{
 			
 			// Elevación
 			case 2:
-				coord1 = print_pos.y;
-				coord2 = print_pos.z;
 				eph_r_1 = 1;
 				eph_r_2 = 2;
 				eph_v_1 = 4;
 				eph_v_2 = 5;
 				break;
+			default:
+				return;
 		};
 		
-		// Dibujo
+		// Pedido al animador
 		if(ephemeris != null){
 			ephemeris.forEach(function(value, index, array){
 				
@@ -85,7 +84,7 @@ class View{
 	};
 	
 	// Info. Básica de simulación
-	static print_basic(request){
+	static print_basic(){
 		
 		// Sistema de coordenadas
 		request.push([
@@ -159,26 +158,301 @@ class View{
 		]);
 	};
 	
+	// Info. de la esfera celeste
+	static info_sphere(){
+		
+		// Sphere
+		request.push([
+			'circle', 
+			origin.x,
+			origin.y, 
+			1e2,
+			'CYAN'
+		]);
+		
+		// North
+		request.push([
+			'print', 
+			"N",
+			origin.x, 
+			origin.y + 1e2,
+			'CYAN'
+		]);
+		
+		// South
+		request.push([
+			'print', 
+			"S",
+			origin.x, 
+			origin.y - 1e2 - 10,
+			'CYAN'
+		]);
+		
+		// East
+		request.push([
+			'print', 
+			"E",
+			origin.x + 1e2, 
+			origin.y,
+			'CYAN'
+		]);
+		
+		// West
+		request.push([
+			'print', 
+			"W",
+			origin.x - 1e2 - 10, 
+			origin.y,
+			'CYAN'
+		]);
+		
+		//--------DATOS DEL PUNTO SOBRE LA SUPERFICIE--------
+		
+		// Coordenadas (deg)
+		request.push([
+			'print', 
+			"Point coordinates of orbited body from " + Satellite.ctrl.name + 
+			" -> lat: " + str( significant( rad_to_deg( PHI ), 4 ) ) + 
+			"° lon: " + str( significant( rad_to_deg( LAMBDA ), 4 ) ) + "°",
+			10, 
+			10,
+			'WHITE'
+		]);
+		
+		//--------DATOS DEL PUNTO MONITOREADO-----------
+		
+		// Pointing Coordinates of the sun from ctrl (rad)
+		let p_q;
+		if(Satellite.ctrl.orbit.perturbation != undefined){
+			
+			// Corregir si el nodo ascendente ha cambiado de dirección
+			let u_omega = Satellite.ctrl.orbit.perturbation.upper_omega;
+			let tilt = Satellite.ctrl.orbit.perturbation.axial_tilt;
+			if(Satellite.ctrl.orbit.perturbation.negative_inclination){
+				u_omega += PI;
+				tilt *= -1;
+			};
+			p_q = pointing_coordiantes(
+				Satellite.ctrl.orbit.r,
+				{	// Sun
+					x: 0,
+					y: 0,
+					z: 0
+				},
+				Satellite.ctrl.orbit.perturbation.i,
+				tilt,
+				u_omega
+			);
+			
+			// Right ascension
+			request.push([
+				'print', 
+				"RA = " + str( p_q.alpha ) + " rad",
+				10, 
+				20,
+				'WHITE'
+			]);
+			
+			// Declination
+			request.push([
+				'print', 
+				"D = " + str( p_q.delta ) + " rad",
+				10,
+				30,
+				'WHITE'
+			]);
+		};
+		
+		// Hora sideral del meridiano cero (rad)
+		request.push([
+			'print', 
+			"GST = " + str( Satellite.ctrl.GST ) + " rad",
+			10, 
+			40,
+			'WHITE'
+		]);
+		
+		// Fecha (TT)
+		let date = new Date( s_to_ms( s_time ) + EPOCH_J2000.getTime() );
+		request.push([
+			'print', 
+			"Date (TT) = " + str( date ),
+			10, 
+			50,
+			'WHITE'
+		]);
+		
+		// Hora universal coordinada
+		let sun_sky = celestial_sphere_pos(p_q.alpha, p_q.delta, LAMBDA, PHI, Satellite.ctrl.GST);
+		request.push([
+			'print', 
+			"Real UTC = " + hour_string( rad_to_h_m_s( sun_sky.hour ) ),
+			10, 
+			60,
+			'WHITE'
+		]);
+		request.push([
+			'print', 
+			"sun x = " + str( significant( sun_sky.pos.x, 4 ) ) + 
+			", sun y = " + str( significant( sun_sky.pos.y, 4 ) ) + 
+			", sun z = " + str( significant( sun_sky.pos.z, 4 ) ),
+			10, 
+			70,
+			'WHITE'
+		]);
+		let color;
+		if(sun_sky.pos.z > 0){
+			color = 'CYAN';
+		}else{
+			color = 'GREY'
+		};
+		
+		// Center body
+		request.push([
+			'circle', 
+			origin.x + sun_sky.pos.x * 1e2,
+			origin.y + sun_sky.pos.y * 1e2, 
+			2,
+			color
+		]);
+		
+		// North position over location
+		let north_sky = celestial_sphere_pos(0, PI / 2, LAMBDA, PHI, Satellite.ctrl.GST);
+		request.push([
+			'print', 
+			"north x = " + str( significant( north_sky.pos.x, 4 ) ) + 
+			", north y = " + str( significant( north_sky.pos.y, 4 ) ) + 
+			", north z = " + str( significant( north_sky.pos.z, 4 ) ),
+			10, 
+			80,
+			'WHITE'
+		]);
+		if(north_sky.pos.z > 0){
+			color = 'RED';
+		}else{
+			color = 'GREY'
+		};
+		
+		// North
+		request.push([
+			'circle', 
+			origin.x + north_sky.pos.x * 1e2,
+			origin.y + north_sky.pos.y * 1e2, 
+			1,
+			color
+		]);
+		
+		// South position over location
+		let south_sky = celestial_sphere_pos(0, -PI / 2, LAMBDA, PHI, Satellite.ctrl.GST);
+		request.push([
+			'print', 
+			"south x = " + str( significant( south_sky.pos.x, 4 ) ) + 
+			", south y = " + str( significant( south_sky.pos.y, 4 ) ) + 
+			", south z = " + str( significant( south_sky.pos.z, 4 ) ),
+			10, 
+			90,
+			'WHITE'
+		]);
+		if(south_sky.pos.z > 0){
+			color = 'RED';
+		}else{
+			color = 'GREY'
+		};
+		
+		// South
+		request.push([
+			'circle', 
+			origin.x + south_sky.pos.x * 1e2,
+			origin.y + south_sky.pos.y * 1e2, 
+			1,
+			color
+		]);
+		
+		// Local meridian of location from location
+		let local_sky = celestial_sphere_pos(
+			LST( Satellite.ctrl.GST, LAMBDA ),
+			0,
+			LAMBDA,
+			PHI,
+			Satellite.ctrl.GST
+		);
+		request.push([
+			'print', 
+			"local x = " + str( significant( local_sky.pos.x, 4 ) ) + 
+			", local y = " + str( significant( local_sky.pos.y, 4 ) ) + 
+			", local z = " + str( significant( local_sky.pos.z, 4 ) ),
+			10, 
+			100,
+			'WHITE'
+		]);
+		if(local_sky.pos.z > 0){
+			color = 'BLUE';
+		}else{
+			color = 'GREY'
+		};
+		
+		// Local meridian
+		request.push([
+			'circle', 
+			origin.x + local_sky.pos.x * 1e2,
+			origin.y + local_sky.pos.y * 1e2, 
+			1,
+			color
+		]);
+		
+		// East of location from location
+		let east_sky = celestial_sphere_pos(
+			LST( Satellite.ctrl.GST, LAMBDA ) + PI / 2,
+			0,
+			LAMBDA,
+			PHI,
+			Satellite.ctrl.GST
+		);
+		request.push([
+			'print', 
+			"east x = " + str( significant( east_sky.pos.x, 4 ) ) + 
+			", east y = " + str( significant( east_sky.pos.y, 4 ) ) + 
+			", east z = " + str( significant( east_sky.pos.z, 4 ) ),
+			10, 
+			110,
+			'WHITE'
+		]);
+		if(east_sky.pos.z > 0){
+			color = 'GREEN';
+		}else{
+			color = 'GREY'
+		};
+		
+		// East
+		request.push([
+			'circle', 
+			origin.x + east_sky.pos.x * 1e2,
+			origin.y + east_sky.pos.y * 1e2, 
+			1,
+			color
+		]);
+	};
+	
 	// Impresión de las magnitudes
-	static print_info(request, page){
+	static print_info(){
 		
 		// ---------- INFO. ESPECÍFICA DE LA PÁGINA ---------------
-		switch(page){
+		switch(info_page){
 			
 			// Invariantes y anomalías
 			case 0:
-				View.print_0( request );
+				View.print_0();
 				break;
 			
 			// Elementos orbitales
 			case 1:
-				View.print_1( request );
+				View.print_1();
 				break;
 		};
 	};
 	
 	// Página 0: Invariantes y anomalías
-	static print_0(request){
+	static print_0(){
 		
 		// Posición del satélite controlado (er)
 		request.push([
@@ -329,7 +603,7 @@ class View{
 	};
 	
 	// Página 1: Elementos orbitales
-	static print_1(request){
+	static print_1(){
 		
 		// Componentes del nodo ascendente (er)
 		request.push([
@@ -612,5 +886,60 @@ class View{
 			height_p( 1 ) - 50,
 			'WHITE'
 		]);
+	};
+	
+	// Construcción de vista
+	static show(){
+		
+		// Construir nuevo pedido
+		request = [];
+		
+		//------------SELECCIÓN DE VISTA-----------
+		switch(view_page){
+			case 1:
+			
+				//----PLANTA------
+				c1 = 'x';
+				c2 = 'y';
+				break;
+			case 2:
+				
+				//----ELEVACIÓN-----
+				c1 = 'y';
+				c2 = 'z';
+				break;
+			case 3:
+				
+				//------ESFERA CELESTE------------
+				View.info_sphere();
+				
+				// Info. básica
+				View.print_basic();
+				
+				// Enviar pedido al animador
+				animator.postMessage({
+					type: 'request',
+					req: request
+				});
+				return;
+		};
+		
+		// Satélites
+		Satellite.list.forEach(function(value, index, array){
+			value.view();
+		});
+		
+		// Efemérides
+		View.draw_ephemeris();
+		
+		// Imprimir info. solicitada
+		View.print_basic();
+		View.print_info();
+		
+		// Enviar pedido al animador
+		animator.postMessage({
+			type: 'request',
+			req: request
+		});
 	};
 };

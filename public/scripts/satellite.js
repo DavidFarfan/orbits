@@ -625,28 +625,38 @@ class Satellite{
 	// Simmulación
 	sim(){
 		
-		// Acción
-		this.orbit.sim( this.get_gravity() ); // Traslación
-		this.rotate(); // Rotación
+		// Traslación
+		this.orbit.sim( this.get_gravity() );
 		
+		// Esfera de influencia
+		if(this.orbited != null){
+			this.rsoi = r_soi(
+				this.orbit.perturbation.a,
+				this.m,
+				Satellite.get_sat( this.orbited ).m
+			);
+		};
+		
+		// Rotación
+		this.rotate(); 
+		
+		// Orbita de transferencia
 		if(this.orbit_to_me != undefined){
 			this.orbit_to_me.orbit.sim( this.orbit_to_me.sat.get_gravity() );
 		};
-		
-		this.rsoi = r_soi( this, Satellite.get_sat( this.orbited ) )
 	};
 	
-	// Vista 1
-	view1(request){
+	// Vista
+	view(){
 		
-		// Ocultar vista
+		// Ocultar satélite
 		if(!this.alive){
 			return;
 		};
 		
 		// Órbita
 		let print_pos = this.get_print_pos();
-		this.orbit.view1( request, print_pos, true );
+		this.orbit.view( print_pos, true );
 		
 		// Color inicativo del Control
 		let color;
@@ -663,8 +673,8 @@ class Satellite{
 		};
 		request.push([
 			'circle',
-			to_px( print_pos.x + this.orbit.r.x ),
-			to_px( print_pos.y + this.orbit.r.y ),
+			to_px( print_pos[c1] + this.orbit.r[c1] ),
+			to_px( print_pos[c2] + this.orbit.r[c2] ),
 			draw_radius,
 			'CYAN'
 		]);
@@ -676,281 +686,50 @@ class Satellite{
 		};
 		request.push([
 			'circle',
-			to_px( print_pos.x + this.orbit.r.x ),
-			to_px( print_pos.y + this.orbit.r.y ),
+			to_px( print_pos[c1] + this.orbit.r[c1] ),
+			to_px( print_pos[c2] + this.orbit.r[c2] ),
 			draw_rsoi,
 			'RED'
 		]);
 		
-		// Target (Future Position)
-		if(this.target != undefined && this.orbit_to_me != undefined){
-			
-			let target_r = this.target.r;
-			let target_v = this.target.v;
-			this.orbit_to_me.orbit.view1(
-				request,
-				this.orbit_to_me.sat.get_print_pos()
-			);
-			
-			// Vector r
-			request.push([
-				'line', 
-				to_px( print_pos.x ),
-				to_px( print_pos.y ),  
-				to_px( print_pos.x + target_r.x ),
-				to_px( print_pos.y + target_r.y ),
-				'CYAN'
-			]);
-			
-			// Vector v
-			request.push([
-				'line',
-				to_px( print_pos.x + target_r.x ),
-				to_px( print_pos.y + target_r.y ),
-				
-				// La longitud del vector se dibuja sin tener en cuenta la escala
-				to_px( print_pos.x + target_r.x ) + target_v.x * 1e0,
-				to_px( print_pos.y + target_r.y ) + target_v.y * 1e0,
-				'CYAN'
-			]);
-		};
-		
 		// Vector r
-		request.push([
-			'line', 
-			to_px( print_pos.x ),
-			to_px( print_pos.y ),  
-			to_px( print_pos.x + this.pos.x ),
-			to_px( print_pos.y + this.pos.y ),
-			color
-		]);
+		view_vec( print_pos, this.pos, color );
 		
 		// Vector v
-		request.push([
-			'line',
-			to_px( print_pos.x + this.pos.x ),
-			to_px( print_pos.y + this.pos.y ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( print_pos.x + this.pos.x ) + this.vel.x * 1e0,
-			to_px( print_pos.y + this.pos.y ) + this.vel.y * 1e0,
-			color
-		]);
+		view_vec_abs( sum_vec( print_pos, this.pos ), this.vel, 0, color );
 		
 		// Vector h
-		request.push([
-			'line',
-			to_px( print_pos.x ),
-			to_px( print_pos.y ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( print_pos.x ) + this.h_vec.x * 1e-5,
-			to_px( print_pos.y ) + this.h_vec.y * 1e-5,
-			"CYAN"
-		]);
+		view_vec_abs( print_pos, this.h_vec, -2, 'CYAN' );
 		
 		// Eje de rotación
-		request.push([
-			'line',
-			to_px( print_pos.x + this.orbit.r.x ),
-			to_px( print_pos.y + this.orbit.r.y ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( print_pos.x + this.orbit.r.x ) + this.orbit.perturbation.rot_axis.x * 1e-5,
-			to_px( print_pos.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
-			"CYAN"
-		]);
-		
-		// Lanzamiento
-		let dir_rot = this.launch_trajectory(
-			deg_to_rad( 0 ),
-			deg_to_rad( 90 ),
-			this.rsoi
+		view_vec_abs(
+			sum_vec( print_pos, this.orbit.r ),
+			this.orbit.perturbation.rot_axis,
+			-2,
+			'PURPLE'
 		);
-		
-		// Impresión de lanzamiento
-		request.push([
-			'line',
-			to_px( print_pos.x + this.orbit.r.x + dir_rot.pos.x ),
-			to_px( print_pos.y + this.orbit.r.y + dir_rot.pos.y ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( print_pos.x + this.orbit.r.x + dir_rot.pos.x + dir_rot.vel.x ) * 1e0,
-			to_px( print_pos.y + this.orbit.r.y + dir_rot.pos.y + dir_rot.vel.y ) * 1e0,
-			'RED'
-		]);
-		request.push([ 
-			'print', 
-			'negative_inclination: ' + str(
-				this.orbit.perturbation.negative_inclination
-			), 
-			to_px( print_pos.x + this.orbit.r.x ) - 10, 
-			to_px( print_pos.y + this.orbit.r.y ) + 60,
-			color
-		]);
-		request.push([ 
-			'print', 
-			'dir rot x: ' + str( dir_rot.vel.x ), 
-			to_px( print_pos.x + this.orbit.r.x ) - 10, 
-			to_px( print_pos.y + this.orbit.r.y ) + 50,
-			color
-		]);
-		request.push([ 
-			'print', 
-			'dir rot y: ' + str( dir_rot.vel.y ), 
-			to_px( print_pos.x + this.orbit.r.x ) - 10, 
-			to_px( print_pos.y + this.orbit.r.y ) + 40,
-			color
-		]);
-		request.push([ 
-			'print', 
-			'dir rot z: ' + str( dir_rot.vel.z ), 
-			to_px( print_pos.x + this.orbit.r.x ) - 10, 
-			to_px( print_pos.y + this.orbit.r.y ) + 30,
-			color
-		]);
-		request.push([ 
-			'print', 
-			this.GST,
-			to_px( print_pos.x + this.orbit.r.x ) - 10, 
-			to_px( print_pos.y + this.orbit.r.y ) + 20,
-			color
-		]);
 		
 		// Nombre
 		request.push([ 
 			'print', 
 			this.name,
-			to_px( print_pos.x + this.orbit.r.x ) - 10, 
-			to_px( print_pos.y + this.orbit.r.y ) + 10,
+			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+			to_px( print_pos[c2] + this.orbit.r[c2] ) + 10,
 			color
-		]);
-	};
-	
-	// Vista 2
-	view2(request){
-		
-		// Ocultar vista
-		if(!this.alive){
-			return;
-		};
-		
-		// Órbita
-		let print_pos = this.get_print_pos();
-		this.orbit.view2( request, print_pos, true );
-		
-		// Color inicativo del Control
-		let color;
-		if(this.ctrl){
-			color = 'WHITE';
-		}else{
-			color = 'YELLOW';
-		};
-		
-		// Radio
-		let draw_radius = to_px( this.R );
-		if(draw_radius < 1){
-			draw_radius = 1;
-		};
-		request.push([
-			'circle',
-			to_px( print_pos.y + this.orbit.r.y ),
-			to_px( print_pos.z + this.orbit.r.z ),
-			draw_radius,
-			'CYAN'
-		]);
-		
-		// SOI
-		let draw_rsoi = to_px( this.rsoi );
-		if(draw_rsoi < 1){
-			draw_rsoi = 1;
-		};
-		request.push([
-			'circle',
-			to_px( print_pos.y + this.orbit.r.y ),
-			to_px( print_pos.z + this.orbit.r.z ),
-			draw_rsoi,
-			'RED'
 		]);
 		
 		// Target (Future Position)
 		if(this.target != undefined && this.orbit_to_me != undefined){
 			
-			let target_r = this.target.r;
-			let target_v = this.target.v;
-			this.orbit_to_me.orbit.view2(
-				request,
-				this.orbit_to_me.sat.get_print_pos()
-			);
+			// Órbita de transferencia
+			this.orbit_to_me.orbit.view( this.orbit_to_me.sat.get_print_pos() );
 			
-			// Vector r
-			request.push([
-				'line', 
-				to_px( print_pos.y ),
-				to_px( print_pos.z ),  
-				to_px( print_pos.y + target_r.y ),
-				to_px( print_pos.z + target_r.z ),
-				'CYAN'
-			]);
+			// Vector r futuro
+			view_vec( print_pos, this.target.r, 'CYAN' );
 			
-			// Vector v
-			request.push([
-				'line',
-				to_px( print_pos.y + target_r.y ),
-				to_px( print_pos.z + target_r.z ),
-				
-				// La longitud del vector se dibuja sin tener en cuenta la escala
-				to_px( print_pos.y + target_r.y ) + target_v.y * 1e0,
-				to_px( print_pos.z + target_r.z ) + target_v.z * 1e0,
-				'CYAN'
-			]);
+			// Vector v futuro
+			view_vec_abs( sum_vec( print_pos, this.target.r ), this.target.v, 0, 'CYAN' );
 		};
-		
-		// Vector r
-		request.push([
-			'line', 
-			to_px( print_pos.y ),
-			to_px( print_pos.z ),  
-			to_px( print_pos.y + this.pos.y ),
-			to_px( print_pos.z + this.pos.z ),
-			color
-		]);
-		
-		// Vector v
-		request.push([
-			'line',
-			to_px( print_pos.y + this.pos.y ),
-			to_px( print_pos.z + this.pos.z ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( print_pos.y + this.pos.y ) + this.vel.y * 1e0,
-			to_px( print_pos.z + this.pos.z ) + this.vel.z * 1e0,
-			color
-		]);
-		
-		// Vector h
-		request.push([
-			'line',
-			to_px( print_pos.y ),
-			to_px( print_pos.z ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( print_pos.y ) + this.h_vec.y * 1e-5,
-			to_px( print_pos.z ) + this.h_vec.z * 1e-5,
-			"CYAN"
-		]);
-		
-		// Eje de rotación
-		request.push([
-			'line',
-			to_px( print_pos.y + this.orbit.r.y ),
-			to_px( print_pos.z + this.orbit.r.z ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( print_pos.y + this.orbit.r.y ) + this.orbit.perturbation.rot_axis.y * 1e-5,
-			to_px( print_pos.z + this.orbit.r.z ) + this.orbit.perturbation.rot_axis.z * 1e-5,
-			"CYAN"
-		]);
 		
 		// Lanzamiento
 		let dir_rot = this.launch_trajectory(
@@ -958,53 +737,44 @@ class Satellite{
 			deg_to_rad( 90 ),
 			this.rsoi
 		);
+		let launch_pos = sum_vec( sum_vec( print_pos, this.orbit.r ), dir_rot.pos );
+		view_vec( launch_pos, dir_rot.vel, 'RED' );
 		
-		// Impresión de lanzamiento
-		request.push([
-			'line',
-			to_px( print_pos.y + this.orbit.r.y + dir_rot.pos.y ),
-			to_px( print_pos.z + this.orbit.r.z + dir_rot.pos.z ),
-			
-			// La longitud del vector se dibuja sin tener en cuenta la escala
-			to_px( print_pos.y + this.orbit.r.y + dir_rot.pos.y + dir_rot.vel.y ) * 1e0,
-			to_px( print_pos.z + this.orbit.r.z + dir_rot.pos.z + dir_rot.vel.z ) * 1e0,
-			'RED'
+		request.push([ 
+			'print', 
+			'negative_inclination: ' + str(
+				this.orbit.perturbation.negative_inclination
+			), 
+			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+			to_px( print_pos[c2] + this.orbit.r[c2] ) + 60,
+			color
 		]);
 		request.push([ 
 			'print', 
 			'dir rot x: ' + str( dir_rot.vel.x ), 
-			to_px( print_pos.y + this.orbit.r.y ) - 10, 
-			to_px( print_pos.z + this.orbit.r.z ) + 50,
+			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+			to_px( print_pos[c2] + this.orbit.r[c2] ) + 50,
 			color
 		]);
 		request.push([ 
 			'print', 
 			'dir rot y: ' + str( dir_rot.vel.y ), 
-			to_px( print_pos.y + this.orbit.r.y ) - 10, 
-			to_px( print_pos.z + this.orbit.r.z ) + 40,
+			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+			to_px( print_pos[c2] + this.orbit.r[c2] ) + 40,
 			color
 		]);
 		request.push([ 
 			'print', 
 			'dir rot z: ' + str( dir_rot.vel.z ), 
-			to_px( print_pos.y + this.orbit.r.y ) - 10, 
-			to_px( print_pos.z + this.orbit.r.z ) + 30,
+			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+			to_px( print_pos[c2] + this.orbit.r[c2] ) + 30,
 			color
 		]);
 		request.push([ 
 			'print', 
 			this.GST,
-			to_px( print_pos.y + this.orbit.r.y ) - 10, 
-			to_px( print_pos.z + this.orbit.r.z ) + 20,
-			color
-		]);
-		
-		// Nombre 
-		request.push([
-			'print', 
-			this.name,
-			to_px( print_pos.y + this.orbit.r.y ) - 10, 
-			to_px( print_pos.z + this.orbit.r.z ) + 10,
+			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+			to_px( print_pos[c2] + this.orbit.r[c2] ) + 20,
 			color
 		]);
 	};

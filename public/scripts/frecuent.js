@@ -1,5 +1,5 @@
 
-//--------FUNCIONES JS FRECUENTES------------
+//--------FUNCIONES FRECUENTES------------
 
 // Log
 function log(txt){
