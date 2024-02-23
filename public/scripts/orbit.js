@@ -119,8 +119,11 @@ class Orbit{
 		if(adjust_rot){
 			this.axial_tilt *= -1;
 		};
+		
+		// Inclinación respecto a la eclíptica J2000
+		let normal_eclliptic = prod_by_sc( norm_vec( h ), {x:0, y:0, z:1} );
 		this.rot_axis = rotation_axis(
-			h,
+			normal_eclliptic,
 			this.axial_tilt,
 			this.upper_omega
 		);

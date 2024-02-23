@@ -161,29 +161,27 @@ class Satellite{
 									) - s_time
 		);
 		vehicles_trajectories ++;
-		
-		// EPOCH
-		log( 'EPOCH' );
-		log( Satellite.get_sat( vehicle_name ).epoch );
-		log( 'TIME' );
-		log( s_time );
-		
-		// TRASPASO
-		Satellite.ctrl.alive = false;
-		Satellite.get_sat( vehicle_name ).ctrl_set( true );
 	};
 	
 	// Rutina de control manual
 	static ctrl_rutine(){
 		
-		// Verificar cambios de parámetros
+		// Verificar entrada del usuario
 		if(Satellite.moved == 0){
 			return;
 		};  
 		
 		// Preparar nuevas condiciones iniciales del satélite
-		var pos = Satellite.ctrl.pos;
-		var vel = Satellite.ctrl.vel;
+		var pos = {
+			x: Satellite.ctrl.pos.x,
+			y: Satellite.ctrl.pos.y,
+			z: Satellite.ctrl.pos.z,
+		};
+		var vel = {
+			x: Satellite.ctrl.vel.x,
+			y: Satellite.ctrl.vel.y,
+			z: Satellite.ctrl.vel.z,
+		};
 		
 		// Cambiar posisición/velocidad del satélite controlado según bandera
 		switch(Satellite.moved){
@@ -224,28 +222,72 @@ class Satellite{
 				vel.z += sat.vz;
 				break;
 		};
+		Satellite.moved = 0;
 		
-		// Nueva órbita
-		Satellite.ctrl.pos_set(pos);
-		Satellite.ctrl.vel_set(vel);
-		Satellite.ctrl.rotation_set({
+		// Conservar rotación
+		let sat_rot = {
 			T: Satellite.ctrl.sidereal_rotation_period,
 			t0: Satellite.ctrl.GST0,
-			tilt: Satellite.ctrl.axial_tilt
-		});
-		Satellite.ctrl.physics({
+			tilt: Satellite.ctrl.orbit.axial_tilt
+		};
+		
+		// Conservar perturbaciones
+		let sat_dif = {
 			da: Satellite.ctrl.orbit.da_dt,
 			de: Satellite.ctrl.orbit.de_dt,
 			di: Satellite.ctrl.orbit.di_dt,
 			dupper_omega: Satellite.ctrl.orbit.dupper_omega_dt,
 			dp: Satellite.ctrl.orbit.dp_dt
-		});
+		};
 		
-		// Reiniciar tiempo de simulación
-		s_base_time = Satellite.ctrl.epoch;
+		// Conservar nombre
+		let sat_name = Satellite.ctrl.name;
 		
-		// Esperar un nuevo cambio de parámetros
-		Satellite.moved = 0;
+		// Datos relevantes
+		log( 'Epoch' );
+		log( Satellite.ctrl.epoch );
+		log( 'Time' );
+		log( s_time );
+		log( 'Prev set:' );
+		log( Satellite.ctrl.pos );
+		log( Satellite.ctrl.vel );
+		log( 'New set:' );
+		log( pos );
+		log( vel );
+		log( 'Rot' );
+		log( sat_rot );
+		log( 'DIf' );
+		log( sat_dif );
+		log( 'sat name' );
+		log( sat_name );
+		
+		// Saltar al epoch
+		set_time( Satellite.ctrl.epoch );
+		
+		// Implementar los nuevos settings
+		new Satellite(
+			sat_name,
+			Satellite.ctrl.orbited,
+			Satellite.ctrl.R,
+			Satellite.ctrl.m,
+			Satellite.ctrl.u,
+			pos,
+			vel,
+			sat_rot,
+			sat_dif,
+			false
+		);
+		
+		// Matar los settings actuales
+		Satellite.ctrl.name_set('dead');
+		Satellite.ctrl.set_live();
+		
+		// Ceder el control a los nuevos settings
+		set_center_ctrl( sat_name );
+		
+		// Imprimir el satélite modificado
+		log( 'sat' );
+		log( Satellite.get_sat( sat_name ) );
 	};
 	
 	// Trayectoria y punto de lanzamiento
@@ -263,7 +305,7 @@ class Satellite{
 		);
 		
 		//  Ajustar al plano ecuatorial
-		let tilt = this.axial_tilt;
+		let tilt = this.orbit.axial_tilt;
 		if(this.orbit.perturbation.negative_inclination){
 			tilt *= -1;
 		};
@@ -397,6 +439,16 @@ class Satellite{
 	// Nombre del satélite
 	name_set(name){
 		this.name = name;
+	};
+	
+	// Epoch
+	epoch_set(){
+		this.epoch = s_time;
+	};
+	
+	// Mostrar/Ocultar
+	set_live(){
+		this.alive = !this.alive;
 	};
 	
 	// Radio del satélite
@@ -582,13 +634,10 @@ class Satellite{
 		
 		// Ascensión recta incial del meridiano cero
 		this.GST0 = rot.t0;
-		
-		// Oblicuidad de la órbita
-		this.axial_tilt = rot.tilt;
 	};
 	
 	// Magnitudes físicas
-	physics(dif){
+	physics(dif, rot){
 		
 		// Vector momento angular
 		this.h_vec = angular_momentum( this.pos, this.vel );
@@ -606,7 +655,7 @@ class Satellite{
 			this.get_gravity(),
 			this.vel,
 			this.pos,
-			this.axial_tilt,
+			rot.tilt,
 			dif
 		);
 	};
@@ -624,6 +673,11 @@ class Satellite{
 	
 	// Simmulación
 	sim(){
+		
+		// Ignorar satélite
+		if(!this.alive){
+			return;
+		};
 		
 		// Traslación
 		this.orbit.sim( this.get_gravity() );
@@ -737,9 +791,10 @@ class Satellite{
 			deg_to_rad( 90 ),
 			this.rsoi
 		);
+		
+		// El lanzamiento inicia en la superficie
 		let launch_pos = sum_vec( sum_vec( print_pos, this.orbit.r ), dir_rot.pos );
 		view_vec( launch_pos, dir_rot.vel, 'RED' );
-		
 		request.push([ 
 			'print', 
 			'negative_inclination: ' + str(
@@ -782,9 +837,9 @@ class Satellite{
 	// Variables del satélite
 	constructor(name, orbited, R, m, u, pos, vel, rot, dif, ctrl){
 		this.alive = true;
-		this.epoch = s_base_time;
 		this.name_set(name);
 		this.orbited = orbited;
+		this.epoch_set();
 		this.R_set(R);
 		this.m_set(m);
 		this.u = u;
@@ -792,7 +847,7 @@ class Satellite{
 		this.pos_set(pos);
 		this.vel_set(vel);
 		this.rotation_set(rot);
-		this.physics(dif);
+		this.physics(dif, rot);
 		Satellite.list.push(this);
 	};
 };

@@ -72,6 +72,12 @@ const origin = { // Coordenadas del origen en la pantalla
 var ephemeris = null; // Efemérides
 
 //--------UTILIDADES------------
+// Ir a un punto concreto del Tiempo
+function set_time(t){
+	s_base_time = t;
+	s_time = s_base_time;
+};
+
 // Poner satélite en el centro y controlarlo
 function set_center_ctrl(name){
 	center_body = Satellite.get_sat( name );
@@ -335,7 +341,7 @@ t_scale_slider.value = to_eday( t_scale );
 t_scale_slider.oninput = () => {
 	
 	// Realizar el cambio de escala temporal
-	t_scale = EDAY * t_scale_slider.value * 1e-0;
+	t_scale = EDAY * t_scale_slider.value * 1e0;
 };
 const stop_button = document.getElementById("stop_button");
 stop_button.onclick = () => {
@@ -578,7 +584,7 @@ Satellite.sat_from_orbit(
 */
 
 // Asignar y controlar el satélite central
-set_center_ctrl('moon');
+set_center_ctrl('sun');
 
 // Comenzar loop del programa
 setInterval( orbitLoop, s_to_ms( 1 / frac ) );

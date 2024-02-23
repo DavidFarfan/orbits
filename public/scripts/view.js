@@ -221,7 +221,7 @@ class View{
 		
 		//--------DATOS DEL PUNTO MONITOREADO-----------
 		
-		// Pointing Coordinates of the sun from ctrl (rad)
+		// Pointing Coordinates of the orbited body from ctrl (rad)
 		let p_q;
 		if(Satellite.ctrl.orbit.perturbation != undefined){
 			
