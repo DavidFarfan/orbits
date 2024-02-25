@@ -674,8 +674,8 @@ class Satellite{
 	// Simmulación
 	sim(){
 		
-		// Ignorar satélite
-		if(!this.alive){
+		// Ignorar satélite si está muerto
+		if(this.name == 'dead' ){
 			return;
 		};
 		
