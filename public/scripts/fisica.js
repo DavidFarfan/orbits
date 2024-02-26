@@ -71,7 +71,7 @@ const V_INITIAL_LONGITUDE_OF_PERIHELION = deg_to_rad( 131.76755713 ); // Longitu
 const V_INITIAL_ARGUMENT_OF_PERIHELION = V_INITIAL_LONGITUDE_OF_PERIHELION // Argumento de perihelio J2000 (rad)
 	 - V_INITIAL_LONGITUDE_OF_ASCENDING_NODE;
 const V_AXIAL_TILT = deg_to_rad( 177.36 ); // Oblicuidad de la órbita (rad)
-const V_SIDEREAL_ROTATION_PERIOD = h_to_s( 243.018484 * EDAY ); // Periodo rot. sideral (s)
+const V_SIDEREAL_ROTATION_PERIOD = 243.018484 * EDAY; // Periodo rot. sideral (s)
 const V_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
 	period( V_INITIAL_SEMI_MAJOR_AXIS, SUN_U ),
 	2743200 // Ángulo obtenido empíricamente (s)

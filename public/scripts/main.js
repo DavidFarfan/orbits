@@ -323,7 +323,7 @@ button_time.onclick = () => {
 	let dif_days = to_eday( ms_to_s( date_in.getTime() - EPOCH_J2000.getTime() ) );
 	
 	// Aplicar tiempo simulado 
-	// (days from epoch)
+	// (days from J2000)
 	if(text_time.value == ''){
 		s_base_time = eday_to_s( dif_days );
 		
@@ -341,14 +341,14 @@ button_time_add.onclick = () => {
 const s_scale_slider = document.getElementById("s_scale");
 s_scale_slider.value = s_scale_slider.min;
 s_scale_slider.oninput = () => {
-	s_scale = s_scale_slider.value * center_body.R * 1e0;
+	s_scale = s_scale_slider.value * center_body.R * 1e-2;
 };
 const t_scale_slider = document.getElementById("t_scale");
 t_scale_slider.value = to_eday( t_scale );
 t_scale_slider.oninput = () => {
 	
 	// Realizar el cambio de escala temporal
-	t_scale = EDAY * t_scale_slider.value * 1e0;
+	t_scale = EDAY * t_scale_slider.value * 1e-2;
 };
 const stop_button = document.getElementById("stop_button");
 stop_button.onclick = () => {
@@ -375,62 +375,18 @@ phase.onclick = () => {
 // Lanzamiento desde el satélite controlado
 const launch_button = document.getElementById("launch");
 launch_button.onclick = () => {
-	let vl = Satellite.ctrl.launch_trajectory(
-			deg_to_rad( 0 ),
-			deg_to_rad( 90 ),
-			6
-	);
-	let vehicle_name = 'vehicle trajectory No. ' + str( vehicles_trajectories );
-	new Satellite(
-		vehicle_name, 
-		Satellite.ctrl.name, 
-		1e0,
-		1e0, 
-		1e0, 
-		vl.pos, 
-		vl.vel, 
-		{
-			T: 0,
-			t0: 0,
-			tilt: 0
-		},
-		{
-			da: 0,
-			de: 0,
-			di: 0,
-			dupper_omega: 0,
-			dp: 0
-		},
-		false
-	);
-	log( Satellite.get_sat( vehicle_name ).orbit );
-	let f0_for_launch_orbit = argument_of_periapse_f(
-		Satellite.get_sat( vehicle_name ).orbit.eccentricity,
-		vl.pos,
-		Satellite.get_sat( vehicle_name ).orbit.upper_omega,
-		Satellite.get_sat( vehicle_name ).orbit.i
-	).f;
-	log(f0_for_launch_orbit);
-	Satellite.get_sat( vehicle_name ).orbit.set_t0(null, t_from_f(
-									Satellite.get_sat( vehicle_name ).orbit.type,
-									f0_for_launch_orbit,
-									Satellite.get_sat( vehicle_name ).orbit.e, 
-									Satellite.get_sat( vehicle_name ).orbit.a, 
-									Satellite.get_sat( vehicle_name ).orbit.T,
-									Satellite.get_sat( vehicle_name ).get_gravity()
-								) - s_time
-	);
-	vehicles_trajectories ++;
+	Satellite.launch();
 };
 
 // Targeting
+let desidred_time = 6 * EDAY;
 const targeting_button = document.getElementById("targeting");
 targeting_button.onclick = () => {
 	if(destin != null & depart != null){
 		log("---TARGETING----");
 		Satellite.get_sat( destin ).elliptic_targeting(
 			Satellite.get_sat( depart ),
-			6 * EDAY
+			desidred_time
 		).pos
 	};
 };

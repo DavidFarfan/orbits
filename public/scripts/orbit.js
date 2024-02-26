@@ -47,6 +47,11 @@ class Orbit{
 		return f_orbit;
 	};
 	
+	// Epoch
+	epoch_set(){
+		this.epoch = s_time;
+	};
+	
 	// Orbit type
 	set_type(E){
 		if(E > 0){
@@ -356,6 +361,7 @@ class Orbit{
 	
 	// Variables de la órbita (a partir del satélite que la recorre)
 	constructor(h, E, u, v, r, axial_tilt, dif, adjust_rot){	
+		this.epoch_set();
 		this.set_type(E);
 		this.set_line_of_nodes(h);
 		this.set_eccentricity(u, v, h, r);

@@ -118,7 +118,7 @@ class Satellite{
 		log( sat_dist );
 		
 		// Crear un satélite con características idénticas
-		let vehicle_name = 'vehicle trajectory No. ' + str( vehicles_trajectories );
+		let vehicle_name = 'v' + str( vehicles_trajectories );
 		new Satellite(
 			vehicle_name, 
 			Satellite.ctrl.orbited, 
@@ -244,7 +244,7 @@ class Satellite{
 		let sat_name = Satellite.ctrl.name;
 		
 		// Saltar al epoch
-		set_time( Satellite.ctrl.epoch );
+		set_time( Satellite.ctrl.orbit.epoch );
 		
 		// Implementar los nuevos settings
 		new Satellite(
@@ -260,12 +260,94 @@ class Satellite{
 			false
 		);
 		
+		// Ajustar posición inicial en la órbita
+		let f0_adj = argument_of_periapse_f(
+			Satellite.get_sat( sat_name ).orbit.eccentricity,
+			pos,
+			Satellite.get_sat( sat_name ).orbit.upper_omega,
+			Satellite.get_sat( sat_name ).orbit.i
+		).f;
+		Satellite.get_sat( sat_name ).orbit.set_t0(null, t_from_f(
+										Satellite.get_sat( sat_name ).orbit.type,
+										f0_adj,
+										Satellite.get_sat( sat_name ).orbit.e, 
+										Satellite.get_sat( sat_name ).orbit.a, 
+										Satellite.get_sat( sat_name ).orbit.T,
+										Satellite.get_sat( sat_name ).get_gravity()
+									) - s_time
+		);
+		
 		// Matar los settings actuales
 		Satellite.ctrl.name_set('dead');
 		Satellite.ctrl.set_live();
 		
 		// Ceder el control a los nuevos settings
 		set_center_ctrl( sat_name );
+	};
+	
+	// Lanzamineto de un vehiculo desde superficie planetaria
+	static launch(){
+		
+		// Velocidad inicial
+		let vl = Satellite.ctrl.launch_trajectory(
+			deg_to_rad( 0 ),
+			deg_to_rad( 45 ),
+			6
+		);
+		
+		// Nombre del vehículo 
+		let vehicle_name = 'v' + str( vehicles_trajectories );
+		vehicles_trajectories ++;
+		
+		// Crear el vehículo
+		new Satellite(
+			vehicle_name, 
+			Satellite.ctrl.name, 
+			1e0,
+			1e0, 
+			1e0, 
+			vl.pos, 
+			vl.vel, 
+			{
+				T: 0,
+				t0: 0,
+				tilt: 0
+			},
+			{
+				da: 0,
+				de: 0,
+				di: 0,
+				dupper_omega: 0,
+				dp: 0
+			},
+			false
+		);
+		
+		// Ajustar posición inicial en la órbita
+		let f0_for_launch_orbit = argument_of_periapse_f(
+			Satellite.get_sat( vehicle_name ).orbit.eccentricity,
+			vl.pos,
+			Satellite.get_sat( vehicle_name ).orbit.upper_omega,
+			Satellite.get_sat( vehicle_name ).orbit.i
+		).f;
+		Satellite.get_sat( vehicle_name ).orbit.set_t0(null, t_from_f(
+										Satellite.get_sat( vehicle_name ).orbit.type,
+										f0_for_launch_orbit,
+										Satellite.get_sat( vehicle_name ).orbit.e, 
+										Satellite.get_sat( vehicle_name ).orbit.a, 
+										Satellite.get_sat( vehicle_name ).orbit.T,
+										Satellite.get_sat( vehicle_name ).get_gravity()
+									) - s_time
+		);
+		
+		// Info. relevante
+		log( '---LAUNCH---' );
+		log( 'name' );
+		log( vehicle_name );
+		log( 'launch' );
+		log( vl );
+		log( 'vehicle' );
+		log( Satellite.get_sat( vehicle_name ) );
 	};
 	
 	// Trayectoria y punto de lanzamiento
@@ -384,11 +466,6 @@ class Satellite{
 	// Nombre del satélite
 	name_set(name){
 		this.name = name;
-	};
-	
-	// Epoch
-	epoch_set(){
-		this.epoch = s_time;
 	};
 	
 	// Mostrar/Ocultar
@@ -733,7 +810,7 @@ class Satellite{
 		// Lanzamiento
 		let dir_rot = this.launch_trajectory(
 			deg_to_rad( 0 ),
-			deg_to_rad( 90 ),
+			deg_to_rad( 45 ),
 			this.rsoi
 		);
 		
@@ -784,7 +861,6 @@ class Satellite{
 		this.alive = true;
 		this.name_set(name);
 		this.orbited = orbited;
-		this.epoch_set();
 		this.R_set(R);
 		this.m_set(m);
 		this.u = u;
