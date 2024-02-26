@@ -243,24 +243,6 @@ class Satellite{
 		// Conservar nombre
 		let sat_name = Satellite.ctrl.name;
 		
-		// Datos relevantes
-		log( 'Epoch' );
-		log( Satellite.ctrl.epoch );
-		log( 'Time' );
-		log( s_time );
-		log( 'Prev set:' );
-		log( Satellite.ctrl.pos );
-		log( Satellite.ctrl.vel );
-		log( 'New set:' );
-		log( pos );
-		log( vel );
-		log( 'Rot' );
-		log( sat_rot );
-		log( 'DIf' );
-		log( sat_dif );
-		log( 'sat name' );
-		log( sat_name );
-		
 		// Saltar al epoch
 		set_time( Satellite.ctrl.epoch );
 		
@@ -284,10 +266,6 @@ class Satellite{
 		
 		// Ceder el control a los nuevos settings
 		set_center_ctrl( sat_name );
-		
-		// Imprimir el satélite modificado
-		log( 'sat' );
-		log( Satellite.get_sat( sat_name ) );
 	};
 	
 	// Trayectoria y punto de lanzamiento
@@ -319,69 +297,46 @@ class Satellite{
 			tilt,
 			this.orbit.perturbation.upper_omega
 		);
-		
 		return dir_rot;
 	};
 	
 	// Elliptic targeting
 	elliptic_targeting(sat, des_time){
 		
-		// Coordenadas absolutas de los objetos involucrados
-		log( 'CENTER' );
-		let absolute_pos_center = Satellite.get_sat( this.orbited )
-			.get_absolute_r( true );
-		log( 'SAT' );
-		let absolute_pos_sat = sat.get_absolute_r( true );
-		log( 'TARGET' );
-		let absolute_pos_target = this.get_absolute_r( true );
+		// Coordenadas absolutas de los objetos 
+		let absolute_pos_center = Satellite.get_sat( this.orbited ).get_absolute_r();
+		let absolute_pos_sat = sat.get_absolute_r();
+		let absolute_pos_target = this.get_absolute_r();
 		
-		// Coordenadas ajustadas CENTRO/SATÉLITE/OBJETIVO
-		log( 'SAT_r' );
-		log( sat.orbit.r );
-		log( 'SAT_POS' );
+		// Coordenadas ajustadas al centro del target
 		let sat_dist = sum_vec(
 			absolute_pos_sat,
 			prod_by_sc( -1, absolute_pos_center )
 		);
-		log( sat_dist );
-		log( 'TARGET_r' );
-		log( this.orbit.r );
-		log( 'TARGET_POS' );
 		let target_dist = sum_vec(
 			absolute_pos_target,
 			prod_by_sc( -1, absolute_pos_center )
 		);
-		log( target_dist );
 		
 		// Target en el tiempo deseado de colisión
-		let comp = this.orbit.fictional_pos(
-				des_time,
-				this.orbit.t,
-				this.orbit.f,
-				this.get_gravity()
+		let future_vecs = this.orbit.fictional_pos(
+			des_time,
+			this.orbit.t,
+			this.orbit.f,
+			this.get_gravity()
 		);
 		this.target = {
-			r: comp.pos.r,
-			v: comp.pos.v
+			r: future_vecs.pos.r,
+			v: future_vecs.pos.v
 		};
 		
 		// Feasibility
-		log("---Chord, Semi perimeter----");
 		let cs = chord_semi_perimeter( sat_dist, this.target.r );
-		log( cs );
-		log("---t---");
 		let mint = ell_min_flight_t( sat_dist, this.target.r, this.get_gravity() );
 		let maxt = dt_from_a( sat_dist, this.target.r, cs.semi_perimeter / 2, this.get_gravity() );
-		log( 'min t: ' + str( to_eday( mint ) ) );
-		log( 'des t: ' + str( to_eday( des_time ) ) );
-		log( 'max t: ' + str( to_eday( maxt ) ) );
-		log("---a---");
 		let min_a = a_from_dt( sat_dist, this.target.r, mint, this.get_gravity() );
 		let des_a = a_from_dt( sat_dist, this.target.r, des_time, this.get_gravity() );
 		let max_a = a_from_dt( sat_dist, this.target.r, maxt, this.get_gravity() );
-		log( 'min a: ' + str( min_a.a ) );
-		log( 'des a: ' + str( des_a.a ) );
-		log( 'max a: ' + str( max_a.a ) + " = s/2 = " + str( cs.semi_perimeter / 2 ) );
 		let orbit_curve = new Orbit(
 			angular_momentum( sat_dist, des_a.v ),
 			orbital_energy( norm_vec( des_a.v ), this.get_gravity(), norm_vec( sat_dist ) ),
@@ -405,10 +360,8 @@ class Satellite{
 			orbit_curve.upper_omega,
 			orbit_curve.i
 		).f;
-		log( 'f ajustado' );
-		log( f0_for_target_orbit );
 		
-		// Tiempo ajustado
+		// Tiempo inicial
 		let t_init = t_from_f(
 			orbit_curve.type,
 			f0_for_target_orbit,
@@ -417,13 +370,7 @@ class Satellite{
 			orbit_curve.T,
 			this.get_gravity()
 		);
-		log( 'tiempo de partida' );
-		log( t_init );
-		log( 'tiempo' );
-		log( s_time );
-		log( 'ajuste' );
 		let t_adj = t_init - s_time;
-		log( t_adj );
 		orbit_curve.set_t0( null, t_adj ); 
 		
 		// Transfer orbit se dibuja alrededor del cuerpo orbitado por target
@@ -431,9 +378,7 @@ class Satellite{
 			sat: this,
 			orbit: orbit_curve
 		};
-		log('trajectory');
-		log(this.orbit_to_me);
-		return comp;
+		return future_vecs;
 	};
 	
 	// Nombre del satélite
@@ -792,7 +737,7 @@ class Satellite{
 			this.rsoi
 		);
 		
-		// El lanzamiento inicia en la superficie
+		// Visualizar lanzamiento
 		let launch_pos = sum_vec( sum_vec( print_pos, this.orbit.r ), dir_rot.pos );
 		view_vec( launch_pos, dir_rot.vel, 'RED' );
 		request.push([ 

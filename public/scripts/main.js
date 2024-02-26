@@ -286,6 +286,13 @@ ctrl_button.onclick = () => {
 		// Establecer partida y destino del targeting
 		destin =  depart;
 		depart = ctrl_sat.value;
+		
+		// Ver destino y partida
+		log( '------ctrl-----' );
+		log( 'Destination:' );
+		log( destin );
+		log( 'Departure' );
+		log( depart );
 	};
 };
 
@@ -370,10 +377,9 @@ const launch_button = document.getElementById("launch");
 launch_button.onclick = () => {
 	let vl = Satellite.ctrl.launch_trajectory(
 			deg_to_rad( 0 ),
-			deg_to_rad( 45 ),
+			deg_to_rad( 90 ),
 			6
 	);
-	log( vl );
 	let vehicle_name = 'vehicle trajectory No. ' + str( vehicles_trajectories );
 	new Satellite(
 		vehicle_name, 
@@ -422,8 +428,8 @@ const targeting_button = document.getElementById("targeting");
 targeting_button.onclick = () => {
 	if(destin != null & depart != null){
 		log("---TARGETING----");
-		Satellite.get_sat(destin).elliptic_targeting(
-			Satellite.get_sat(depart),
+		Satellite.get_sat( destin ).elliptic_targeting(
+			Satellite.get_sat( depart ),
 			6 * EDAY
 		).pos
 	};
@@ -497,7 +503,6 @@ Satellite.sat_from_orbit(
 	MOON_INITIAL_TRUE_ANOMALY
 );
 
-/*
 // Ceres (SE J2000, no perturbations)
 Satellite.sat_from_orbit(
 	'ceres',
@@ -581,7 +586,6 @@ Satellite.sat_from_orbit(
 	},
 	M_INITIAL_TRUE_ANOMALY
 );
-*/
 
 // Asignar y controlar el satélite central
 set_center_ctrl('sun');

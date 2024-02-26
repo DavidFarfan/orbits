@@ -1241,7 +1241,7 @@ function launch_dir(ra, d, longitude, latitude, GST, radius, vel_mag){
 		pos = prod_by_sc( radius, pos );
 	};
 	
-	// Dirección e lanzamiento (declinación, ascención recta desde la superficie)
+	// Dirección de lanzamiento (declinación, ascención recta desde la superficie)
 	let vel = x_rot( // Ascención recta
 		y_rot(	// declinación
 			{
