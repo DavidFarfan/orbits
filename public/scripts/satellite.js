@@ -147,8 +147,8 @@ class Satellite{
 		);
 		
 		// Modificar intervalo de visibilidad
-		Satellite.get_sat( vehicle_name ).init_set();
-		Satellite.ctrl.end_set();
+		Satellite.get_sat( vehicle_name ).init_set( Satellite.ctrl.name );
+		Satellite.ctrl.end_set( vehicle_name );
 	};
 	
 	// Rutina de control manual
@@ -245,7 +245,8 @@ class Satellite{
 			vel,
 			sat_rot,
 			sat_dif,
-			false
+			false,
+			Satellite.ctrl.phase
 		);
 		
 		// Ajustar posición inicial en la órbita
@@ -268,6 +269,8 @@ class Satellite{
 		// Conservar intervalo de vida
 		Satellite.get_sat( sat_name ).init = Satellite.ctrl.init;
 		Satellite.get_sat( sat_name ).end = Satellite.ctrl.end;
+		Satellite.get_sat( sat_name ).prev_sat = Satellite.ctrl.prev_sat;
+		Satellite.get_sat( sat_name ).next_sat = Satellite.ctrl.next_sat;		
 		
 		// Matar los settings actuales
 		Satellite.ctrl.name_set('dead');
@@ -340,6 +343,42 @@ class Satellite{
 		log( vl );
 		log( 'vehicle' );
 		log( Satellite.get_sat( vehicle_name ) );
+	};
+	
+	// Control de fases
+	static phase_control(){
+		if(Satellite.ctrl.antelife()){
+			set_center_ctrl( Satellite.ctrl.prev_sat );
+			return;
+		};
+		if(Satellite.ctrl.poslife()){
+			set_center_ctrl( Satellite.ctrl.next_sat );
+			return;
+		};
+	};
+	
+	// Antevida
+	antelife(){
+		if(this.init != undefined){
+			return s_time < this.init;
+		};
+		return false;
+	};
+	
+	// Posvida
+	poslife(){
+		if(this.end != undefined){
+			return s_time > this.end;
+		};
+		return false;
+	};
+	
+	// Verificar intervalo de vida
+	phase_valid(){
+		if(this.antelife() || this.poslife()){
+			return false;
+		};
+		return true;
 	};
 	
 	// Trayectoria y punto de lanzamiento
@@ -475,12 +514,14 @@ class Satellite{
 		this.m = m;
 	};
 	
-	// Intervalo ed vida
-	init_set(){
+	// Intervalo de vida
+	init_set(name){
 		this.init = s_time;
+		this.prev_sat = name;
 	};
-	end_set(){
+	end_set(name){
 		this.end = s_time;
+		this.next_sat = name;
 	};
 	
 	// Número de fase
@@ -735,15 +776,8 @@ class Satellite{
 	view(){
 		
 		// Verificar intervalo de vida
-		if(this.init != undefined){
-			if(s_time < this.init){
-				return;
-			};
-		};
-		if(this.end != undefined){
-			if(s_time > this.end){
-				return;
-			};
+		if(!this.phase_valid()){
+			return;
 		};
 		
 		// Ocultar satélite

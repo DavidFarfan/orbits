@@ -182,6 +182,7 @@ function orbitLoop(){
 	
 	// Control manual
 	Satellite.ctrl_rutine();
+	Satellite.phase_control();
 	
 	// Simular movimiento de los satélites
 	Satellite.list.forEach(function(value, index, array){
