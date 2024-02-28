@@ -99,39 +99,25 @@ class Satellite{
 	// Flight leg
 	static flight_leg(){
 		
-		// Coordenadas absolutas de los objetos involucrados
-		log( 'CENTER' );
-		let absolute_pos_center = Satellite.get_sat(
-			Satellite.ctrl.orbited
-		).get_absolute_r( true );
-		log( absolute_pos_center );
-		log( 'SAT' );
-		let absolute_pos_sat = Satellite.ctrl.get_absolute_r( true );
-		log( absolute_pos_sat );
+		// Conservar rotación en la nueva fase
+		let sat_rot = {
+			T: Satellite.ctrl.sidereal_rotation_period,
+			t0: Satellite.ctrl.GST0,
+			tilt: Satellite.ctrl.orbit.axial_tilt
+		};
 		
-		// Coordenadas ajustadas CENTRO/SATÉLITE
-		log( 'SAT_POS' );
-		let sat_dist = sum_vec(
-			absolute_pos_sat,
-			prod_by_sc( -1, absolute_pos_center )
-		);
-		log( sat_dist );
-		
-		// Crear un satélite con características idénticas
-		let vehicle_name = 'v' + str( vehicles_trajectories );
+		// Crear un satélite en el punto de simulación
+		let phase_no = Satellite.ctrl.phase + 1;
+		let vehicle_name = Satellite.ctrl.name + str( phase_no );
 		new Satellite(
 			vehicle_name, 
 			Satellite.ctrl.orbited, 
 			Satellite.ctrl.R,
 			Satellite.ctrl.m, 
 			Satellite.ctrl.u, 
-			sat_dist, 
+			Satellite.ctrl.orbit.r, 
 			Satellite.ctrl.orbit.v, 
-			{
-				T: 0,
-				t0: 0,
-				tilt: 0
-			},
+			sat_rot,
 			{
 				da: 0,
 				de: 0,
@@ -139,28 +125,30 @@ class Satellite{
 				dupper_omega: 0,
 				dp: 0
 			},
-			false
+			false,
+			phase_no
 		);
-		log( Satellite.get_sat( vehicle_name ).orbit );
 		
 		// Ajustar tiempo inicial
-		let f0_for_launch_orbit = argument_of_periapse_f(
+		let f0_adj = argument_of_periapse_f(
 			Satellite.get_sat( vehicle_name ).orbit.eccentricity,
-			sat_dist,
+			Satellite.ctrl.orbit.r,
 			Satellite.get_sat( vehicle_name ).orbit.upper_omega,
 			Satellite.get_sat( vehicle_name ).orbit.i
 		).f;
-		log(f0_for_launch_orbit);
 		Satellite.get_sat( vehicle_name ).orbit.set_t0(null, t_from_f(
 										Satellite.get_sat( vehicle_name ).orbit.type,
-										f0_for_launch_orbit,
+										f0_adj,
 										Satellite.get_sat( vehicle_name ).orbit.e, 
 										Satellite.get_sat( vehicle_name ).orbit.a, 
 										Satellite.get_sat( vehicle_name ).orbit.T,
 										Satellite.get_sat( vehicle_name ).get_gravity()
 									) - s_time
 		);
-		vehicles_trajectories ++;
+		
+		// Modificar intervalo de visibilidad
+		Satellite.get_sat( vehicle_name ).init_set();
+		Satellite.ctrl.end_set();
 	};
 	
 	// Rutina de control manual
@@ -276,6 +264,10 @@ class Satellite{
 										Satellite.get_sat( sat_name ).get_gravity()
 									) - s_time
 		);
+		
+		// Conservar intervalo de vida
+		Satellite.get_sat( sat_name ).init = Satellite.ctrl.init;
+		Satellite.get_sat( sat_name ).end = Satellite.ctrl.end;
 		
 		// Matar los settings actuales
 		Satellite.ctrl.name_set('dead');
@@ -481,6 +473,23 @@ class Satellite{
 	// Masa del satélite
 	m_set(m){
 		this.m = m;
+	};
+	
+	// Intervalo ed vida
+	init_set(){
+		this.init = s_time;
+	};
+	end_set(){
+		this.end = s_time;
+	};
+	
+	// Número de fase
+	phase_set(p){
+		if(p==null){
+			this.phase = 0;
+		}else{
+			this.phase = p;
+		};
 	};
 	
 	// Parámetro gravitatorio al que está sometido
@@ -725,6 +734,18 @@ class Satellite{
 	// Vista
 	view(){
 		
+		// Verificar intervalo de vida
+		if(this.init != undefined){
+			if(s_time < this.init){
+				return;
+			};
+		};
+		if(this.end != undefined){
+			if(s_time > this.end){
+				return;
+			};
+		};
+		
 		// Ocultar satélite
 		if(!this.alive){
 			return;
@@ -857,13 +878,14 @@ class Satellite{
 	};
 	
 	// Variables del satélite
-	constructor(name, orbited, R, m, u, pos, vel, rot, dif, ctrl){
-		this.alive = true;
+	constructor(name, orbited, R, m, u, pos, vel, rot, dif, ctrl, p){
+		this.set_live();
 		this.name_set(name);
 		this.orbited = orbited;
 		this.R_set(R);
 		this.m_set(m);
 		this.u = u;
+		this.phase_set(p);
 		this.ctrl_set(ctrl);
 		this.pos_set(pos);
 		this.vel_set(vel);
