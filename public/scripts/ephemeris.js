@@ -113,7 +113,7 @@ $(document).ready((data, status) => {
 			let formated_data = cartesian_horizons_ephem( data );
 			
 			// El almacenaje se hace con un mensaje a sí mismo
-			self.postMessage({ type: 'ephemeris', eph: formated_data });
+			//self.postMessage({ type: 'ephemeris', eph: formated_data });
 		}
 	);
 });

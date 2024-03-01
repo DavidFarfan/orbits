@@ -296,6 +296,14 @@ ctrl_button.onclick = () => {
 		log( depart );
 	};
 };
+const adj_center = document.getElementById("adj_center");
+const adjust_button = document.getElementById("adjust_button");
+adjust_button.onclick = () => {
+	if( Satellite.get_sat( adj_center.value ) != null ){
+		Satellite.moved = 7;
+		Satellite.ctrl_rutine( adj_center.value );
+	};
+};
 
 // Captura de parámetros del punto sobre la superficie del satélite controlado
 const lat_slider = document.getElementById("lat");

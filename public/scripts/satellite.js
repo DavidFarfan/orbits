@@ -152,7 +152,7 @@ class Satellite{
 	};
 	
 	// Rutina de control manual
-	static ctrl_rutine(){
+	static ctrl_rutine(adj_center){
 		
 		// Verificar entrada del usuario
 		if(Satellite.moved == 0){
@@ -209,6 +209,8 @@ class Satellite{
 			case 6:
 				vel.z += sat.vz;
 				break;
+			default:
+				break;
 		};
 		Satellite.moved = 0;
 		
@@ -234,10 +236,36 @@ class Satellite{
 		// Saltar al epoch
 		set_time( Satellite.ctrl.orbit.epoch );
 		
+		// Ajuste de centro
+		let center_name = Satellite.ctrl.orbited;
+		if(adj_center != null){
+			center_name = adj_center;
+			
+			// Coordenadas absolutas de los objetos 
+			let absolute_pos_center = Satellite.get_sat( adj_center ).get_absolute_r();
+			let absolute_pos_sat = Satellite.ctrl.get_absolute_r();
+			
+			// Coordenadas ajustadas al centro seleccionado
+			pos = sum_vec(
+				absolute_pos_sat,
+				prod_by_sc( -1, absolute_pos_center )
+			);
+			
+			// Velocidades absolutas de los objetos 
+			let absolute_vel_center = Satellite.get_sat( adj_center ).get_absolute_v();
+			let absolute_vel_sat = Satellite.ctrl.get_absolute_v();
+			
+			// Velocidades ajustadas al centro seleccionado
+			vel = sum_vec(
+				absolute_vel_sat,
+				prod_by_sc( -1, absolute_vel_center )
+			);
+		};
+		
 		// Implementar los nuevos settings
 		new Satellite(
 			sat_name,
-			Satellite.ctrl.orbited,
+			center_name,
 			Satellite.ctrl.R,
 			Satellite.ctrl.m,
 			Satellite.ctrl.u,
