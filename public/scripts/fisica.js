@@ -186,6 +186,11 @@ function floor(a){
 	return Math.floor( a );
 };
 
+// VALOR ABSOLUTO
+function abs(n){
+	return Math.abs( n );
+};
+
 // MÁXIMO ENTRE DOS NÚMEROS
 function max(a, b){
 	return Math.max( a, b );

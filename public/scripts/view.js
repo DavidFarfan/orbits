@@ -600,6 +600,30 @@ class View{
 			110,
 			'WHITE'
 		]);
+		
+		// delta v (m/s)
+		if(Satellite.ctrl.delta_v != null){
+			request.push([
+				'print',
+				"delta v (km/s) = [ x: " + str( significant( Satellite.ctrl.delta_v.x, 4 ) ) + 
+				", y: " + str( significant( Satellite.ctrl.delta_v.y, 4 ) ) + 
+				", z: " + str( significant( Satellite.ctrl.delta_v.z, 4 ) ) + " ]",
+				10, 
+				120,
+				'WHITE'
+			]);
+		};
+		
+		// delta v, magnitud (km/s)
+		if(Satellite.ctrl.delta_v != null){
+			request.push([
+				'print',
+				"|delta v| (km/s) = " + str( significant( norm_vec( Satellite.ctrl.delta_v ), 4 ) ),
+				10, 
+				130,
+				'WHITE'
+			]);
+		};
 	};
 	
 	// Página 1: Elementos orbitales

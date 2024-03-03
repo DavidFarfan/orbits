@@ -17,7 +17,8 @@ var mousePos = { // Posicion inicial del mouse sobre el lienzo
 	y: height_p( .5 )
 };
 
-// Diferencial para el control de los satélites 
+// Diferencial para el control de los satélites
+var punctual_changes = false;
 var sat = { 
 	x: to_km( 0 ),
 	y: to_km( 0 ),
@@ -54,8 +55,10 @@ var depart = null;
 var destin = null;
 
 // Parámetros de escala de la simulación
-var s_scale = 0; // Escala del espacio (kilómetros por pixel de lienzo)
-var t_scale = 0; // Escala del tiempo (Segundos simulados por segundo real)
+var s_scale = 1; // Escala de espacio
+var t_scale = 1; // Escala de tiempo
+var zoom = 0; // Zoom (kilómetros por pixel de lienzo)
+var t_sense = 0; // Sentido y magnitud (Segundos simulados por segundo real)
 var center = { // Centro del lienzo (kilómetros): variable dep. el tiempo
 	x: 0,
 	y: 0,
@@ -96,22 +99,22 @@ function height_p(p){
 
 // Converisión: Pixeles a Kilómetros
 function to_km(px){
-	return s_scale * px;
+	return zoom * px;
 };
 
 // Converisión: Kilómetros a Pixeles
 function to_px(x){
-	return x / s_scale;
+	return x / zoom;
 };
 
 // CONVERSIÓN DE SEGUNDOS REALES A SEGUNDOS SIMULADOS
 function to_sim_t(t){
-	return t_scale * t;
+	return t_sense * t;
 };
 
 // CONVERSIÓN DE SEGUNDOS SIMULADOS A SEGUNDOS REALES
 function to_real_t(st){
-	return st / t_scale;
+	return st / t_sense;
 };
 
 // Pedir un vector escalado al animador
@@ -181,7 +184,7 @@ function orbitLoop(){
 	//------------SIMULACIÓN------------
 	
 	// Control manual
-	Satellite.ctrl_rutine();
+	Satellite.ctrl_routine();
 	Satellite.phase_control();
 	
 	// Simular movimiento de los satélites
@@ -230,70 +233,87 @@ canvas.addEventListener('mousemove', evt => {
 }, false);
 
 // CONTROL DEL SATÉLITE
+const pos_x_punctual = document.getElementById("pos_x_punctual");
+const pos_y_punctual = document.getElementById("pos_y_punctual");
+const pos_z_punctual = document.getElementById("pos_z_punctual");
+const vel_x_punctual = document.getElementById("vel_x_punctual");
+const vel_y_punctual = document.getElementById("vel_y_punctual");
+const vel_z_punctual = document.getElementById("vel_z_punctual");
 const posx_reduce = document.getElementById("posx_reduce");
 posx_reduce.onclick = () => {
 	Satellite.moved = -1;
+	punctual_changes = pos_x_punctual.value != '';
 };
 const posx_increase = document.getElementById("posx_increase");
 posx_increase.onclick = () => {
 	Satellite.moved = 1;
+	punctual_changes = pos_x_punctual.value != '';
 };
 const posy_reduce = document.getElementById("posy_reduce");
 posy_reduce.onclick = () => {
 	Satellite.moved = -2;
+	punctual_changes = pos_y_punctual.value != '';
 };
 const posy_increase = document.getElementById("posy_increase");
 posy_increase.onclick = () => {
 	Satellite.moved = 2;
+	punctual_changes = pos_y_punctual.value != '';
 };
 const posz_reduce = document.getElementById("posz_reduce");
 posz_reduce.onclick = () => {
 	Satellite.moved = -3;
+	punctual_changes = pos_z_punctual.value != '';
 };
 const posz_increase = document.getElementById("posz_increase");
 posz_increase.onclick = () => {
 	Satellite.moved = 3;
+	punctual_changes = pos_z_punctual.value != '';
 };
 const velx_reduce = document.getElementById("velx_reduce");
 velx_reduce.onclick = () => {
 	Satellite.moved = -4;
+	punctual_changes = vel_x_punctual.value != '';
 };
 const velx_increase = document.getElementById("velx_increase");
 velx_increase.onclick = () => {
 	Satellite.moved = 4;
+	punctual_changes = vel_x_punctual.value != '';
 };
 const vely_reduce = document.getElementById("vely_reduce");
 vely_reduce.onclick = () => {
 	Satellite.moved = -5;
+	punctual_changes = vel_y_punctual.value != '';
 };
 const vely_increase = document.getElementById("vely_increase");
 vely_increase.onclick = () => {
 	Satellite.moved = 5;
+	punctual_changes = vel_y_punctual.value != '';
 };
 const velz_reduce = document.getElementById("velz_reduce");
 velz_reduce.onclick = () => {
 	Satellite.moved = -6;
+	punctual_changes = vel_z_punctual.value != '';
 };
 const velz_increase = document.getElementById("velz_increase");
 velz_increase.onclick = () => {
 	Satellite.moved = 6;
+	punctual_changes = vel_z_punctual.value != '';
 };
 const ctrl_sat = document.getElementById("ctrl_sat");
 const ctrl_button = document.getElementById("ctrl_button");
+const depart_label = document.getElementById("depart_label");
+const destin_label = document.getElementById("destin_label");
 ctrl_button.onclick = () => {
 	if( Satellite.get_sat( ctrl_sat.value ) != null ){
 		set_center_ctrl( ctrl_sat.value );
 		
 		// Establecer partida y destino del targeting
-		destin =  depart;
+		destin = depart;
 		depart = ctrl_sat.value;
 		
 		// Ver destino y partida
-		log( '------ctrl-----' );
-		log( 'Destination:' );
-		log( destin );
-		log( 'Departure' );
-		log( depart );
+		depart_label.innerHTML = depart;
+		destin_label.innerHTML = destin;
 	};
 };
 const adj_center = document.getElementById("adj_center");
@@ -301,7 +321,7 @@ const adjust_button = document.getElementById("adjust_button");
 adjust_button.onclick = () => {
 	if( Satellite.get_sat( adj_center.value ) != null ){
 		Satellite.moved = 7;
-		Satellite.ctrl_rutine( adj_center.value );
+		Satellite.ctrl_routine( adj_center.value );
 	};
 };
 
@@ -350,21 +370,31 @@ button_time_add.onclick = () => {
 const s_scale_slider = document.getElementById("s_scale");
 s_scale_slider.value = s_scale_slider.min;
 s_scale_slider.oninput = () => {
-	s_scale = s_scale_slider.value * center_body.R * 1e-2;
+	s_scale = s_scale_slider.value * 2e-2;
+	zoom = zoom_slider.value * center_body.R * pow( 10, s_scale );
 };
 const t_scale_slider = document.getElementById("t_scale");
-t_scale_slider.value = to_eday( t_scale );
+t_scale_slider.value = t_scale_slider.min;
 t_scale_slider.oninput = () => {
-	
-	// Realizar el cambio de escala temporal
-	t_scale = EDAY * t_scale_slider.value * 1e-2;
+	t_scale = t_scale_slider.value * 2e-2;
+	t_sense = EDAY * t_sense_slider.value * pow( 10, t_scale );
+};
+const zoom_slider = document.getElementById("zoom");
+zoom_slider.value = zoom_slider.min;
+zoom_slider.oninput = () => {
+	zoom = zoom_slider.value * center_body.R * pow( 10, s_scale );
+};
+const t_sense_slider = document.getElementById("t_sense");
+t_sense_slider.value = to_eday( t_sense );
+t_sense_slider.oninput = () => {
+	t_sense = EDAY * t_sense_slider.value * pow( 10, t_scale );
 };
 const stop_button = document.getElementById("stop_button");
 stop_button.onclick = () => {
 	
 	// Detener el tiempo
-	t_scale = 0;
-	t_scale_slider.value = 0;
+	t_sense = 0;
+	t_sense_slider.value = 0;
 };
 
 // Seleccionar vista con un click en el lienzo
@@ -375,7 +405,6 @@ canvas.addEventListener('click', () => {
 // Tramo de vuelo
 const phase = document.getElementById("phase");
 phase.onclick = () => {
-	log( 'New phase from: ' + Satellite.ctrl.name );
 	
 	// Crear un vehículo ditinto que parta de la posición simulada ctrl
 	Satellite.flight_leg();
@@ -388,15 +417,34 @@ launch_button.onclick = () => {
 };
 
 // Targeting
-let desidred_time = 6 * EDAY;
+const flight_time = document.getElementById("flight_time");
 const targeting_button = document.getElementById("targeting");
+const vel_vec_x_label = document.getElementById("vel_vec_x_label");
+const vel_vec_y_label = document.getElementById("vel_vec_y_label");
+const vel_vec_z_label = document.getElementById("vel_vec_z_label");
+const a_min_label = document.getElementById("a_min_label");
+const a_des_label = document.getElementById("a_des_label");
+const a_max_label = document.getElementById("a_max_label");
+const t_min_label = document.getElementById("t_min_label");
+const t_des_label = document.getElementById("t_des_label");
+const t_max_label = document.getElementById("t_max_label");
 targeting_button.onclick = () => {
 	if(destin != null & depart != null){
-		log("---TARGETING----");
-		Satellite.get_sat( destin ).elliptic_targeting(
+		let targeting_data = Satellite.get_sat( destin ).elliptic_targeting(
 			Satellite.get_sat( depart ),
-			desidred_time
-		).pos
+			flight_time.value * EDAY
+		);
+		
+		// Ver info. del targeting
+		vel_vec_x_label.innerHTML = significant( targeting_data.v.x, 3 );
+		vel_vec_y_label.innerHTML = significant( targeting_data.v.y, 3 );
+		vel_vec_z_label.innerHTML = significant( targeting_data.v.z, 3 );
+		a_min_label.innerHTML = significant( targeting_data.a[0], 3 );
+		a_des_label.innerHTML = significant( targeting_data.a[1], 3 );
+		a_max_label.innerHTML = significant( targeting_data.a[2], 3 );
+		t_min_label.innerHTML = significant( to_eday( targeting_data.t[0] ), 3 );
+		t_des_label.innerHTML = significant( to_eday( targeting_data.t[1] ), 3 );
+		t_max_label.innerHTML = significant( to_eday( targeting_data.t[2] ), 3 );
 	};
 };
 

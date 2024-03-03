@@ -149,10 +149,13 @@ class Satellite{
 		// Modificar intervalo de visibilidad
 		Satellite.get_sat( vehicle_name ).init_set( Satellite.ctrl.name );
 		Satellite.ctrl.end_set( vehicle_name );
+		
+		// Ceder el control a los nuevos settings
+		set_center_ctrl( vehicle_name );
 	};
 	
 	// Rutina de control manual
-	static ctrl_rutine(adj_center){
+	static ctrl_routine(adj_center){
 		
 		// Verificar entrada del usuario
 		if(Satellite.moved == 0){
@@ -171,46 +174,72 @@ class Satellite{
 			z: Satellite.ctrl.vel.z,
 		};
 		
-		// Cambiar posisición/velocidad del satélite controlado según bandera
-		switch(Satellite.moved){
-			case -1:
-				pos.x -= sat.x;
-				break;
-			case 1:
-				pos.x += sat.x;
-				break;
-			case -2:
-				pos.y -= sat.y;
-				break;
-			case 2:
-				pos.y += sat.y;
-				break;
-			case -3:
-				pos.z -= sat.z;
-				break;
-			case 3:
-				pos.z += sat.z;
-				break;
-			case -4:
-				vel.x -= sat.vx;
-				break;
-			case 4:
-				vel.x += sat.vx;
-				break;
-			case -5:
-				vel.y -= sat.vy;
-				break;
-			case 5:
-				vel.y += sat.vy;
-				break;
-			case -6:
-				vel.z -= sat.vz;
-				break;
-			case 6:
-				vel.z += sat.vz;
-				break;
-			default:
-				break;
+		// Cambiar posisición/velocidad del satélite controlado
+		if(punctual_changes){
+			switch( abs( Satellite.moved ) ){
+				case 1:
+					pos.x = pos_x_punctual.value * ER;
+					break;
+				case 2:
+					pos.y = pos_y_punctual.value * ER;
+					break;
+				case 3:
+					pos.z = pos_z_punctual.value * ER;
+					break;
+				case 4:
+					vel.x = vel_x_punctual.value * 1;
+					break;
+				case 5:
+					vel.y = vel_y_punctual.value * 1;
+					break;
+				case 6:
+					vel.z = vel_z_punctual.value * 1;
+					break;
+				default:
+					break;
+			};
+			punctual_changes = false;
+		}else{
+			switch(Satellite.moved){
+				case -1:
+					pos.x -= sat.x;
+					break;
+				case 1:
+					pos.x += sat.x;
+					break;
+				case -2:
+					pos.y -= sat.y;
+					break;
+				case 2:
+					pos.y += sat.y;
+					break;
+				case -3:
+					pos.z -= sat.z;
+					break;
+				case 3:
+					pos.z += sat.z;
+					break;
+				case -4:
+					vel.x -= sat.vx;
+					break;
+				case 4:
+					vel.x += sat.vx;
+					break;
+				case -5:
+					vel.y -= sat.vy;
+					break;
+				case 5:
+					vel.y += sat.vy;
+					break;
+				case -6:
+					vel.z -= sat.vz;
+					break;
+				case 6:
+					vel.z += sat.vz;
+					break;
+				default:
+					break;
+			};
 		};
 		Satellite.moved = 0;
 		
@@ -298,7 +327,9 @@ class Satellite{
 		Satellite.get_sat( sat_name ).init = Satellite.ctrl.init;
 		Satellite.get_sat( sat_name ).end = Satellite.ctrl.end;
 		Satellite.get_sat( sat_name ).prev_sat = Satellite.ctrl.prev_sat;
-		Satellite.get_sat( sat_name ).next_sat = Satellite.ctrl.next_sat;		
+		Satellite.get_sat( sat_name ).prev_v = Satellite.ctrl.prev_v;
+		Satellite.get_sat( sat_name ).delta_v_calculation();
+		Satellite.get_sat( sat_name ).next_sat = Satellite.ctrl.next_sat;
 		
 		// Matar los settings actuales
 		Satellite.ctrl.name_set('dead');
@@ -326,13 +357,13 @@ class Satellite{
 		new Satellite(
 			vehicle_name, 
 			Satellite.ctrl.name, 
-			1e0,
-			1e0, 
-			1e0, 
+			1e-1,
+			1e-1,
+			1e-1,
 			vl.pos, 
 			vl.vel, 
 			{
-				T: 0,
+				T: E_SIDEREAL_ROTATION_PERIOD,
 				t0: 0,
 				tilt: 0
 			},
@@ -363,14 +394,8 @@ class Satellite{
 									) - s_time
 		);
 		
-		// Info. relevante
-		log( '---LAUNCH---' );
-		log( 'name' );
-		log( vehicle_name );
-		log( 'launch' );
-		log( vl );
-		log( 'vehicle' );
-		log( Satellite.get_sat( vehicle_name ) );
+		// Ceder el control al vehículo
+		set_center_ctrl( vehicle_name );
 	};
 	
 	// Control de fases
@@ -519,7 +544,11 @@ class Satellite{
 			sat: this,
 			orbit: orbit_curve
 		};
-		return future_vecs;
+		return {
+			v: des_a.v,
+			a: [ min_a.a, des_a.a, max_a.a ],
+			t: [ mint, des_time, maxt ]
+		};
 	};
 	
 	// Nombre del satélite
@@ -542,10 +571,23 @@ class Satellite{
 		this.m = m;
 	};
 	
+	// Delta v
+	delta_v_calculation(){
+		if(this.prev_v == null){
+			return;
+		};
+		this.delta_v = sum_vec(
+			this.prev_v,
+			prod_by_sc( -1, this.vel ),
+		);
+	};
+	
 	// Intervalo de vida
 	init_set(name){
 		this.init = s_time;
 		this.prev_sat = name;
+		this.prev_v = Satellite.get_sat( this.prev_sat ).orbit.v;
+		this.delta_v_calculation();
 	};
 	end_set(name){
 		this.end = s_time;
@@ -894,7 +936,7 @@ class Satellite{
 		let dir_rot = this.launch_trajectory(
 			deg_to_rad( 0 ),
 			deg_to_rad( 45 ),
-			this.rsoi
+			this.R
 		);
 		
 		// Visualizar lanzamiento
