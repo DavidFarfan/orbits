@@ -342,10 +342,13 @@ class Satellite{
 	// Lanzamineto de un vehiculo desde superficie planetaria
 	static launch(){
 		
+		log('RA-D');
+		log(sight_RA);
+		log(sight_D);
 		// Velocidad inicial
 		let vl = Satellite.ctrl.launch_trajectory(
-			deg_to_rad( 0 ),
-			deg_to_rad( 45 ),
+			sight_RA,
+			sight_D,
 			6
 		);
 		
@@ -934,8 +937,8 @@ class Satellite{
 		
 		// Lanzamiento
 		let dir_rot = this.launch_trajectory(
-			deg_to_rad( 0 ),
-			deg_to_rad( 45 ),
+			sight_RA,
+			sight_D,
 			this.R
 		);
 		

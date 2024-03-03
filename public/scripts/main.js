@@ -66,6 +66,8 @@ var center = { // Centro del lienzo (kilómetros): variable dep. el tiempo
 };
 var PHI = 0; // Latitud sobre el satélite controlado
 var LAMBDA = 0; // Longitud sobre el satélite controlado
+var sight_RA = 0; // Ascención recta 
+var sight_D = 0; // Declincación 
 const origin = { // Coordenadas del origen en la pantalla
 	x: width_p( .5 ),
 	y: height_p( .5 )
@@ -333,6 +335,14 @@ lat_slider.oninput = () => {
 const long_slider = document.getElementById("long");
 long_slider.oninput = () => {
 	LAMBDA = long_slider.value * PI * ( 1 / long_slider.max );
+};
+const d_slider = document.getElementById("d");
+d_slider.oninput = () => {
+	sight_D = d_slider.value * .5 * PI * ( 1 / d_slider.max );
+};
+const ra_slider = document.getElementById("ra");
+ra_slider.oninput = () => {
+	sight_RA = ra_slider.value * PI * ( 1 / ra_slider.max );
 };
 
 // Captura de página de info. de simulación a desplegar
@@ -602,6 +612,8 @@ Satellite.sat_from_orbit(
 
 // Asignar y controlar el satélite central
 set_center_ctrl('sun');
+s_scale = s_scale_slider.value * 2e-2;
+zoom = zoom_slider.value * center_body.R * pow( 10, s_scale );
 
 // Comenzar loop del programa
 setInterval( orbitLoop, s_to_ms( 1 / frac ) );
