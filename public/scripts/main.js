@@ -145,6 +145,83 @@ function view_vec_abs(o, vec, mag, color){
 	]);
 };
 
+// Fijar tiempo de simulación
+function apply_time(){
+	
+	// Calcular días transcurridos de la fecha ingresada
+	let date_in = new Date( select_date.value + " 12:00:00 GMT+00:00" );
+	let dif_days = to_eday( ms_to_s( date_in.getTime() - EPOCH_J2000.getTime() ) );
+	
+	// Fecha exacta
+	if(text_time.value == ''){
+		s_base_time = eday_to_s( dif_days );
+		
+	// Días desde J2000
+	}else{
+		s_base_time = eday_to_s( Number( text_time.value ) );
+	};
+};
+
+// Adelantar tiempo de simulación
+function add_time(){
+	s_base_time += eday_to_s( Number( text_time.value ) );
+};
+
+// Selección del satélite controlado
+function select_sat_ctrl(){
+	if( Satellite.get_sat( ctrl_sat.value ) != null ){
+		set_center_ctrl( ctrl_sat.value );
+		
+		// Establecer partida y destino del targeting
+		destin = depart;
+		depart = ctrl_sat.value;
+		
+		// Ver destino y partida
+		depart_label.innerHTML = depart;
+		destin_label.innerHTML = destin;
+	};
+};
+
+// Selección de parámetros de lanzamiento
+function lat_set(){
+	PHI = lat_slider.value * .5 * PI * ( 1 / lat_slider.max );
+	lat_slider.value = PHI * 2 * ( 1 / PI ) * lat_slider.max;
+};
+function long_set(){
+	LAMBDA = long_slider.value * PI * ( 1 / long_slider.max );
+	long_slider.value = LAMBDA * ( 1 / PI ) * long_slider.max;
+};
+function D_set(){
+	sight_D = d_slider.value * .5 * PI * ( 1 / d_slider.max );
+	d_slider.value = sight_D * 2 * ( 1 / PI ) * d_slider.max;
+};
+function RA_set(){
+	sight_RA = ra_slider.value * PI * ( 1 / ra_slider.max );
+	ra_slider.value = sight_RA * ( 1 / PI ) * ra_slider.max;
+};
+function slider_lat_set(){
+	lat_slider.value = PHI * 2 * ( 1 / PI ) * lat_slider.max;
+	PHI = lat_slider.value * .5 * PI * ( 1 / lat_slider.max );
+};
+function slider_long_set(){
+	long_slider.value = LAMBDA * ( 1 / PI ) * long_slider.max;
+	LAMBDA = long_slider.value * PI * ( 1 / long_slider.max );
+};
+function slider_D_set(){
+	d_slider.value = sight_D * 2 * ( 1 / PI ) * d_slider.max;
+	sight_D = d_slider.value * .5 * PI * ( 1 / d_slider.max );
+};
+function slider_RA_set(){
+	ra_slider.value = sight_RA * ( 1 / PI ) * ra_slider.max;
+	sight_RA = ra_slider.value * PI * ( 1 / ra_slider.max );
+};
+
+// Cambiar la magnitud de la velocidad inicial del satélite controlado
+function set_magnitude(){
+	punctual_changes = true;
+	Satellite.moved = 8;
+};
+
 //---------LOOP DE SIMULACIÓN------------
 function orbitLoop(){
 	
@@ -304,8 +381,7 @@ velz_increase.onclick = () => {
 const magnitude_punctual = document.getElementById("magnitude_punctual");
 const magnitude_button = document.getElementById("magnitude_button");
 magnitude_button.onclick = () => {
-	punctual_changes = true;
-	Satellite.moved = 8;
+	set_magnitude();
 };
 
 const ctrl_sat = document.getElementById("ctrl_sat");
@@ -313,17 +389,7 @@ const ctrl_button = document.getElementById("ctrl_button");
 const depart_label = document.getElementById("depart_label");
 const destin_label = document.getElementById("destin_label");
 ctrl_button.onclick = () => {
-	if( Satellite.get_sat( ctrl_sat.value ) != null ){
-		set_center_ctrl( ctrl_sat.value );
-		
-		// Establecer partida y destino del targeting
-		destin = depart;
-		depart = ctrl_sat.value;
-		
-		// Ver destino y partida
-		depart_label.innerHTML = depart;
-		destin_label.innerHTML = destin;
-	};
+	select_sat_ctrl();
 };
 const adj_center = document.getElementById("adj_center");
 const adjust_button = document.getElementById("adjust_button");
@@ -341,19 +407,19 @@ delete_btn.onclick = () => {
 // Captura de parámetros del punto sobre la superficie del satélite controlado
 const lat_slider = document.getElementById("lat");
 lat_slider.oninput = () => {
-	PHI = lat_slider.value * .5 * PI * ( 1 / lat_slider.max );
+	lat_set();
 };
 const long_slider = document.getElementById("long");
 long_slider.oninput = () => {
-	LAMBDA = long_slider.value * PI * ( 1 / long_slider.max );
+	long_set(); 
 };
 const d_slider = document.getElementById("d");
 d_slider.oninput = () => {
-	sight_D = d_slider.value * .5 * PI * ( 1 / d_slider.max );
+	D_set();
 };
 const ra_slider = document.getElementById("ra");
 ra_slider.oninput = () => {
-	sight_RA = ra_slider.value * PI * ( 1 / ra_slider.max );
+	RA_set();
 };
 
 // Captura de página de info. de simulación a desplegar
@@ -367,24 +433,12 @@ const text_time = document.getElementById("text_time");
 const select_date = document.getElementById("select_date");
 const button_time = document.getElementById("button_time");
 button_time.onclick = () => {
-	
-	// Calcular días transcurridos de la fecha ingresada
-	let date_in = new Date( select_date.value + " 12:00:00 GMT+00:00" );
-	let dif_days = to_eday( ms_to_s( date_in.getTime() - EPOCH_J2000.getTime() ) );
-	
-	// Aplicar tiempo simulado 
-	// (days from J2000)
-	if(text_time.value == ''){
-		s_base_time = eday_to_s( dif_days );
-		
-	// (selected date)
-	}else{
-		s_base_time = eday_to_s( Number( text_time.value ) );
-	};
+	apply_time();
 };
+
 const button_time_add = document.getElementById("button_time_add");
 button_time_add.onclick = () => {
-	s_base_time += eday_to_s( Number( text_time.value ) );
+	add_time();
 };
 
 // Captura de parámetros de escala de simulación
@@ -628,3 +682,41 @@ zoom = zoom_slider.value * center_body.R * pow( 10, s_scale );
 
 // Comenzar loop del programa
 setInterval( orbitLoop, s_to_ms( 1 / frac ) );
+
+// Instrucciones para la simulación de una misión
+select_date.value = '1969-07-16';
+apply_time();
+orbitLoop();
+text_time.value = '0.0833333';
+add_time();
+orbitLoop();
+ctrl_sat.value = 'earth';
+select_sat_ctrl();
+orbitLoop();
+PHI = deg_to_rad( 27.9 );
+slider_lat_set();
+orbitLoop();
+LAMBDA = deg_to_rad( -81.0 );
+slider_long_set();
+orbitLoop();
+sight_RA = deg_to_rad( -97.2 );
+slider_RA_set();
+orbitLoop();
+sight_D = deg_to_rad( 84.6 );
+slider_D_set();
+orbitLoop();
+Satellite.launch();
+orbitLoop();
+magnitude_punctual.value = '1.8';
+set_magnitude();
+orbitLoop();
+text_time.value = '0.0021875049';
+add_time();
+orbitLoop();
+setTimeout(function(){
+    Satellite.flight_leg();
+	orbitLoop();
+	magnitude_punctual.value = '7.81';
+	set_magnitude();
+	orbitLoop();
+}, 2000);

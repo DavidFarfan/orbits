@@ -360,9 +360,6 @@ class Satellite{
 	// Lanzamineto de un vehiculo desde superficie planetaria
 	static launch(){
 		
-		log('RA-D');
-		log(sight_RA);
-		log(sight_D);
 		// Velocidad inicial
 		let vl = Satellite.ctrl.launch_trajectory(
 			sight_RA,
