@@ -195,6 +195,11 @@ class Satellite{
 				case 6:
 					vel.z = vel_z_punctual.value * 1;
 					break;
+				case 8:
+					vel.x = magnitude_punctual.value * 1 * Satellite.ctrl.vel.x / norm_vec( Satellite.ctrl.vel );
+					vel.y = magnitude_punctual.value * 1 * Satellite.ctrl.vel.y / norm_vec( Satellite.ctrl.vel );
+					vel.z = magnitude_punctual.value * 1 * Satellite.ctrl.vel.z / norm_vec( Satellite.ctrl.vel );
+					break;
 				default:
 					break;
 			};
@@ -339,6 +344,19 @@ class Satellite{
 		set_center_ctrl( sat_name );
 	};
 	
+	// Deshacerse de un satélite
+	static kill(){
+		
+		// Referenciar el Satélite orbitado
+		let pass_name = Satellite.ctrl.orbited;
+		
+		// Matar los settings actuales
+		Satellite.ctrl.kill_sat();
+		
+		// Ceder el control al satélite orbitado
+		set_center_ctrl( pass_name );
+	};
+	
 	// Lanzamineto de un vehiculo desde superficie planetaria
 	static launch(){
 		
@@ -413,9 +431,22 @@ class Satellite{
 		};
 	};
 	
+	// Matarse
+	kill_sat(){
+		
+		// Dejar la fase anterior con validez permanente
+		if(this.prev_sat != null){
+			Satellite.get_sat( this.prev_sat ).end_set();
+		};
+		
+		// Desaparecer
+		this.name_set('dead');
+		this.set_live();
+	};
+	
 	// Antevida
 	antelife(){
-		if(this.init != undefined){
+		if(this.init != null){
 			return s_time < this.init;
 		};
 		return false;
@@ -423,7 +454,7 @@ class Satellite{
 	
 	// Posvida
 	poslife(){
-		if(this.end != undefined){
+		if(this.end != null){
 			return s_time > this.end;
 		};
 		return false;
@@ -505,7 +536,7 @@ class Satellite{
 		let maxt = dt_from_a( sat_dist, this.target.r, cs.semi_perimeter / 2, this.get_gravity() );
 		let min_a = a_from_dt( sat_dist, this.target.r, mint, this.get_gravity() );
 		let des_a = a_from_dt( sat_dist, this.target.r, des_time, this.get_gravity() );
-		let max_a = a_from_dt( sat_dist, this.target.r, maxt, this.get_gravity() );
+		let max_a = a_from_dt( sat_dist, this.target.r, maxt, this.get_gravity() ); 
 		let orbit_curve = new Orbit(
 			angular_momentum( sat_dist, des_a.v ),
 			orbital_energy( norm_vec( des_a.v ), this.get_gravity(), norm_vec( sat_dist ) ),
@@ -559,6 +590,16 @@ class Satellite{
 		this.name = name;
 	};
 	
+	// Cuerpo orbitado
+	orbited_set(name){
+		
+		// Hacer constar la condición del primer satélite
+		if(name == null){
+			this.first = true;
+		};
+		this.orbited = name;
+	};
+	
 	// Mostrar/Ocultar
 	set_live(){
 		this.alive = !this.alive;
@@ -577,6 +618,7 @@ class Satellite{
 	// Delta v
 	delta_v_calculation(){
 		if(this.prev_v == null){
+			this.delta_v = null;
 			return;
 		};
 		this.delta_v = sum_vec(
@@ -587,12 +629,32 @@ class Satellite{
 	
 	// Intervalo de vida
 	init_set(name){
+		
+		// Deshacer 
+		if(name == null){
+			this.init = null;
+			this.prev_sat = null;
+			this.prev_v = null;
+			delta_v_calculation();
+			return;
+		};
+		
+		// Hacer
 		this.init = s_time;
 		this.prev_sat = name;
 		this.prev_v = Satellite.get_sat( this.prev_sat ).orbit.v;
 		this.delta_v_calculation();
 	};
 	end_set(name){
+		
+		// Deshacer 
+		if(name == null){
+			this.end = null;
+			this.next_sat = null;
+			return;
+		};
+		
+		// Hacer
 		this.end = s_time;
 		this.next_sat = name;
 	};
@@ -819,6 +881,11 @@ class Satellite{
 	// Simmulación
 	sim(){
 		
+		// Matar el satélite si no tiene cuerpo central
+		if(!this.first && Satellite.get_sat( this.orbited ) == null){
+			this.kill_sat();
+		};
+		
 		// Ignorar satélite si está muerto
 		if(this.name == 'dead' ){
 			return;
@@ -988,7 +1055,7 @@ class Satellite{
 	constructor(name, orbited, R, m, u, pos, vel, rot, dif, ctrl, p){
 		this.set_live();
 		this.name_set(name);
-		this.orbited = orbited;
+		this.orbited_set(orbited);
 		this.R_set(R);
 		this.m_set(m);
 		this.u = u;

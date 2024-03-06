@@ -19,6 +19,9 @@
 		</div>
 		<div class="flex-row">
 			<div class="flex-col" align="center">
+				<h2>
+					control options
+				</h2>
 				<div class="container">
 					<label>ctrl sat</label>
 					<input type="text" value="" id="ctrl_sat">
@@ -65,8 +68,19 @@
 					<input type="button" class="button" value="reduce" id="velz_reduce">
 					<input type="button" class="button" value="increase" id="velz_increase">
 				</div>
+				<div class="slidecontainer">
+					<label>magnitude</label>
+					<input type="text" value="" id="magnitude_punctual">
+					<input type="button" class="button" value="apply" id="magnitude_button">
+				</div>
+				<div class="container">
+					<input type="button" class="button" value="Delete" id="delete">
+				</div>
 			</div>
 			<div class="flex-col" align="center">
+				<h2>
+					launch options
+				</h2>
 				<div class="slidecontainer">
 					<label>lat</label>
 					<input type="range" min="-100" max="100" value="0" class="slider" id="lat">
@@ -75,8 +89,6 @@
 					<label>long</label>
 					<input type="range" min="-100" max="100" value="0" class="slider" id="long">
 				</div>
-			</div>
-			<div class="flex-col" align="center">
 				<div class="slidecontainer">
 					<label>ra</label>
 					<input type="range" min="-100" max="100" value="0" class="slider" id="ra">
@@ -85,10 +97,19 @@
 					<label>d</label>
 					<input type="range" min="0" max="100" value="0" class="slider" id="d">
 				</div>
+				<div class="slidecontainer">
+					<input type="button" class="button" value="Launch" id="launch">
+				</div>
+				<div class="slidecontainer">
+					<input type="button" class="button" value="Phase" id="phase">
+				</div>
 			</div>
 		</div>
 		<div class="flex-row">
 			<div class="flex-col" align="center">
+				<h2>
+					simul options
+				</h2>
 				<div class="slidecontainer">
 					<label>space scale</label>
 					<input type="range" min="-100" max="100" value="0" class="slider" id="s_scale">
@@ -106,29 +127,32 @@
 					<input type="range" min="-100" max="100" value="0" class="slider" id="t_sense">
 					<input type="button" class="button" value="Za Warudo" id="stop_button">
 				</div>
-			</div>
-			<div class="flex-col" align="center">
-				<div class="slidecontainer">
-					<label>simul time</label>
-					<input type="text" value="" id="text_time">
-					<div class="flex-col" align="center">
-						<label>edays past J2000</label>
-						<input type="button" class="button" value="apply time" id="button_time">
-						<label>edays past present</label>
-						<input type="button" class="button" value="add time" id="button_time_add">
-						<form>
-						  <label>
-							simul date
-							<input type="date" name="party" id="select_date" min="1-01-01" max="3000-12-31" />
-						  </label>
-						</form>
+				<div class="flex-col" align="center">
+					<div class="slidecontainer">
+						<label>simul time</label>
+						<input type="text" value="" id="text_time">
+						<div class="flex-col" align="center">
+							<label>edays past J2000</label>
+							<input type="button" class="button" value="apply time" id="button_time">
+							<label>edays past present</label>
+							<input type="button" class="button" value="add time" id="button_time_add">
+							<form>
+							  <label>
+								simul date
+								<input type="date" name="party" id="select_date" min="1-01-01" max="3000-12-31" />
+							  </label>
+							</form>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="flex-col" align="center">
 				<div class="slidecontainer">
 					<input type="button" class="button" value="Display next page" id="page">
 				</div>
+			</div>
+			<div class="flex-col" align="center">
+				<h2>
+					targeting options
+				</h2>
 				<div class="container">
 					<label> desired flight time (days) </label>
 					<input type="text" value="" id="flight_time">
@@ -159,12 +183,6 @@
 					<label id="t_min_label"> 0 </label> ,
 					<label id="t_des_label"> 0 </label> ,
 					<label id="t_max_label"> 0 </label> ]
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Launch" id="launch">
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Phase" id="phase">
 				</div>
 			</div>
 		</div>

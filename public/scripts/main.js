@@ -301,6 +301,13 @@ velz_increase.onclick = () => {
 	Satellite.moved = 6;
 	punctual_changes = vel_z_punctual.value != '';
 };
+const magnitude_punctual = document.getElementById("magnitude_punctual");
+const magnitude_button = document.getElementById("magnitude_button");
+magnitude_button.onclick = () => {
+	punctual_changes = true;
+	Satellite.moved = 8;
+};
+
 const ctrl_sat = document.getElementById("ctrl_sat");
 const ctrl_button = document.getElementById("ctrl_button");
 const depart_label = document.getElementById("depart_label");
@@ -325,6 +332,10 @@ adjust_button.onclick = () => {
 		Satellite.moved = 7;
 		Satellite.ctrl_routine( adj_center.value );
 	};
+};
+const delete_btn = document.getElementById("delete");
+delete_btn.onclick = () => {
+	Satellite.kill();
 };
 
 // Captura de parámetros del punto sobre la superficie del satélite controlado

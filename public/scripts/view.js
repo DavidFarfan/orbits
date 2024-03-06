@@ -211,7 +211,9 @@ class View{
 		// Coordenadas (deg)
 		request.push([
 			'print', 
-			"Point coordinates of orbited body from " + Satellite.ctrl.name + 
+			"Orbited from " + Satellite.ctrl.name + 
+			" -> RA: " + str( significant( rad_to_deg( sight_RA ), 4 ) ) + 
+			" -> D: " + str( significant( rad_to_deg( sight_D ), 4 ) ) + 
 			" -> lat: " + str( significant( rad_to_deg( PHI ), 4 ) ) + 
 			"° lon: " + str( significant( rad_to_deg( LAMBDA ), 4 ) ) + "°",
 			10, 
