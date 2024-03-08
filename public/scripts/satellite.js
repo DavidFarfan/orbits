@@ -517,9 +517,9 @@ class Satellite{
 		
 		// Target en el tiempo deseado de colisión
 		let future_vecs = this.orbit.fictional_pos(
-			des_time,
-			this.orbit.t,
-			this.orbit.f,
+			s_time + des_time,
+			this.orbit.t0,
+			this.orbit.f0,
 			this.get_gravity()
 		);
 		this.target = {

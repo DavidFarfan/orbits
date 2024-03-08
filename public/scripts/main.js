@@ -719,4 +719,9 @@ setTimeout(function(){
 	magnitude_punctual.value = '7.81';
 	set_magnitude();
 	orbitLoop();
-}, 2000);
+}, 100);
+setTimeout(function(){
+    text_time.value = '0.113888875';
+	add_time();
+	orbitLoop();
+}, 200);
