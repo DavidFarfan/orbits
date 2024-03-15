@@ -191,6 +191,11 @@ function abs(n){
 	return Math.abs( n );
 };
 
+// MÍNIMO ENTRE DOS NÚMEROS
+function min(a, b){
+	return Math.min( a, b );
+};
+
 // MÁXIMO ENTRE DOS NÚMEROS
 function max(a, b){
 	return Math.max( a, b );

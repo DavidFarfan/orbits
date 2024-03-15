@@ -223,47 +223,26 @@ class View{
 		
 		//--------DATOS DEL PUNTO MONITOREADO-----------
 		
-		// Pointing Coordinates of the orbited body from ctrl (rad)
-		let p_q;
-		if(Satellite.ctrl.orbit.perturbation != undefined){
-			
-			// Corregir si el nodo ascendente ha cambiado de dirección
-			let u_omega = Satellite.ctrl.orbit.perturbation.upper_omega;
-			let tilt = Satellite.ctrl.orbit.perturbation.axial_tilt;
-			if(Satellite.ctrl.orbit.perturbation.negative_inclination){
-				u_omega += PI;
-				tilt *= -1;
-			};
-			p_q = pointing_coordiantes(
-				Satellite.ctrl.orbit.r,
-				{	// Sun
-					x: 0,
-					y: 0,
-					z: 0
-				},
-				Satellite.ctrl.orbit.perturbation.i,
-				tilt,
-				u_omega
-			);
-			
-			// Right ascension
-			request.push([
-				'print', 
-				"RA = " + str( p_q.alpha ) + " rad",
-				10, 
-				20,
-				'WHITE'
-			]);
-			
-			// Declination
-			request.push([
-				'print', 
-				"D = " + str( p_q.delta ) + " rad",
-				10,
-				30,
-				'WHITE'
-			]);
-		};
+		// Coordenadas del cuerpo orbitado
+		let p_q = Satellite.ctrl.pointing_to_orbited();
+		
+		// Right ascension
+		request.push([
+			'print', 
+			"RA = " + str( p_q.alpha ) + " rad",
+			10, 
+			20,
+			'WHITE'
+		]);
+		
+		// Declination
+		request.push([
+			'print', 
+			"D = " + str( p_q.delta ) + " rad",
+			10,
+			30,
+			'WHITE'
+		]);
 		
 		// Hora sideral del meridiano cero (rad)
 		request.push([

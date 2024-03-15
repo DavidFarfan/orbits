@@ -222,6 +222,64 @@ function set_magnitude(){
 	Satellite.moved = 8;
 };
 
+// Ajustar el centro de un satélite
+function adjust_center(){
+	if( Satellite.get_sat( adj_center.value ) != null ){
+		Satellite.moved = 7;
+		Satellite.ctrl_routine( adj_center.value );
+	};
+};
+
+// Ajustar Posición y Velocidad del satélite controlado
+function sub_pos_x(){
+	Satellite.moved = -1;
+	punctual_changes = pos_x_punctual.value != '';
+};
+function add_pos_x(){
+	Satellite.moved = 1;
+	punctual_changes = pos_x_punctual.value != '';
+};
+function sub_pos_y(){
+	Satellite.moved = -2;
+	punctual_changes = pos_y_punctual.value != '';
+};
+function add_pos_y(){
+	Satellite.moved = 2;
+	punctual_changes = pos_y_punctual.value != '';
+};
+function sub_pos_z(){
+	Satellite.moved = -3;
+	punctual_changes = pos_z_punctual.value != '';
+};
+function add_pos_z(){
+	Satellite.moved = 3;
+	punctual_changes = pos_z_punctual.value != '';
+};
+function sub_vel_x(){
+	Satellite.moved = -4;
+	punctual_changes = vel_x_punctual.value != '';
+};
+function add_vel_x(){
+	Satellite.moved = 4;
+	punctual_changes = vel_x_punctual.value != '';
+};
+function sub_vel_y(){
+	Satellite.moved = -5;
+	punctual_changes = vel_y_punctual.value != '';
+};
+function add_vel_y(){
+	Satellite.moved = 5;
+	punctual_changes = vel_y_punctual.value != '';
+};
+function sub_vel_z(){
+	Satellite.moved = -6;
+	punctual_changes = vel_z_punctual.value != '';
+};
+function add_vel_z(){
+	Satellite.moved = 6;
+	punctual_changes = vel_z_punctual.value != '';
+};
+
 //---------LOOP DE SIMULACIÓN------------
 function orbitLoop(){
 	
@@ -320,63 +378,51 @@ const vel_y_punctual = document.getElementById("vel_y_punctual");
 const vel_z_punctual = document.getElementById("vel_z_punctual");
 const posx_reduce = document.getElementById("posx_reduce");
 posx_reduce.onclick = () => {
-	Satellite.moved = -1;
-	punctual_changes = pos_x_punctual.value != '';
+	sub_pos_x();
 };
 const posx_increase = document.getElementById("posx_increase");
 posx_increase.onclick = () => {
-	Satellite.moved = 1;
-	punctual_changes = pos_x_punctual.value != '';
+	add_pos_x();
 };
 const posy_reduce = document.getElementById("posy_reduce");
 posy_reduce.onclick = () => {
-	Satellite.moved = -2;
-	punctual_changes = pos_y_punctual.value != '';
-};
+	sub_pos_y();
+}; 
 const posy_increase = document.getElementById("posy_increase");
 posy_increase.onclick = () => {
-	Satellite.moved = 2;
-	punctual_changes = pos_y_punctual.value != '';
+	add_pos_y();
 };
 const posz_reduce = document.getElementById("posz_reduce");
 posz_reduce.onclick = () => {
-	Satellite.moved = -3;
-	punctual_changes = pos_z_punctual.value != '';
+	sub_pos_z();
 };
 const posz_increase = document.getElementById("posz_increase");
 posz_increase.onclick = () => {
-	Satellite.moved = 3;
-	punctual_changes = pos_z_punctual.value != '';
+	add_pos_z();
 };
 const velx_reduce = document.getElementById("velx_reduce");
 velx_reduce.onclick = () => {
-	Satellite.moved = -4;
-	punctual_changes = vel_x_punctual.value != '';
+	sub_vel_x();
 };
 const velx_increase = document.getElementById("velx_increase");
 velx_increase.onclick = () => {
-	Satellite.moved = 4;
-	punctual_changes = vel_x_punctual.value != '';
+	add_vel_x();
 };
 const vely_reduce = document.getElementById("vely_reduce");
 vely_reduce.onclick = () => {
-	Satellite.moved = -5;
-	punctual_changes = vel_y_punctual.value != '';
+	sub_vel_y();
 };
 const vely_increase = document.getElementById("vely_increase");
 vely_increase.onclick = () => {
-	Satellite.moved = 5;
-	punctual_changes = vel_y_punctual.value != '';
+	add_vel_y();
 };
 const velz_reduce = document.getElementById("velz_reduce");
 velz_reduce.onclick = () => {
-	Satellite.moved = -6;
-	punctual_changes = vel_z_punctual.value != '';
+	sub_vel_z();
 };
 const velz_increase = document.getElementById("velz_increase");
 velz_increase.onclick = () => {
-	Satellite.moved = 6;
-	punctual_changes = vel_z_punctual.value != '';
+	add_vel_z();
 };
 const magnitude_punctual = document.getElementById("magnitude_punctual");
 const magnitude_button = document.getElementById("magnitude_button");
@@ -394,10 +440,7 @@ ctrl_button.onclick = () => {
 const adj_center = document.getElementById("adj_center");
 const adjust_button = document.getElementById("adjust_button");
 adjust_button.onclick = () => {
-	if( Satellite.get_sat( adj_center.value ) != null ){
-		Satellite.moved = 7;
-		Satellite.ctrl_routine( adj_center.value );
-	};
+	adjust_center();
 };
 const delete_btn = document.getElementById("delete");
 delete_btn.onclick = () => {
@@ -425,6 +468,7 @@ ra_slider.oninput = () => {
 // Captura de página de info. de simulación a desplegar
 const display_page_button = document.getElementById("page");
 display_page_button.onclick = () => {
+	Satellite.ctrl.landing_coordinates();
 	info_page = ( info_page + 1 ) % 2;
 };
 
@@ -511,9 +555,9 @@ targeting_button.onclick = () => {
 		);
 		
 		// Ver info. del targeting
-		vel_vec_x_label.innerHTML = significant( targeting_data.v.x, 3 );
-		vel_vec_y_label.innerHTML = significant( targeting_data.v.y, 3 );
-		vel_vec_z_label.innerHTML = significant( targeting_data.v.z, 3 );
+		vel_vec_x_label.innerHTML = significant( targeting_data.v.x, 10 );
+		vel_vec_y_label.innerHTML = significant( targeting_data.v.y, 10 );
+		vel_vec_z_label.innerHTML = significant( targeting_data.v.z, 10 );
 		a_min_label.innerHTML = significant( targeting_data.a[0], 3 );
 		a_des_label.innerHTML = significant( targeting_data.a[1], 3 );
 		a_max_label.innerHTML = significant( targeting_data.a[2], 3 );
@@ -684,6 +728,7 @@ zoom = zoom_slider.value * center_body.R * pow( 10, s_scale );
 setInterval( orbitLoop, s_to_ms( 1 / frac ) );
 
 // Instrucciones para la simulación de una misión
+let time_lapse = 200;
 select_date.value = '1969-07-16';
 apply_time();
 orbitLoop();
@@ -719,9 +764,80 @@ setTimeout(function(){
 	magnitude_punctual.value = '7.81';
 	set_magnitude();
 	orbitLoop();
-}, 100);
+}, 1 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.113888875';
+    text_time.value = '0.08';
 	add_time();
 	orbitLoop();
-}, 200);
+}, 2 * time_lapse);
+setTimeout(function(){
+    Satellite.flight_leg();
+	orbitLoop();
+}, 3 * time_lapse);
+setTimeout(function(){
+	vel_x_punctual.value = 0.6063469937;
+	add_vel_x();
+	orbitLoop();
+}, 4 * time_lapse);
+setTimeout(function(){
+	vel_y_punctual.value = -10.8905;
+	add_vel_y();
+	orbitLoop();
+}, 5 * time_lapse);
+setTimeout(function(){
+	vel_z_punctual.value = -1.098515030;
+	add_vel_z();
+	orbitLoop();
+}, 6 * time_lapse);
+setTimeout(function(){
+    text_time.value = '2.23';
+	add_time();
+	orbitLoop();
+}, 7 * time_lapse);
+setTimeout(function(){
+    Satellite.flight_leg();
+	orbitLoop();
+}, 8 * time_lapse);
+setTimeout(function(){
+    adj_center.value = 'moon';
+	adjust_center();
+	orbitLoop();
+}, 9 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.6475';
+	add_time();
+	orbitLoop();
+}, 10 * time_lapse);
+setTimeout(function(){
+    Satellite.flight_leg();
+	orbitLoop();
+	magnitude_punctual.value = '1.52';
+	set_magnitude();
+	orbitLoop();
+}, 11 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.045';
+	add_time();
+	orbitLoop();
+}, 12 * time_lapse);
+setTimeout(function(){
+    Satellite.flight_leg();
+	orbitLoop();
+	magnitude_punctual.value = '1.623';
+	set_magnitude();
+	orbitLoop();
+}, 13 * time_lapse);
+setTimeout(function(){
+    PHI = deg_to_rad( 0 );
+	slider_lat_set();
+	orbitLoop();
+	LAMBDA = deg_to_rad( 0 );
+	slider_long_set();
+	orbitLoop();
+	sight_RA = deg_to_rad( 0 );
+	slider_RA_set();
+	orbitLoop();
+	sight_D = deg_to_rad( 90 );
+	slider_D_set();
+	orbitLoop();
+}, 14 * time_lapse);
