@@ -766,6 +766,20 @@ setTimeout(function(){
 	orbitLoop();
 }, 1 * time_lapse);
 setTimeout(function(){
+    PHI = deg_to_rad( 0 );
+	slider_lat_set();
+	orbitLoop();
+	LAMBDA = deg_to_rad( 0 );
+	slider_long_set();
+	orbitLoop();
+	sight_RA = deg_to_rad( 0 );
+	slider_RA_set();
+	orbitLoop();
+	sight_D = deg_to_rad( 90 );
+	slider_D_set();
+	orbitLoop();
+}, 2 * time_lapse);
+setTimeout(function(){
     text_time.value = '0.08';
 	add_time();
 	orbitLoop();

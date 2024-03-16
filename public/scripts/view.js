@@ -614,13 +614,13 @@ class View{
 		request.push([
 			'print', 
 			"n (er) = [ "
-				+ str( significant( to_er( Satellite.ctrl.orbit.ascending_node.x ), 4 ) ) + ", " 
-				+ str( significant( to_er( Satellite.ctrl.orbit.ascending_node.y ), 4 ) ) + ", " 
-				+ str( significant( to_er( Satellite.ctrl.orbit.ascending_node.z ), 4 ) ) 
+				+ str( significant( to_er( Satellite.ctrl.orbit.ascending_node.x ), 3 ) ) + ", " 
+				+ str( significant( to_er( Satellite.ctrl.orbit.ascending_node.y ), 3 ) ) + ", " 
+				+ str( significant( to_er( Satellite.ctrl.orbit.ascending_node.z ), 3 ) ) 
 			+ " ], [ "
-				+ str( significant( to_er( Satellite.ctrl.orbit.perturbation.ascending_node.x ), 4 ) ) + ", " 
-				+ str( significant( to_er( Satellite.ctrl.orbit.perturbation.ascending_node.y ), 4 ) ) + ", " 
-				+ str( significant( to_er( Satellite.ctrl.orbit.perturbation.ascending_node.z ), 4 ) ) 
+				+ str( significant( to_er( Satellite.ctrl.orbit.perturbation.ascending_node.x ), 3 ) ) + ", " 
+				+ str( significant( to_er( Satellite.ctrl.orbit.perturbation.ascending_node.y ), 3 ) ) + ", " 
+				+ str( significant( to_er( Satellite.ctrl.orbit.perturbation.ascending_node.z ), 3 ) ) 
 			+ " ]",
 			10, 
 			10,

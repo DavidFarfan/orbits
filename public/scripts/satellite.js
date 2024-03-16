@@ -473,74 +473,82 @@ class Satellite{
 			
 			// surface position
 			let vec_r = normalize_vec( this.orbit.r );
-			let dec_r = atan( vec_r.z / hipo(
-				vec_r.y,
-				vec_r.x
-			));
-			let angle_r = angle_vec({
-				x: vec_r.x,
-				y: vec_r.y
-			});
-			log('r');
-			log( 'plane: ' + str( rad_to_deg( angle_r ) ) );
-			log( 'z: ' + str( rad_to_deg( dec_r ) ) );
 			
 			// hypotetical launch
 			let vec_launch = normalize_vec(Satellite.get_sat( this.orbited ).launch_trajectory(
 				0,
 				deg_to_rad( 90 ),
-				LAMBDA,
-				PHI,
+				0,
+				0,
 				1
 			).pos);
-			let dec_launch = atan( vec_launch.z / hipo(
-				vec_launch.y,
-				vec_launch.x
-			));
+			
+			// Set en el plano ecliptico
+			//log('ecli');
+			//log('ref vec: ');
+			//log(vec_launch);
+			//log('pos vec: ');
+			//log(vec_r);
+			
+			// Set en el plano ecuatorial
+			let tilt = Satellite.get_sat( this.orbited ).orbit.axial_tilt;
+			let u_omega = Satellite.get_sat( this.orbited ).orbit.perturbation.upper_omega;
+			if(Satellite.get_sat( this.orbited ).orbit.perturbation.negative_inclination){
+				tilt *= -1;
+			};
+			
+			// rotacion 1
+			vec_launch = z_rot( vec_launch, -u_omega );
+			vec_r = z_rot( vec_r, -u_omega );
+			//log('rot 1');
+			//log('ref vec: ');
+			//log(vec_launch);
+			//log('pos vec: ');
+			//log(vec_r);
+			
+			// rotacion 2
+			vec_launch = x_rot( vec_launch, -tilt );
+			vec_r = x_rot( vec_r, -tilt );
+			//log('rot 2');
+			//log('ref vec: ');
+			//log(vec_launch);
+			//log('pos vec: ');
+			//log(vec_r);
+			
+			// Declinación
+			let phi = atan( vec_r.z / hipo( vec_r.y, vec_r.x ) );
+			//log('phi: ');
+			//log( significant( rad_to_deg( phi ), 4 ) );
+			
+			// Referencia en el origen de coordenadas
 			let angle_launch = angle_vec({
 				x: vec_launch.x,
 				y: vec_launch.y
 			});
-			log('launch');
-			log( 'plane: ' + str( rad_to_deg( angle_launch ) ) );
-			log( 'z: ' + str( rad_to_deg( dec_launch ) ) );
+			vec_launch = z_rot( vec_launch, -angle_launch );
+			vec_r = z_rot( vec_r, -angle_launch );
+			//log('rot 3');
+			//log('ref vec: ');
+			//log(vec_launch);
+			//log('pos vec: ');
+			//log(vec_r);
 			
-			// Rotate frame
-			let rotate_vec_launch = y_rot(
-				z_rot(
-					vec_launch,
-					-angle_launch
-				),
-				dec_launch
-			);
-			let rotate_vec_r = y_rot(
-				z_rot(
-					vec_r,
-					-angle_launch
-				),
-				dec_launch
-			);
-			log('ref vec: ');
-			log(rotate_vec_launch);
-			log('pos vec: ');
-			log(rotate_vec_r);
-			
-			// Coordinates
-			let lambda = angle_vec({
-				x: rotate_vec_r.x,
-				y: rotate_vec_r.y
-			});
+			// Ascención recta
+			let lambda = angle_vec(vec_r);
 			if(lambda > PI ){
-				lambda = lambda - 2 * PI;
+				lambda -= 2 * PI;
 			};
-			let phi = atan( rotate_vec_r.z / hipo(
-				rotate_vec_r.y,
-				rotate_vec_r.x
-			) );
-			log('lambda: ');
-			log( significant( rad_to_deg( lambda ), 4 ) );
-			log('phi: ');
-			log( significant( rad_to_deg( phi ), 4 ) );
+			//log('lambda: ');
+			//log( significant( rad_to_deg( lambda ), 4 ) );
+			
+			return {
+				lambda: lambda,
+				phi: phi
+			};
+		};
+		return {
+			lambda: 0,
+			phi: 0
 		};
 	};
 	
@@ -1164,7 +1172,6 @@ class Satellite{
 		*/
 		
 		/*
-		// Aterrizaje
 		let land_coords = this.landing_coordinates();
 		request.push([ 
 			'print',
@@ -1200,6 +1207,19 @@ class Satellite{
 			color
 		]);
 		*/
+		
+		// Aterrizaje
+		let land_coords = this.landing_coordinates();
+		request.push([ 
+			'print',
+			'land: lambda = ' +
+			str( significant( rad_to_deg( land_coords.lambda ), 4 ) ) +
+			', phi = ' +
+			str( significant( rad_to_deg( land_coords.phi ), 4 ) ), 
+			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+			to_px( print_pos[c2] + this.orbit.r[c2] ) + 20,
+			color
+		]);
 	};
 	
 	// Variables del satélite
