@@ -164,15 +164,12 @@ const MOON_INITIAL_LONGITUDE_OF_ASCENDING_NODE = deg_to_rad( 1.239580554371928e+
 const MOON_INITIAL_ARGUMENT_OF_PERIGEE = deg_to_rad( 3.089226727206595e+02 ); // Argumento de perihelio J2000 (rad)
 
 const MOON_AXIAL_TILT = deg_to_rad( 6.68 ); // Oblicuidad de la órbita (rad)
-const MOON_SIDEREAL_ROTATION_PERIOD = 26.849 * EDAY; // Periodo rot. sideral (s)
+const MOON_SIDEREAL_ROTATION_PERIOD = 26.955 * EDAY; // Periodo rot. sideral (s)
 const MOON_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
 	period( MOON_INITIAL_SEMI_MAJOR_AXIS, E_U ),
 	11.35 * EDAY // Ángulo obtenido empíricamente (s)
 );
-const MOON_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0, i.e 12:00 aprox. (s)
-	MOON_SIDEREAL_ROTATION_PERIOD,
-	0 // Segundos desde FPOA en J2000, obtenido empíricamente (s)
-));
+const MOON_INITIAL_GST = 16.5 * EDAY; // Segundos desde FPOA en J2000, obtenido empíricamente (s)
 const MOON_DIFF_SEMI_MAJOR_AXIS = 0; // Cambio del Semi-eje mayor J2000 (km/Cy)
 const MOON_DIFF_ECCENTRICITY = 0; // Cambio de la Excentricidad J2000 (1/Cy)
 const MOON_DIFF_INCLINATION = deg_to_rad( 0 ); // Cambio de la Inclinación J2000 (rad/Cy)
