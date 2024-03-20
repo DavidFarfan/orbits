@@ -1,26 +1,37 @@
-earth-moon:
-
+											// APOLLO 11
+											// EARTH - MOON
 date: 16/07/1969
-add time: 0.0833333
+add time: 0.0833333 						// Hora de lanzamiento
 ctrl: earth
 lat: 27.9
-lon: -81.0
-ra: -97.2
-d: 84.6
+lon: -81.0 									// Florida
+ra: -97.2  									// Ángulo de lanzamiento
+d: 84.6 
 launch
 mag: 1.8
-add time: 0.0021875049 // (189 s)
-phase
+add time: 0.0021875049 						// (189 s) 
+phase 										// orbita terrestre
 mag: 7.81
-add time: 0.08 // (1 h 55 m)
-phase
+add time: 0.08 								// (1 h 55 m)
+phase 										// inyección translunar
 vel: 0.6063469937, -10.8905, -1.098515030
-add time: 2.23 // (2d 5h 31m)
-phase
+add time: 2.23 								// (2d 5h 31m)
+phase 										// SOI de la luna
 center: moon
-add time: 0.648 // (15h 33m)
-phase
+add time: 0.648 							// (15h 33m)
+phase										// orbita lunar eliptica
 mag: 1.52
-add time: 0.045 // (1h 5m)
-phase
+add time: 0.045 							// (1h 5m)
+phase										// orbita lunar circular
 mag: 1.623
+add time: 1.145								// (1d 3h 28m)
+phase										// Desacoplamiento del LM
+add time: 0.053								// (1h 16m)
+phase										// Orbita de descenso
+mag: 1.6
+add time: 0.036								// (52m)
+phase										// Motor de descenso
+mag: 1.58
+add time: 0.0043							// (6m)
+phase										// Alunizaje, Mar de la tranquilidad
+mag: 1e-2
