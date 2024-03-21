@@ -96,6 +96,63 @@ class Satellite{
 		);
 	};
 	
+	// Clone phase
+	static clone_phase(){
+		
+		// Conservar rotación en la nueva fase
+		let sat_rot = {
+			T: Satellite.ctrl.sidereal_rotation_period,
+			t0: Satellite.ctrl.GST0,
+			tilt: Satellite.ctrl.orbit.axial_tilt
+		};
+		
+		// Crear un satélite en el punto de simulación
+		let phase_no = Satellite.ctrl.phase + 1;
+		let vehicle_name = Satellite.ctrl.name + str( phase_no );
+		new Satellite(
+			vehicle_name, 
+			Satellite.ctrl.orbited, 
+			Satellite.ctrl.R,
+			Satellite.ctrl.m, 
+			Satellite.ctrl.u, 
+			Satellite.ctrl.orbit.r, 
+			Satellite.ctrl.orbit.v, 
+			sat_rot,
+			{
+				da: 0,
+				de: 0,
+				di: 0,
+				dupper_omega: 0,
+				dp: 0
+			},
+			false,
+			phase_no
+		);
+		
+		// Ajustar tiempo inicial
+		let f0_adj = argument_of_periapse_f(
+			Satellite.get_sat( vehicle_name ).orbit.eccentricity,
+			Satellite.ctrl.orbit.r,
+			Satellite.get_sat( vehicle_name ).orbit.upper_omega,
+			Satellite.get_sat( vehicle_name ).orbit.i
+		).f;
+		Satellite.get_sat( vehicle_name ).orbit.set_t0(null, t_from_f(
+										Satellite.get_sat( vehicle_name ).orbit.type,
+										f0_adj,
+										Satellite.get_sat( vehicle_name ).orbit.e, 
+										Satellite.get_sat( vehicle_name ).orbit.a, 
+										Satellite.get_sat( vehicle_name ).orbit.T,
+										Satellite.get_sat( vehicle_name ).get_gravity()
+									) - s_time
+		);
+		
+		// Modificar intervalo de visibilidad
+		Satellite.get_sat( vehicle_name ).init_set( Satellite.ctrl.name );
+		
+		// Contar desacople como una fase
+		Satellite.ctrl.phase += 1;
+	};
+	
 	// Flight leg
 	static flight_leg(){
 		

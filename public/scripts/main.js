@@ -525,8 +525,16 @@ canvas.addEventListener('click', () => {
 const phase = document.getElementById("phase");
 phase.onclick = () => {
 	
-	// Crear un vehículo ditinto que parta de la posición simulada ctrl
+	// Pasar settings a otro satélite
 	Satellite.flight_leg();
+};
+
+// Desacoplamiento
+const undock = document.getElementById("undock");
+undock.onclick = () => {
+	
+	// Copiar settings en otro satélite
+	Satellite.clone_phase();
 };
 
 // Lanzamiento desde el satélite controlado
@@ -847,7 +855,7 @@ setTimeout(function(){
 	orbitLoop();
 }, 14 * time_lapse);
 setTimeout(function(){
-    Satellite.flight_leg();
+    Satellite.clone_phase();
 	orbitLoop();
 }, 15 * time_lapse);
 setTimeout(function(){
