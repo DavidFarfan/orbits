@@ -96,6 +96,69 @@ class Satellite{
 		);
 	};
 	
+	// Merge satellites
+	static merge_sats(){
+		
+		// Unir departure (ctrl) al destination, si lo hay
+		if(destin != null & depart != null){
+			
+			// Conservar rotación en la nueva fase
+			let sat_rot = {
+				T: Satellite.get_sat( destin ).sidereal_rotation_period,
+				t0: Satellite.get_sat( destin ).GST0,
+				tilt: Satellite.get_sat( destin ).orbit.axial_tilt
+			};
+			
+			// Crear un satélite en el punto de simulación
+			let phase_no = Satellite.get_sat( destin ).phase + 1;
+			let vehicle_name = Satellite.get_sat( destin ).name + str( phase_no );
+			new Satellite(
+				vehicle_name, 
+				Satellite.get_sat( destin ).orbited, 
+				Satellite.get_sat( destin ).R,
+				Satellite.get_sat( destin ).m, 
+				Satellite.get_sat( destin ).u, 
+				Satellite.get_sat( destin ).orbit.r, 
+				Satellite.get_sat( destin ).orbit.v, 
+				sat_rot,
+				{
+					da: 0,
+					de: 0,
+					di: 0,
+					dupper_omega: 0,
+					dp: 0
+				},
+				false,
+				phase_no
+			);
+			
+			// Ajustar tiempo inicial
+			let f0_adj = argument_of_periapse_f(
+				Satellite.get_sat( vehicle_name ).orbit.eccentricity,
+				Satellite.get_sat( destin ).orbit.r,
+				Satellite.get_sat( vehicle_name ).orbit.upper_omega,
+				Satellite.get_sat( vehicle_name ).orbit.i
+			).f;
+			Satellite.get_sat( vehicle_name ).orbit.set_t0(null, t_from_f(
+											Satellite.get_sat( vehicle_name ).orbit.type,
+											f0_adj,
+											Satellite.get_sat( vehicle_name ).orbit.e, 
+											Satellite.get_sat( vehicle_name ).orbit.a, 
+											Satellite.get_sat( vehicle_name ).orbit.T,
+											Satellite.get_sat( vehicle_name ).get_gravity()
+										) - s_time
+			);
+			
+			// Modificar intervalo de visibilidad
+			Satellite.get_sat( vehicle_name ).init_set( Satellite.get_sat( destin ).name );
+			Satellite.get_sat( destin ).end_set( vehicle_name );
+			Satellite.ctrl.end_set( vehicle_name );
+			
+			// Ceder el control a los nuevos settings
+			set_center_ctrl( vehicle_name );
+		};
+	};
+	
 	// Clone phase
 	static clone_phase(){
 		

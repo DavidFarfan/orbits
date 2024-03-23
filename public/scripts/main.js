@@ -537,6 +537,14 @@ undock.onclick = () => {
 	Satellite.clone_phase();
 };
 
+// Acoplamiento
+const dock = document.getElementById("dock");
+dock.onclick = () => {
+	
+	// Unir dos satélites en uno
+	Satellite.merge_sats();
+};
+
 // Lanzamiento desde el satélite controlado
 const launch_button = document.getElementById("launch");
 launch_button.onclick = () => {
@@ -894,3 +902,83 @@ setTimeout(function(){
 	set_magnitude();
 	orbitLoop();
 }, 21 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.917';
+	add_time();
+	orbitLoop();
+}, 22 * time_lapse);
+setTimeout(function(){
+	ctrl_sat.value = 'moon';
+	select_sat_ctrl();
+	orbitLoop();
+	PHI = deg_to_rad( 1.111 );
+	slider_lat_set();
+	orbitLoop();
+	LAMBDA = deg_to_rad( 26.59 );
+	slider_long_set();
+	orbitLoop();
+	sight_RA = deg_to_rad( 88 );
+	slider_RA_set();
+	orbitLoop();
+	sight_D = deg_to_rad( 87.3 );
+	slider_D_set();
+	orbitLoop();
+	Satellite.launch();
+	orbitLoop();
+	magnitude_punctual.value = '0.25';
+	set_magnitude();
+	orbitLoop();
+}, 23 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.001806';
+	add_time();
+	orbitLoop();
+}, 24 * time_lapse);
+setTimeout(function(){
+	Satellite.flight_leg();
+	orbitLoop();
+	magnitude_punctual.value = '1.69';
+	set_magnitude();
+	orbitLoop();
+}, 25 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.03698';
+	add_time();
+	orbitLoop();
+}, 26 * time_lapse);
+setTimeout(function(){
+	Satellite.flight_leg();
+	orbitLoop();
+	magnitude_punctual.value = '1.631';
+	set_magnitude();
+	orbitLoop();
+}, 27 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.0821';
+	add_time();
+	orbitLoop();
+}, 28 * time_lapse);
+setTimeout(function(){
+    Satellite.flight_leg();
+	orbitLoop();
+}, 29 * time_lapse);
+setTimeout(function(){
+	vel_x_punctual.value = 1.3428525;
+	add_vel_x();
+	orbitLoop();
+}, 30 * time_lapse);
+setTimeout(function(){
+	vel_y_punctual.value = -0.93307448;
+	add_vel_y();
+	orbitLoop();
+}, 31 * time_lapse);
+setTimeout(function(){
+	vel_z_punctual.value = 0.034479868;
+	add_vel_z();
+	orbitLoop();
+}, 32 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.04';
+	add_time();
+	orbitLoop();
+}, 33 * time_lapse);
