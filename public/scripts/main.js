@@ -545,6 +545,14 @@ dock.onclick = () => {
 	Satellite.merge_sats();
 };
 
+// Fin del vuelo
+const end_sat = document.getElementById("end_sat");
+end_sat.onclick = () => {
+	
+	// Terminar vuelo
+	Satellite.end_flight();
+};
+
 // Lanzamiento desde el satélite controlado
 const launch_button = document.getElementById("launch");
 launch_button.onclick = () => {
@@ -903,14 +911,20 @@ setTimeout(function(){
 	orbitLoop();
 }, 21 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.917';
+    text_time.value = '0.0008';
 	add_time();
 	orbitLoop();
 }, 22 * time_lapse);
 setTimeout(function(){
-	ctrl_sat.value = 'moon';
-	select_sat_ctrl();
+    Satellite.end_flight();
 	orbitLoop();
+}, 23 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.9162';
+	add_time();
+	orbitLoop();
+}, 24 * time_lapse);
+setTimeout(function(){
 	PHI = deg_to_rad( 1.111 );
 	slider_lat_set();
 	orbitLoop();
@@ -928,57 +942,67 @@ setTimeout(function(){
 	magnitude_punctual.value = '0.25';
 	set_magnitude();
 	orbitLoop();
-}, 23 * time_lapse);
-setTimeout(function(){
-    text_time.value = '0.001806';
-	add_time();
-	orbitLoop();
-}, 24 * time_lapse);
-setTimeout(function(){
-	Satellite.flight_leg();
-	orbitLoop();
-	magnitude_punctual.value = '1.69';
-	set_magnitude();
-	orbitLoop();
 }, 25 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.03698';
+    text_time.value = '0.001806';
 	add_time();
 	orbitLoop();
 }, 26 * time_lapse);
 setTimeout(function(){
 	Satellite.flight_leg();
 	orbitLoop();
-	magnitude_punctual.value = '1.631';
+	magnitude_punctual.value = '1.69';
 	set_magnitude();
 	orbitLoop();
 }, 27 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.0821';
+    text_time.value = '0.03698';
 	add_time();
 	orbitLoop();
 }, 28 * time_lapse);
 setTimeout(function(){
-    Satellite.flight_leg();
+	Satellite.flight_leg();
+	orbitLoop();
+	magnitude_punctual.value = '1.631';
+	set_magnitude();
 	orbitLoop();
 }, 29 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.0821';
+	add_time();
+	orbitLoop();
+}, 30 * time_lapse);
+setTimeout(function(){
+    Satellite.flight_leg();
+	orbitLoop();
+}, 31 * time_lapse);
 setTimeout(function(){
 	vel_x_punctual.value = 1.3428525;
 	add_vel_x();
 	orbitLoop();
-}, 30 * time_lapse);
+}, 32 * time_lapse);
 setTimeout(function(){
 	vel_y_punctual.value = -0.93307448;
 	add_vel_y();
 	orbitLoop();
-}, 31 * time_lapse);
+}, 33 * time_lapse);
 setTimeout(function(){
 	vel_z_punctual.value = 0.034479868;
 	add_vel_z();
 	orbitLoop();
-}, 32 * time_lapse);
+}, 34 * time_lapse);
 setTimeout(function(){
     text_time.value = '0.04';
 	add_time();
 	orbitLoop();
-}, 33 * time_lapse);
+}, 35 * time_lapse);
+setTimeout(function(){
+    ctrl_sat.value = 'v0123456';
+	select_sat_ctrl();
+	orbitLoop();
+	ctrl_sat.value = 'v1123';
+	select_sat_ctrl();
+	orbitLoop();
+	Satellite.merge_sats();
+	orbitLoop();
+}, 36 * time_lapse);

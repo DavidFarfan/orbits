@@ -25,7 +25,7 @@ add time: 0.045 							// (1h 5m)
 phase										// orbita lunar circular
 mag: 1.623
 add time: 1.145								// (1d 3h 28m)
-clone										// Desacoplamiento del LM
+undock										// Desacoplamiento del LM
 add time: 0.053								// (1h 16m)
 phase										// Orbita de descenso
 mag: 1.6
@@ -35,9 +35,11 @@ mag: 1.58
 add time: 0.0043							// (6m)
 phase										// Alunizaje, Mar de la tranquilidad
 mag: 1e-2
+add time: 0.0008							// (1m)
+end
+
 											// MOON - EARTH
-add time: 0.917								// (22h)
-ctrl: moon
+add time: 0.9162							// (22h)
 lat: 1.111
 lon: 26.59									// Mar de la tranquilidad
 ra: 88										// Ángulo de lanzamiento
@@ -51,6 +53,9 @@ add time: 0.03698							// (53m)
 phase										// orbita circular
 mag: 1.631
 add time: 0.0821							// Una órbita después (1h 58m)
-phase										// LM/CM rendezvous
+phase										// Órbita hacia el CM
 vel: 1.3428525, -0.93307448, 0.034479868 
 add time: 0.04								// (1h)
+ctrl: v0123456
+ctrl: v1123
+dock										// LM/CM rendezvous

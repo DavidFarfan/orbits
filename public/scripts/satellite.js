@@ -96,6 +96,16 @@ class Satellite{
 		);
 	};
 	
+	// End flight
+	static end_flight(){
+		
+		// Modificar intervalo de visibilidad
+		Satellite.ctrl.end_set( Satellite.ctrl.orbited );
+		
+		// Ceder el control al cuerpo orbitado
+		set_center_ctrl( Satellite.ctrl.orbited );
+	};
+	
 	// Merge satellites
 	static merge_sats(){
 		
@@ -533,6 +543,9 @@ class Satellite{
 										Satellite.get_sat( vehicle_name ).get_gravity()
 									) - s_time
 		);
+		
+		// Modificar intervalo de visibilidad
+		Satellite.get_sat( vehicle_name ).init_set( Satellite.ctrl.name );
 		
 		// Ceder el control al vehículo
 		set_center_ctrl( vehicle_name );
