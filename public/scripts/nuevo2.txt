@@ -59,3 +59,14 @@ add time: 0.04								// (1h)
 ctrl: v0123456
 ctrl: v1123
 dock										// LM/CM rendezvous
+add time: 0.3								// (7h  12m)
+phase										// inyección transtierra
+mag: 2.548
+add time: 0.6								// (14h 24m)
+phase										// salida del SOI
+center: earth
+add time: 2.3176							// (2d 7h 37m)
+phase										// Amerizaje Oceano Pacifico
+mag: 1e-2	
+add time: 0.0008							// (1m)
+end								

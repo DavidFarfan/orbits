@@ -1006,3 +1006,50 @@ setTimeout(function(){
 	Satellite.merge_sats();
 	orbitLoop();
 }, 36 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.3';
+	add_time();
+	orbitLoop();
+}, 37 * time_lapse);
+setTimeout(function(){
+	Satellite.flight_leg();
+	orbitLoop();
+	magnitude_punctual.value = '2.548';
+	set_magnitude();
+	orbitLoop();
+}, 38 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.6';
+	add_time();
+	orbitLoop();
+}, 39 * time_lapse);
+setTimeout(function(){
+    Satellite.flight_leg();
+	orbitLoop();
+}, 40 * time_lapse);
+setTimeout(function(){
+    adj_center.value = 'earth';
+	adjust_center();
+	orbitLoop();
+}, 41 * time_lapse);
+setTimeout(function(){
+    text_time.value = '2.3176';
+	add_time();
+	orbitLoop();
+}, 42 * time_lapse);
+setTimeout(function(){
+	Satellite.flight_leg();
+	orbitLoop();
+	magnitude_punctual.value = '1e-2';
+	set_magnitude();
+	orbitLoop();
+}, 43 * time_lapse);
+setTimeout(function(){
+    text_time.value = '0.0008';
+	add_time();
+	orbitLoop();
+}, 44 * time_lapse);
+setTimeout(function(){
+    Satellite.end_flight();
+	orbitLoop();
+}, 45 * time_lapse);
