@@ -1275,52 +1275,6 @@ function launch_dir(ra, d, longitude, latitude, GST, radius, vel_mag){
 	};
 };
 
-// POSICIÓN EN LA ESFERA CELESTE
-function celestial_sphere_pos(ra, d, longitude, latitude, GST){
-	
-	// Meridiano local
-	let ref = -1;	// Hacia el sur en latitud norte
-	let d_ra = -LST(GST, longitude); // Diferencial del ángulo de rotación
-	if(latitude < 0){
-		ref *= -1;	// Hacia el norte en latitud sur
-	};
-	
-	// Dirección
-	let pos = x_rot(	// Ecuador
-		z_rot(		// Dirección sur
-			x_rot(	// Altura
-				{
-					x: 0,
-					y: ref,
-					z: 0
-				},
-				ref * d
-			),
-			ref * ( ra + d_ra )
-		),
-		ref * ( PI / 2 - latitude )
-	);
-	
-	// Orientar el norte hacia arriba
-	if(latitude < 0){
-		pos.y *= -1;
-	};
-	
-	// Orientar el este hacia la derecha
-	pos.x *= -1;
-	
-	// Obtener hora
-	let ref_vec = y_rot( x_rot( pos, -latitude ), -PI / 2 );
-	let hour = angle_vec({
-		x: ref_vec.x,
-		y: ref_vec.z
-	});
-	return {
-		pos: pos,
-		hour: hour
-	};
-};
-
 //-------RENDEZVOUS/TARGETING------------------
 
 // CHORD Y SEMI-PERIMETER

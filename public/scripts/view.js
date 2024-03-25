@@ -86,23 +86,23 @@ class View{
 	// Info. Básica de simulación
 	static print_basic(){
 		
-		// Sistema de coordenadas
+		// Sistema de Coordenadas
 		request.push([
 			'print', 
-			"coordinate system: SE in J2000",
+			"SE J2000",
 			10, 
 			height_p( 1 ) - 10,
 			'WHITE'
 		]);
 		
-		// Parámetro gravitacional del cuerpo orbitado (km^3/s^2)
-		let GM = 0;
-		if(Satellite.ctrl.orbited != null){
-			GM = Satellite.ctrl.get_gravity();
-		};
+		// Lanzamiento (deg)
 		request.push([
 			'print', 
-			"G (km^3/s^2) = " + str( significant( GM, 4 ) ),
+			"Launch Settings from " + Satellite.ctrl.name + 
+			" -> RA: " + str( significant( rad_to_deg( sight_RA ), 4 ) ) + 
+			" -> D: " + str( significant( rad_to_deg( sight_D ), 4 ) ) + 
+			" -> lat: " + str( significant( rad_to_deg( PHI ), 4 ) ) + 
+			"° lon: " + str( significant( rad_to_deg( LAMBDA ), 4 ) ) + "°",
 			10, 
 			height_p( 1 ) - 20,
 			'WHITE'
@@ -117,21 +117,37 @@ class View{
 			'WHITE'
 		]);
 		
-		// Tiempo de simulación (eday)
+		// Tiempo de simulación absoluto (eday) y de órbita
 		request.push([
 			'print', 
-			"simul time (eday) = " + str( significant( to_eday( s_time ), 4 ) ),
+			"simul time (eday) = " + str( significant( to_eday( s_time ), 4 ) ) +
+			", orbit sim. time (eday) = " + str( significant( to_eday( Satellite.ctrl.orbit.t ), 4 ) ),
 			10, 
 			height_p( 1 ) - 40,
 			'WHITE'
 		]);
 		
-		// Tiempo de órbita (eday)
+		// Fecha (TT) y Siglos desde el Epoch
+		let date = new Date( s_to_ms( s_time ) + EPOCH_J2000.getTime() );
 		request.push([
 			'print', 
-			"orbit sim. time (eday) = " + str( significant( to_eday( Satellite.ctrl.orbit.t ), 4 ) ),
+			"Date (TT) = " + str( date.toUTCString() ) +
+			", dt (Cy) = " + str( significant( to_century( s_time ), 4 ) ),
 			10, 
 			height_p( 1 ) - 50,
+			'WHITE'
+		]);
+		
+		// Parámetro gravitacional del cuerpo orbitado (km^3/s^2)
+		let GM = 0;
+		if(Satellite.ctrl.orbited != null){
+			GM = Satellite.ctrl.get_gravity();
+		};
+		request.push([
+			'print', 
+			"G (km^3/s^2) = " + str( significant( GM, 4 ) ),
+			10, 
+			height_p( 1 ) - 60,
 			'WHITE'
 		]);
 		
@@ -143,15 +159,6 @@ class View{
 				+ str( significant( to_er( center.y ), 4 ) ) + ", " 
 				+ str( significant( to_er( center.z ), 4 ) ) 
 			+ " ]",
-			10, 
-			height_p( 1 ) - 60,
-			'WHITE'
-		]);
-		
-		// Siglos desde el Epoch
-		request.push([
-			'print', 
-			"dt (Cy) = " + str( to_century( s_time ) ),
 			10, 
 			height_p( 1 ) - 70,
 			'WHITE'
@@ -204,213 +211,6 @@ class View{
 			origin.x - 1e2 - 10, 
 			origin.y,
 			'CYAN'
-		]);
-		
-		//--------DATOS DEL PUNTO SOBRE LA SUPERFICIE--------
-		
-		// Coordenadas (deg)
-		request.push([
-			'print', 
-			"Orbited from " + Satellite.ctrl.name + 
-			" -> RA: " + str( significant( rad_to_deg( sight_RA ), 4 ) ) + 
-			" -> D: " + str( significant( rad_to_deg( sight_D ), 4 ) ) + 
-			" -> lat: " + str( significant( rad_to_deg( PHI ), 4 ) ) + 
-			"° lon: " + str( significant( rad_to_deg( LAMBDA ), 4 ) ) + "°",
-			10, 
-			10,
-			'WHITE'
-		]);
-		
-		//--------DATOS DEL PUNTO MONITOREADO-----------
-		
-		// Coordenadas del cuerpo orbitado
-		let p_q = Satellite.ctrl.pointing_to_orbited();
-		
-		// Right ascension
-		request.push([
-			'print', 
-			"RA = " + str( p_q.alpha ) + " rad",
-			10, 
-			20,
-			'WHITE'
-		]);
-		
-		// Declination
-		request.push([
-			'print', 
-			"D = " + str( p_q.delta ) + " rad",
-			10,
-			30,
-			'WHITE'
-		]);
-		
-		// Hora sideral del meridiano cero (rad)
-		request.push([
-			'print', 
-			"GST = " + str( Satellite.ctrl.GST ) + " rad",
-			10, 
-			40,
-			'WHITE'
-		]);
-		
-		// Fecha (TT)
-		let date = new Date( s_to_ms( s_time ) + EPOCH_J2000.getTime() );
-		request.push([
-			'print', 
-			"Date (TT) = " + str( date ),
-			10, 
-			50,
-			'WHITE'
-		]);
-		
-		// Hora universal coordinada
-		let sun_sky = celestial_sphere_pos(p_q.alpha, p_q.delta, LAMBDA, PHI, Satellite.ctrl.GST);
-		request.push([
-			'print', 
-			"Real UTC = " + hour_string( rad_to_h_m_s( sun_sky.hour ) ),
-			10, 
-			60,
-			'WHITE'
-		]);
-		request.push([
-			'print', 
-			"sun x = " + str( significant( sun_sky.pos.x, 4 ) ) + 
-			", sun y = " + str( significant( sun_sky.pos.y, 4 ) ) + 
-			", sun z = " + str( significant( sun_sky.pos.z, 4 ) ),
-			10, 
-			70,
-			'WHITE'
-		]);
-		let color;
-		if(sun_sky.pos.z > 0){
-			color = 'CYAN';
-		}else{
-			color = 'GREY'
-		};
-		
-		// Center body
-		request.push([
-			'circle', 
-			origin.x + sun_sky.pos.x * 1e2,
-			origin.y + sun_sky.pos.y * 1e2, 
-			2,
-			color
-		]);
-		
-		// North position over location
-		let north_sky = celestial_sphere_pos(0, PI / 2, LAMBDA, PHI, Satellite.ctrl.GST);
-		request.push([
-			'print', 
-			"north x = " + str( significant( north_sky.pos.x, 4 ) ) + 
-			", north y = " + str( significant( north_sky.pos.y, 4 ) ) + 
-			", north z = " + str( significant( north_sky.pos.z, 4 ) ),
-			10, 
-			80,
-			'WHITE'
-		]);
-		if(north_sky.pos.z > 0){
-			color = 'RED';
-		}else{
-			color = 'GREY'
-		};
-		
-		// North
-		request.push([
-			'circle', 
-			origin.x + north_sky.pos.x * 1e2,
-			origin.y + north_sky.pos.y * 1e2, 
-			1,
-			color
-		]);
-		
-		// South position over location
-		let south_sky = celestial_sphere_pos(0, -PI / 2, LAMBDA, PHI, Satellite.ctrl.GST);
-		request.push([
-			'print', 
-			"south x = " + str( significant( south_sky.pos.x, 4 ) ) + 
-			", south y = " + str( significant( south_sky.pos.y, 4 ) ) + 
-			", south z = " + str( significant( south_sky.pos.z, 4 ) ),
-			10, 
-			90,
-			'WHITE'
-		]);
-		if(south_sky.pos.z > 0){
-			color = 'RED';
-		}else{
-			color = 'GREY'
-		};
-		
-		// South
-		request.push([
-			'circle', 
-			origin.x + south_sky.pos.x * 1e2,
-			origin.y + south_sky.pos.y * 1e2, 
-			1,
-			color
-		]);
-		
-		// Local meridian of location from location
-		let local_sky = celestial_sphere_pos(
-			LST( Satellite.ctrl.GST, LAMBDA ),
-			0,
-			LAMBDA,
-			PHI,
-			Satellite.ctrl.GST
-		);
-		request.push([
-			'print', 
-			"local x = " + str( significant( local_sky.pos.x, 4 ) ) + 
-			", local y = " + str( significant( local_sky.pos.y, 4 ) ) + 
-			", local z = " + str( significant( local_sky.pos.z, 4 ) ),
-			10, 
-			100,
-			'WHITE'
-		]);
-		if(local_sky.pos.z > 0){
-			color = 'BLUE';
-		}else{
-			color = 'GREY'
-		};
-		
-		// Local meridian
-		request.push([
-			'circle', 
-			origin.x + local_sky.pos.x * 1e2,
-			origin.y + local_sky.pos.y * 1e2, 
-			1,
-			color
-		]);
-		
-		// East of location from location
-		let east_sky = celestial_sphere_pos(
-			LST( Satellite.ctrl.GST, LAMBDA ) + PI / 2,
-			0,
-			LAMBDA,
-			PHI,
-			Satellite.ctrl.GST
-		);
-		request.push([
-			'print', 
-			"east x = " + str( significant( east_sky.pos.x, 4 ) ) + 
-			", east y = " + str( significant( east_sky.pos.y, 4 ) ) + 
-			", east z = " + str( significant( east_sky.pos.z, 4 ) ),
-			10, 
-			110,
-			'WHITE'
-		]);
-		if(east_sky.pos.z > 0){
-			color = 'GREEN';
-		}else{
-			color = 'GREY'
-		};
-		
-		// East
-		request.push([
-			'circle', 
-			origin.x + east_sky.pos.x * 1e2,
-			origin.y + east_sky.pos.y * 1e2, 
-			1,
-			color
 		]);
 	};
 	

@@ -600,7 +600,7 @@ class Satellite{
 		return true;
 	};
 	
-	// Coordenadas de aterrizaje (por bisección)
+	// Coordenadas de aterrizaje
 	landing_coordinates(){
 		if(this.orbited != null){
 			
