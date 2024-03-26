@@ -45,10 +45,7 @@ const E_INITIAL_TRUE_ANOMALY = M_from_t( // f J2000.0 (rad)
 	period( E_INITIAL_SEMI_MAJOR_AXIS, SUN_U ),
 	-2.59 * EDAY // Ángulo obtenido empíricamente (s)
 );
-const E_INITIAL_GST = rad_to_s(M_from_t( // GST J2000.0, i.e 12:00 aprox. (s)
-	E_SIDEREAL_ROTATION_PERIOD,
-	25427 // Segundos desde FPOA en J2000, obtenido empíricamente (s)
-));
+const E_INITIAL_GST = 23600; // Segundos desde FPOA en J2000, obtenido empíricamente (s)
 const E_DIFF_SEMI_MAJOR_AXIS = -0.00000003 * AU; // Cambio del Semi-eje mayor J2000 (km/Cy)
 const E_DIFF_ECCENTRICITY = -0.00003661; // Cambio de la Excentricidad J2000 (1/Cy)
 const E_DIFF_INCLINATION = deg_to_rad( 0.01337178 ); // Cambio de la Inclinación J2000 (rad/Cy)

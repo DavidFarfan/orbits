@@ -212,6 +212,45 @@ class View{
 			origin.y,
 			'CYAN'
 		]);
+		
+		// Posición en la esfera celeste
+		let sphere_pos = Satellite.celestial_sphere();
+		let color;
+		if(sphere_pos.vec_r.x > 0){
+			color = 'YELLOW';
+		}else{
+			color = 'RED';
+		};
+		request.push([
+			'circle',
+			origin.x + 1e2 * sphere_pos.vec_r.y,
+			origin.y + 1e2 * sphere_pos.vec_r.z,
+			3,
+			color
+		]);
+		
+		// Posición en la esfera celeste
+		if(sphere_pos.vec_launch.x > 0){
+			color = 'CYAN';
+		}else{
+			color = 'GREY';
+		};
+		request.push([
+			'circle',
+			origin.x + 1e2 * sphere_pos.vec_launch.y,
+			origin.y + 1e2 * sphere_pos.vec_launch.z,
+			3,
+			color
+		]);
+		
+		// Posición de la cámara (er)
+		request.push([
+			'print', 
+			str( destin ) + " seen from " + str( depart ),
+			10, 
+			10,
+			'WHITE'
+		]);
 	};
 	
 	// Impresión de las magnitudes

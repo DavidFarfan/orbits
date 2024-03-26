@@ -487,6 +487,93 @@ class Satellite{
 		set_center_ctrl( pass_name );
 	};
 	
+	// Esfera celeste
+	static celestial_sphere(print){
+		
+		// coordenadas del destino desde el origen
+		if(destin != null & depart != null){
+			
+			// Coordenadas absolutas de los objetos 
+			let absolute_pos_center = Satellite.ctrl.get_absolute_r();
+			let absolute_pos_destin = Satellite.get_sat( destin ).get_absolute_r();
+			
+			// Coordenadas ajustadas al centro del target
+			let destin_from_depart = sum_vec(
+				absolute_pos_destin,
+				prod_by_sc( -1, absolute_pos_center )
+			);
+			
+			// surface position
+			let vec_r = normalize_vec( destin_from_depart );
+			
+			// hypotetical launch
+			let vec_launch = normalize_vec(Satellite.ctrl.launch_trajectory(
+				sight_RA,
+				sight_D,
+				LAMBDA,
+				PHI,
+				1
+			).vel);
+			
+			// Set en coordenadas absolutas
+			if(print){
+				log('ecli');
+				log('ref vec: ');
+				log(vec_launch);
+				log('pos vec: ');
+				log(vec_r);
+			};
+			
+			// rotacion 1
+			let lambda_angle = angle_vec({
+				x: vec_launch.x,
+				y: vec_launch.y
+			});
+			vec_launch = z_rot( vec_launch, -lambda_angle );
+			vec_r = z_rot( vec_r, -lambda_angle );
+			if(print){
+				log('rot 1');
+				log('ref vec: ');
+				log(vec_launch);
+				log('pos vec: ');
+				log(vec_r);
+			};
+						
+			// rotacion 2
+			let phi_angle = abs( atan( vec_launch.z / vec_launch.x ) );
+			if(vec_launch.z < 0){
+				phi_angle *= -1;
+			};
+			vec_launch = y_rot( vec_launch, phi_angle );
+			vec_r = y_rot( vec_r, phi_angle );
+			if(print){
+				log('rot 2');
+				log('ref vec: ');
+				log(vec_launch);
+				log('pos vec: ');
+				log(vec_r);
+			};
+			
+			// Devolver coordenadas aspecto en la esfera
+			return {
+				vec_launch: vec_launch,
+				vec_r: vec_r
+			};
+		};
+		return {
+			vec_launch: {
+				x: -1,
+				y: 0,
+				z: 0
+			},
+			vec_r: {
+				x: -1,
+				y: 0,
+				z: 0
+			}
+		};
+	};
+	
 	// Lanzamineto de un vehiculo desde superficie planetaria
 	static launch(){
 		

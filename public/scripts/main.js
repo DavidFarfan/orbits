@@ -592,8 +592,8 @@ targeting_button.onclick = () => {
 };
 
 //-------PROGRAMA PRINCIPAL-----------
-// OBJETOS A SIMULAR
 
+// OBJETOS A SIMULAR
 // Sol (Cuerpo inicial)
 Satellite.sat_from_orbit(
 	'sun',
@@ -762,6 +762,7 @@ orbitLoop();
 ctrl_sat.value = 'earth';
 select_sat_ctrl();
 orbitLoop();
+/*
 PHI = deg_to_rad( 27.9 );
 slider_lat_set();
 orbitLoop();
@@ -1053,3 +1054,4 @@ setTimeout(function(){
     Satellite.end_flight();
 	orbitLoop();
 }, 45 * time_lapse);
+*/
