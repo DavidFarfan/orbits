@@ -382,6 +382,11 @@ function to_er(km){
 	return km / ER;
 };
 
+// KILÓMETROS A MILLAS
+function to_mile(km){
+	return km / 1.609;
+};
+
 //------CURVAS PARAMÉTRICAS-----------
 
 // TRANSFORMACIÓN DE PUNTO EN COORDENADAS POLARES A CARTESIANAS

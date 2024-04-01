@@ -1429,17 +1429,58 @@ class Satellite{
 		*/
 		
 		// Aterrizaje
-		let land_coords = this.landing_coordinates();
-		request.push([ 
-			'print',
-			'land: lambda = ' +
-			str( significant( rad_to_deg( land_coords.lambda ), 4 ) ) +
-			', phi = ' +
-			str( significant( rad_to_deg( land_coords.phi ), 4 ) ), 
-			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
-			to_px( print_pos[c2] + this.orbit.r[c2] ) + 20,
-			color
-		]);
+		if(this.orbited != null){
+			let land_coords = this.landing_coordinates();
+			request.push([ 
+				'print',
+				'land: lambda = ' +
+				str( significant( rad_to_deg( land_coords.lambda ), 4 ) ) +
+				', phi = ' +
+				str( significant( rad_to_deg( land_coords.phi ), 4 ) ), 
+				to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+				to_px( print_pos[c2] + this.orbit.r[c2] ) + 20,
+				color
+			]);
+			
+			// Distancia a la superficie (er)
+			let r_print = norm_vec( Satellite.ctrl.orbit.r ) - Satellite.get_sat(this.orbited).R;
+			request.push([
+				'print', 
+				"|| r || (er) = "
+					+ str( significant( to_er( r_print ), 4 ) )
+					+ ", (mile) ="
+					+ str( significant( to_mile( r_print ), 4 ) ),
+				to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+				to_px( print_pos[c2] + this.orbit.r[c2] ) + 30,
+				'WHITE'
+			]);
+			
+			// Distancia mínima a la superficie (er)
+			let rp_print = Satellite.ctrl.orbit.perturbation.rp - Satellite.get_sat(this.orbited).R;
+			request.push([
+				'print', 
+				"|| rp || (er) = "
+					+ str( significant( to_er( rp_print ), 4 ) )
+					+ ", (mile) ="
+					+ str( significant( to_mile( rp_print ), 4 ) ),
+				to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+				to_px( print_pos[c2] + this.orbit.r[c2] ) + 40,
+				'WHITE'
+			]);
+			
+			// Apoapse (er)
+			let ra_print = Satellite.ctrl.orbit.perturbation.ra - Satellite.get_sat(this.orbited).R;
+			request.push([
+				'print', 
+				"|| ra || (er) = "
+					+ str( significant( to_er( ra_print ), 4 ) )
+					+ ", (mile) ="
+					+ str( significant( to_mile( ra_print ), 4 ) ),
+				to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
+				to_px( print_pos[c2] + this.orbit.r[c2] ) + 50,
+				'WHITE'
+			]);
+		};
 	};
 	
 	// Variables del satélite

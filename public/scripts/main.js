@@ -756,56 +756,41 @@ let time_lapse = 400;
 select_date.value = '1969-07-16';
 apply_time();
 orbitLoop();
-text_time.value = '0.0833333';
+text_time.value = '0.0637';
 add_time();
 orbitLoop();
 ctrl_sat.value = 'earth';
 select_sat_ctrl();
 orbitLoop();
-/*
-PHI = deg_to_rad( 27.9 );
+PHI = deg_to_rad( 28.5 );
 slider_lat_set();
 orbitLoop();
-LAMBDA = deg_to_rad( -81.0 );
+LAMBDA = deg_to_rad( -80.5 );
 slider_long_set();
 orbitLoop();
-sight_RA = deg_to_rad( -97.2 );
+sight_RA = deg_to_rad( -108 );
 slider_RA_set();
 orbitLoop();
-sight_D = deg_to_rad( 84.6 );
+sight_D = deg_to_rad( 88 );
 slider_D_set();
 orbitLoop();
 Satellite.launch();
 orbitLoop();
-magnitude_punctual.value = '1.8';
+magnitude_punctual.value = '1.872';
 set_magnitude();
 orbitLoop();
-text_time.value = '0.0021875049';
+text_time.value = '0.0022905';
 add_time();
 orbitLoop();
 setTimeout(function(){
     Satellite.flight_leg();
 	orbitLoop();
-	magnitude_punctual.value = '7.81';
+	magnitude_punctual.value = '7.7992';
 	set_magnitude();
 	orbitLoop();
 }, 1 * time_lapse);
 setTimeout(function(){
-    PHI = deg_to_rad( 0 );
-	slider_lat_set();
-	orbitLoop();
-	LAMBDA = deg_to_rad( 0 );
-	slider_long_set();
-	orbitLoop();
-	sight_RA = deg_to_rad( 0 );
-	slider_RA_set();
-	orbitLoop();
-	sight_D = deg_to_rad( 90 );
-	slider_D_set();
-	orbitLoop();
-}, 2 * time_lapse);
-setTimeout(function(){
-    text_time.value = '0.08';
+    text_time.value = '0.0827';
 	add_time();
 	orbitLoop();
 }, 2 * time_lapse);
@@ -814,22 +799,22 @@ setTimeout(function(){
 	orbitLoop();
 }, 3 * time_lapse);
 setTimeout(function(){
-	vel_x_punctual.value = 0.6063469937;
+	vel_x_punctual.value = 0.8079985273;
 	add_vel_x();
 	orbitLoop();
 }, 4 * time_lapse);
 setTimeout(function(){
-	vel_y_punctual.value = -10.8905;
+	vel_y_punctual.value = -10.92071;
 	add_vel_y();
 	orbitLoop();
 }, 5 * time_lapse);
 setTimeout(function(){
-	vel_z_punctual.value = -1.098515030;
+	vel_z_punctual.value = 0.2612537019;
 	add_vel_z();
 	orbitLoop();
 }, 6 * time_lapse);
 setTimeout(function(){
-    text_time.value = '2.23';
+    text_time.value = '2.29';
 	add_time();
 	orbitLoop();
 }, 7 * time_lapse);
@@ -843,31 +828,31 @@ setTimeout(function(){
 	orbitLoop();
 }, 9 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.6475';
+    text_time.value = '0.661';
 	add_time();
 	orbitLoop();
 }, 10 * time_lapse);
 setTimeout(function(){
     Satellite.flight_leg();
 	orbitLoop();
-	magnitude_punctual.value = '1.52';
+	magnitude_punctual.value = '1.504';
 	set_magnitude();
 	orbitLoop();
 }, 11 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.045';
+    text_time.value = '0.312';
 	add_time();
 	orbitLoop();
 }, 12 * time_lapse);
 setTimeout(function(){
     Satellite.flight_leg();
 	orbitLoop();
-	magnitude_punctual.value = '1.623';
+	magnitude_punctual.value = '1.628';
 	set_magnitude();
 	orbitLoop();
 }, 13 * time_lapse);
 setTimeout(function(){
-    text_time.value = '1.145';
+    text_time.value = '.9';
 	add_time();
 	orbitLoop();
 }, 14 * time_lapse);
@@ -876,31 +861,31 @@ setTimeout(function(){
 	orbitLoop();
 }, 15 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.053';
+    text_time.value = '0.05';
 	add_time();
 	orbitLoop();
 }, 16 * time_lapse);
 setTimeout(function(){
 	Satellite.flight_leg();
 	orbitLoop();
-	magnitude_punctual.value = '1.6';
+	magnitude_punctual.value = '1.6055';
 	set_magnitude();
 	orbitLoop();
 }, 17 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.036';
+    text_time.value = '0.032';
 	add_time();
 	orbitLoop();
 }, 18 * time_lapse);
 setTimeout(function(){
 	Satellite.flight_leg();
 	orbitLoop();
-	magnitude_punctual.value = '1.58';
+	magnitude_punctual.value = '.6';
 	set_magnitude();
 	orbitLoop();
 }, 19 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.0043';
+    text_time.value = '0.002';
 	add_time();
 	orbitLoop();
 }, 20 * time_lapse);
@@ -912,7 +897,7 @@ setTimeout(function(){
 	orbitLoop();
 }, 21 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.0008';
+    text_time.value = '0.0003';
 	add_time();
 	orbitLoop();
 }, 22 * time_lapse);
@@ -921,55 +906,55 @@ setTimeout(function(){
 	orbitLoop();
 }, 23 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.9162';
+    text_time.value = '0.826';
 	add_time();
 	orbitLoop();
 }, 24 * time_lapse);
 setTimeout(function(){
-	PHI = deg_to_rad( 1.111 );
+	PHI = deg_to_rad( -3.833 );
 	slider_lat_set();
 	orbitLoop();
-	LAMBDA = deg_to_rad( 26.59 );
+	LAMBDA = deg_to_rad( 23.27 );
 	slider_long_set();
 	orbitLoop();
 	sight_RA = deg_to_rad( 88 );
 	slider_RA_set();
 	orbitLoop();
-	sight_D = deg_to_rad( 87.3 );
+	sight_D = deg_to_rad( 80 );
 	slider_D_set();
 	orbitLoop();
 	Satellite.launch();
 	orbitLoop();
-	magnitude_punctual.value = '0.25';
+	magnitude_punctual.value = '0.245';
 	set_magnitude();
 	orbitLoop();
 }, 25 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.001806';
+    text_time.value = '0.0017452';
 	add_time();
 	orbitLoop();
 }, 26 * time_lapse);
 setTimeout(function(){
 	Satellite.flight_leg();
 	orbitLoop();
-	magnitude_punctual.value = '1.69';
+	magnitude_punctual.value = '1.688';
 	set_magnitude();
 	orbitLoop();
 }, 27 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.03698';
+    text_time.value = '0.038';
 	add_time();
 	orbitLoop();
 }, 28 * time_lapse);
 setTimeout(function(){
 	Satellite.flight_leg();
 	orbitLoop();
-	magnitude_punctual.value = '1.631';
+	magnitude_punctual.value = '1.637';
 	set_magnitude();
 	orbitLoop();
 }, 29 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.0821';
+    text_time.value = '0.1';
 	add_time();
 	orbitLoop();
 }, 30 * time_lapse);
@@ -978,22 +963,22 @@ setTimeout(function(){
 	orbitLoop();
 }, 31 * time_lapse);
 setTimeout(function(){
-	vel_x_punctual.value = 1.3428525;
+	vel_x_punctual.value = -1.012431597;
 	add_vel_x();
 	orbitLoop();
 }, 32 * time_lapse);
 setTimeout(function(){
-	vel_y_punctual.value = -0.93307448;
+	vel_y_punctual.value = -1.215872938;
 	add_vel_y();
 	orbitLoop();
 }, 33 * time_lapse);
 setTimeout(function(){
-	vel_z_punctual.value = 0.034479868;
+	vel_z_punctual.value = -0.4382975302;
 	add_vel_z();
 	orbitLoop();
 }, 34 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.04';
+    text_time.value = '0.036';
 	add_time();
 	orbitLoop();
 }, 35 * time_lapse);
@@ -1008,19 +993,19 @@ setTimeout(function(){
 	orbitLoop();
 }, 36 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.3';
+    text_time.value = '0.28';
 	add_time();
 	orbitLoop();
 }, 37 * time_lapse);
 setTimeout(function(){
 	Satellite.flight_leg();
 	orbitLoop();
-	magnitude_punctual.value = '2.548';
+	magnitude_punctual.value = '2.58';
 	set_magnitude();
 	orbitLoop();
 }, 38 * time_lapse);
 setTimeout(function(){
-    text_time.value = '0.6';
+    text_time.value = '0.58';
 	add_time();
 	orbitLoop();
 }, 39 * time_lapse);
@@ -1034,7 +1019,7 @@ setTimeout(function(){
 	orbitLoop();
 }, 41 * time_lapse);
 setTimeout(function(){
-    text_time.value = '2.3176';
+    text_time.value = '2.2648';
 	add_time();
 	orbitLoop();
 }, 42 * time_lapse);
@@ -1054,4 +1039,3 @@ setTimeout(function(){
     Satellite.end_flight();
 	orbitLoop();
 }, 45 * time_lapse);
-*/

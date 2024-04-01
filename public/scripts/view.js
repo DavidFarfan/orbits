@@ -678,8 +678,8 @@ class View{
 				+ str( significant( rad_to_deg( Satellite.ctrl.orbit.fo ), 4 ) )
 			+ ", "
 				+ str( significant( rad_to_deg( Satellite.ctrl.orbit.perturbation.fo ), 4 ) ),
-			width_p( .65 ),
-			height_p( 1 ) - 10,
+			10,
+			140,
 			'WHITE'
 		]);
 		
@@ -690,8 +690,8 @@ class View{
 				+ str( significant( to_eday( Satellite.ctrl.orbit.T ), 6 ) )
 			+ ", "
 				+ str( significant( to_eday( Satellite.ctrl.orbit.perturbation.T ), 6 ) ),
-			width_p( .65 ),
-			height_p( 1 ) - 20,
+			10,
+			150,
 			'WHITE'
 		]);
 		
@@ -702,8 +702,8 @@ class View{
 				+ str( significant( to_er( Satellite.ctrl.orbit.ra ), 4 ) )
 			+ ", "
 				+ str( significant( to_er( Satellite.ctrl.orbit.perturbation.ra ), 4 ) ),
-			width_p( .65 ),
-			height_p( 1 ) - 30,
+			10,
+			160,
 			'WHITE'
 		]);
 		
@@ -714,8 +714,8 @@ class View{
 				+ str( significant( rad_to_deg( Satellite.ctrl.orbit.delta_angle ), 4 ) )
 			+ ", "
 				+ str( significant( rad_to_deg( Satellite.ctrl.orbit.perturbation.delta_angle ), 4 ) ),
-			width_p( .65 ),
-			height_p( 1 ) - 40,
+			10,
+			170,
 			'WHITE'
 		]);
 		
@@ -726,8 +726,8 @@ class View{
 				+ str( significant( Satellite.ctrl.orbit.vx, 4 ) )
 			+ ", "
 				+ str( significant( Satellite.ctrl.orbit.perturbation.vx, 4 ) ),
-			width_p( .65 ),
-			height_p( 1 ) - 50,
+			10,
+			180,
 			'WHITE'
 		]);
 	};

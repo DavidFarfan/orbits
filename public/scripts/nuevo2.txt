@@ -1,71 +1,71 @@
 											// APOLLO 11
 											// EARTH - MOON
 date: 16/07/1969
-add time: 0.0833333 						// Hora de lanzamiento
+add time: 0.0637							// Hora de lanzamiento
 ctrl: earth
-lat: 27.9
-lon: -81.0 									// Florida
-ra: -97.2  									// Ángulo de lanzamiento
-d: 84.6 
+lat: 28.5
+lon: -80.5 									// Florida
+ra: -108  									// Ángulo de lanzamiento
+d: 88
 launch
-mag: 1.8
-add time: 0.0021875049 						// (189 s) 
+mag: 1.872
+add time: 0.0022905							// (3.29 m) 
 phase 										// orbita terrestre
-mag: 7.81
-add time: 0.08 								// (1 h 55 m)
+mag: 7.7992
+add time: 0.0827 							// (1 h 59 m)
 phase 										// inyección translunar
-vel: 0.6063469937, -10.8905, -1.098515030
-add time: 2.23 								// (2d 5h 31m)
+vel: 0.8079985273, -10.92071, 0.2612537019
+add time: 2.29 								// (2d 6h 57m)
 phase 										// SOI de la luna
 center: moon
-add time: 0.648 							// (15h 33m)
+add time: 0.661 							// (15h 52m)
 phase										// orbita lunar eliptica
-mag: 1.52
-add time: 0.045 							// (1h 5m)
+mag: 1.504
+add time: 0.312 							// (1h 5m)
 phase										// orbita lunar circular
-mag: 1.623
-add time: 1.145								// (1d 3h 28m)
+mag: 1.628
+add time: 0.9								// (21h 36m)
 undock										// Desacoplamiento del LM
-add time: 0.053								// (1h 16m)
+add time: 0.05								// (1h 12m)
 phase										// Orbita de descenso
-mag: 1.6
-add time: 0.036								// (52m)
+mag: 1.605
+add time: 0.032								// (46m)
 phase										// Motor de descenso
-mag: 1.58
-add time: 0.0043							// (6m)
+mag: .6
+add time: 0.002								// (3m)
 phase										// Alunizaje, Mar de la tranquilidad
 mag: 1e-2
-add time: 0.0008							// (1m)
+add time: 0.0003							// (0m)
 end
 
 											// MOON - EARTH
-add time: 0.9162							// (22h)
-lat: 1.111
-lon: 26.59									// Mar de la tranquilidad
+add time: 0.85								// (20h 24m)
+lat: -3.833
+lon: 23.27									// Mar de la tranquilidad
 ra: 88										// Ángulo de lanzamiento
-d: 87.3
+d: 30
 launch
-mag: 0.25
-add time: 0.0018							// (2.5m)
+mag: 0.245
+add time: 0.0017452							// (2.5m)
 phase										// orbita inicial
-mag: 1.69
-add time: 0.03698							// (53m)
+mag: 1.688
+add time: 0.038								// (54m)
 phase										// orbita circular
-mag: 1.631
-add time: 0.0821							// Una órbita después (1h 58m)
+mag: 1.637
+add time: 0.1								// Una órbita después (2h 24m)
 phase										// Órbita hacia el CM
-vel: 1.3428525, -0.93307448, 0.034479868 
-add time: 0.04								// (1h)
+vel: -1.012431597, -1.215872938, -0.4382975302
+add time: 0.036								// (51m)
 ctrl: v0123456
 ctrl: v1123
 dock										// LM/CM rendezvous
-add time: 0.3								// (7h  12m)
+add time: 0.28								// (6h 43m)
 phase										// inyección transtierra
-mag: 2.548
-add time: 0.6								// (14h 24m)
+mag: 2.58
+add time: 0.58								// (13h 55m) 
 phase										// salida del SOI
 center: earth
-add time: 2.3176							// (2d 7h 37m)
+add time: 2.2648							// (2d 6h 21m)
 phase										// Amerizaje Oceano Pacifico
 mag: 1e-2	
 add time: 0.0008							// (1m)
