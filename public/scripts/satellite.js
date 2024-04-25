@@ -1312,7 +1312,7 @@ class Satellite{
 		view_vec_abs(
 			sum_vec( print_pos, this.orbit.r ),
 			this.orbit.perturbation.rot_axis,
-			-2,
+			-3,
 			'PURPLE'
 		);
 		
@@ -1350,83 +1350,6 @@ class Satellite{
 		// Visualizar lanzamiento
 		let launch_pos = sum_vec( sum_vec( print_pos, this.orbit.r ), dir_rot.pos );
 		view_vec( launch_pos, dir_rot.vel, 'RED' );
-		
-		/*
-		request.push([ 
-			'print', 
-			'negative_inclination: ' + str(
-				this.orbit.perturbation.negative_inclination
-			), 
-			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
-			to_px( print_pos[c2] + this.orbit.r[c2] ) + 60,
-			color
-		]);
-		request.push([ 
-			'print', 
-			'dir rot x: ' + str( dir_rot.vel.x ), 
-			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
-			to_px( print_pos[c2] + this.orbit.r[c2] ) + 50,
-			color
-		]);
-		request.push([ 
-			'print', 
-			'dir rot y: ' + str( dir_rot.vel.y ), 
-			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
-			to_px( print_pos[c2] + this.orbit.r[c2] ) + 40,
-			color
-		]);
-		request.push([ 
-			'print', 
-			'dir rot z: ' + str( dir_rot.vel.z ), 
-			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
-			to_px( print_pos[c2] + this.orbit.r[c2] ) + 30,
-			color
-		]);
-		request.push([ 
-			'print', 
-			this.GST,
-			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
-			to_px( print_pos[c2] + this.orbit.r[c2] ) + 20,
-			color
-		]);
-		*/
-		
-		/*
-		let land_coords = this.landing_coordinates();
-		request.push([ 
-			'print',
-			'land: x = ' +
-			str( significant( land_coords.vec.x, 4 ) ) +
-			', y = ' +
-			str( significant( land_coords.vec.y, 4 ) ) +
-			', z = ' +
-			str( significant( land_coords.vec.z, 4 ) ), 
-			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
-			to_px( print_pos[c2] + this.orbit.r[c2] ) + 20,
-			color
-		]);	
-		request.push([ 
-			'print',
-			'lambda = ' +
-			str( ( significant( rad_to_deg( land_coords.lambda ), 4 ) ) ), 
-			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
-			to_px( print_pos[c2] + this.orbit.r[c2] ) + 30,
-			color
-		]);
-		let launch_coords = normalize_vec(this.orbit.r);
-		request.push([ 
-			'print',
-			'sat_pos: x = ' +
-			str( significant( launch_coords.x, 4 ) ) +
-			', y = ' +
-			str( significant( launch_coords.y, 4 ) ) +
-			', z = ' +
-			str( significant( launch_coords.z, 4 ) ), 
-			to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
-			to_px( print_pos[c2] + this.orbit.r[c2] ) + 40,
-			color
-		]);
-		*/
 		
 		// Aterrizaje
 		if(this.orbited != null){

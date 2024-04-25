@@ -43,7 +43,7 @@ add time: 0.85								// (20h 24m)
 lat: -3.833
 lon: 23.27									// Mar de la tranquilidad
 ra: 88										// Ángulo de lanzamiento
-d: 30
+d: 80
 launch
 mag: 0.245
 add time: 0.0017452							// (2.5m)
