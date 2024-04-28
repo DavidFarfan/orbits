@@ -3,70 +3,76 @@
 date: 16/07/1969
 add time: 0.0637							// Hora de lanzamiento
 ctrl: earth
-lat: 28.5
-lon: -80.5 									// Florida
+lat: 28.5									// Florida
+lon: -80.5 									
 ra: -108  									// Ángulo de lanzamiento
 d: 88
-launch
-mag: 1.872
-add time: 0.0022905							// (3.29 m) 
-phase 										// orbita terrestre
-mag: 7.7992
-add time: 0.0827 							// (1 h 59 m)
-phase 										// inyección translunar
+launch										// Lift off - SIC
+mag: 1.5
+add time: 0.001797							// (2.58 m) 
+phase										// Roll - SIC1
+mag: 4.4
+add time: 0.0009935							// (1.43 m)
+phase										// orbita terrestre - SII
+vel: -6.648940270, 3.561158574, 0.7578818935
+add time: 0.00138							// (1.98 m)
+phase										// orbita terrestre circular - SIVB
+vel: -7.314951100501277, 2.637584335669657, 0.6037253092682756
+add time: 0.08082							// (1h 56m)
+phase 										// inyección translunar - SIVB1
 vel: 0.8079985273, -10.92071, 0.2612537019
 add time: 2.29 								// (2d 6h 57m)
 phase 										// SOI de la luna
 center: moon
 add time: 0.661 							// (15h 52m)
-phase										// orbita lunar eliptica
+phase										// orbita lunar eliptica - SM
 mag: 1.504
 add time: 0.312 							// (1h 5m)
-phase										// orbita lunar circular
+phase										// orbita lunar circular - SM1
 mag: 1.628
 add time: 0.9								// (21h 36m)
 undock										// Desacoplamiento del LM
 add time: 0.05								// (1h 12m)
-phase										// Orbita de descenso
-mag: 1.605
+phase										// Orbita de descenso - LM
+mag: 1.6055
 add time: 0.032								// (46m)
-phase										// Motor de descenso
+phase										// Motor de descenso - LM1
 mag: .6
 add time: 0.002								// (3m)
-phase										// Alunizaje, Mar de la tranquilidad
+phase										// Mar de la tranquilidad - LM2
 mag: 1e-2
 add time: 0.0003							// (0m)
-end
+end											// Soft Landing - LM3
 
 											// MOON - EARTH
 add time: 0.85								// (20h 24m)
-lat: -3.833
-lon: 23.27									// Mar de la tranquilidad
+lat: -3.833									// Mar de la tranquilidad
+lon: 23.27									
 ra: 88										// Ángulo de lanzamiento
 d: 80
-launch
+launch										// Despegue desde la Luna - LMA
 mag: 0.245
 add time: 0.0017452							// (2.5m)
-phase										// orbita inicial
+phase										// orbita de ascenso inicial - LMA1
 mag: 1.688
 add time: 0.038								// (54m)
-phase										// orbita circular
+phase										// orbita circular - LMA2
 mag: 1.637
-add time: 0.1								// Una órbita después (2h 24m)
-phase										// Órbita hacia el CM
-vel: -1.012431597, -1.215872938, -0.4382975302
+add time: 0.1								// (2h 24m) Una órbita después 
+phase										// Órbita hacia el CSM - LMA3
+vel: -1.012320220, -1.216002404, -0.4381437895
 add time: 0.036								// (51m)
-ctrl: v0123456
+ctrl: v012345678
 ctrl: v1123
 dock										// LM/CM rendezvous
 add time: 0.28								// (6h 43m)
-phase										// inyección transtierra
+phase										// inyección transtierra - SM2
 mag: 2.58
 add time: 0.58								// (13h 55m) 
-phase										// salida del SOI
+phase										// salida de la SOI de la Luna
 center: earth
 add time: 2.2648							// (2d 6h 21m)
 phase										// Amerizaje Oceano Pacifico
-mag: 1e-2	
-add time: 0.0008							// (1m)
+mag: 1e-2
+add time: 0.00102							// (1.4688 m)
 end								

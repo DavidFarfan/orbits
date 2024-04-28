@@ -957,6 +957,13 @@ class Satellite{
 			this.delta_v = null;
 			return;
 		};
+		if(this.phase == 0){
+			this.prev_v = {
+				x: 0,
+				y: 0,
+				z: 0
+			};
+		};
 		this.delta_v = sum_vec(
 			this.prev_v,
 			prod_by_sc( -1, this.vel ),

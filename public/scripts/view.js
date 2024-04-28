@@ -444,6 +444,30 @@ class View{
 				'WHITE'
 			]);
 		};
+		
+		// prev v (km/s)
+		if(Satellite.ctrl.prev_v != null){
+			request.push([
+				'print',
+				"prev v (km/s) = [ x: " + str( significant( Satellite.ctrl.prev_v.x, 4 ) ) + 
+				", y: " + str( significant( Satellite.ctrl.prev_v.y, 4 ) ) + 
+				", z: " + str( significant( Satellite.ctrl.prev_v.z, 4 ) ) + " ]",
+				10, 
+				140,
+				'WHITE'
+			]);
+		};
+		
+		// phase
+		if(Satellite.ctrl.phase != null){
+			request.push([
+				'print',
+				"phase = " + str( Satellite.ctrl.phase ),
+				10, 
+				150,
+				'WHITE'
+			]);
+		};
 	};
 	
 	// Página 1: Elementos orbitales
