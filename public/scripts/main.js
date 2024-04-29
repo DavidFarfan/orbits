@@ -74,7 +74,7 @@ const origin = { // Coordenadas del origen en la pantalla
 };
 
 // Instrucciones para la simulación de una misión
-var time_lapse = 500; // Lapso entre comandos
+var time_lapse = 200; // Lapso entre comandos
 var commands = []; // Comandos
 var automatic = false; // Bandera para uso automático
 

@@ -15,9 +15,25 @@ body {
 	height:95%;
 }
 
+#view2 {
+	background-color: #000;
+	margin-bottom:12px;
+	cursor: crosshair;
+	width:95%;
+	height:95%;
+}
+
 .flex-container {
   display: flex;
   height: 500px;
   align-items: center;
   justify-content: center;
+}
+
+.flex-container-2 {
+  display: flex;
+  height: 500px;
+  margin-left:30px;
+  align-items: left;
+  justify-content: left;
 }

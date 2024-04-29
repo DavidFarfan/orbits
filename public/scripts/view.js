@@ -421,6 +421,17 @@ class View{
 			'WHITE'
 		]);
 		
+		// phase
+		if(Satellite.ctrl.phase != null){
+			request.push([
+				'print',
+				"phase = " + str( Satellite.ctrl.phase ),
+				10, 
+				120,
+				'WHITE'
+			]);
+		};
+		
 		// delta v (m/s)
 		if(Satellite.ctrl.delta_v != null){
 			request.push([
@@ -429,7 +440,7 @@ class View{
 				", y: " + str( significant( Satellite.ctrl.delta_v.y, 4 ) ) + 
 				", z: " + str( significant( Satellite.ctrl.delta_v.z, 4 ) ) + " ]",
 				10, 
-				120,
+				130,
 				'WHITE'
 			]);
 		};
@@ -440,7 +451,7 @@ class View{
 				'print',
 				"|delta v| (km/s) = " + str( significant( norm_vec( Satellite.ctrl.delta_v ), 4 ) ),
 				10, 
-				130,
+				140,
 				'WHITE'
 			]);
 		};
@@ -452,17 +463,6 @@ class View{
 				"prev v (km/s) = [ x: " + str( significant( Satellite.ctrl.prev_v.x, 4 ) ) + 
 				", y: " + str( significant( Satellite.ctrl.prev_v.y, 4 ) ) + 
 				", z: " + str( significant( Satellite.ctrl.prev_v.z, 4 ) ) + " ]",
-				10, 
-				140,
-				'WHITE'
-			]);
-		};
-		
-		// phase
-		if(Satellite.ctrl.phase != null){
-			request.push([
-				'print',
-				"phase = " + str( Satellite.ctrl.phase ),
 				10, 
 				150,
 				'WHITE'
