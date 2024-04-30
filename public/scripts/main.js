@@ -639,8 +639,7 @@ ra_slider.oninput = () => {
 // Captura de página de info. de simulación a desplegar
 const display_page_button = document.getElementById("page");
 display_page_button.onclick = () => {
-	Satellite.ctrl.landing_coordinates();
-	info_page = ( info_page + 1 ) % 2;
+	info_page = ( info_page + 1 ) % 3;
 };
 
 // Captura de tiempo de simulación

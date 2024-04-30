@@ -268,6 +268,11 @@ class View{
 			case 1:
 				View.print_1();
 				break;
+			
+			// Elementos orbitales
+			case 2:
+				View.print_2();
+				break;
 		};
 	};
 	
@@ -752,6 +757,30 @@ class View{
 				+ str( significant( Satellite.ctrl.orbit.perturbation.vx, 4 ) ),
 			10,
 			180,
+			'WHITE'
+		]);
+	};
+	
+	// Página 2: Etapas del vehículo
+	static print_2(){
+	
+		// Plain BG
+		request.push([
+			'rectangle', 
+			width_p(0),
+			height_p(0),
+			width_p(1),
+			height_p(.3),
+			'BLACK'
+		]);
+		
+		// Division Line
+		request.push([
+			'line', 
+			width_p(0),
+			height_p(.3),
+			width_p(1),
+			height_p(.3),
 			'WHITE'
 		]);
 	};

@@ -17,8 +17,14 @@ const colors = { // Paleta
 
 //-----DIBUJO------------
 
+// Rectángulo
+function rectangle(x1, y1, x2, y2, c){
+	ctx.fillStyle = colors[c];
+	ctx.fillRect(x1, y1, x2, y2);
+}
+
 // Borrar el lienzo
-function erase(){
+function erase(c){
 	ctx.fillStyle = colors['BLACK'];
 	ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
@@ -167,6 +173,9 @@ function solve(req){
 			break;
 		case 'ellipse':
 			ellipse(req[1], req[2], req[3], req[4], req[5]);
+			break;
+		case 'rectangle':
+			rectangle(req[1], req[2], req[3], req[4], req[5]);
 			break;
 		case 'print':
 			print(req[1], req[2], req[3], req[4]);
