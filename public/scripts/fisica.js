@@ -24,6 +24,7 @@ const SUNR = 696000.0; // Radio (km)
 const SUNMASS = 1988500 * 1e24; // Masa (kg)
 
 // Parámetros de La Tierra
+const E_g = 0.0098 // Gravedad estándar (km/s^2)
 const E_U = 398600.435436; // Parámetro gravitacional (km^3/s^2)
 const ER = 6371.01; // Radio volumétrico medio (km)
 const EDAY = 86400.002; // Día solar medio (s)
