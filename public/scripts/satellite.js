@@ -460,6 +460,9 @@ class Satellite{
 		
 		// Conservar intervalo de vida
 		Satellite.get_sat( sat_name ).init = Satellite.ctrl.init;
+		if(Satellite.ctrl.vehicle){
+			Satellite.get_sat( sat_name ).vehicle = Satellite.ctrl.vehicle.copy();
+		};
 		Satellite.get_sat( sat_name ).end = Satellite.ctrl.end;
 		Satellite.get_sat( sat_name ).prev_sat = Satellite.ctrl.prev_sat;
 		Satellite.get_sat( sat_name ).prev_v = Satellite.ctrl.prev_v;
@@ -953,10 +956,14 @@ class Satellite{
 	
 	// Delta v
 	delta_v_calculation(){
+		
+		// Sin fase previa
 		if(this.prev_v == null){
 			this.delta_v = null;
 			return;
 		};
+		
+		// Lanzamiento inicial
 		if(this.phase == 0){
 			this.prev_v = {
 				x: 0,
@@ -964,40 +971,49 @@ class Satellite{
 				z: 0
 			};
 		};
+		
+		// Cálculo de delta v
 		this.delta_v = sum_vec(
 			this.prev_v,
 			prod_by_sc( -1, this.vel ),
 		);
+		
+		// Cálculo de la propulsión
+		this.burn();
 	};
 	
 	// Intervalo de vida
 	init_set(name){
 		
-		// Deshacer 
+		// Sin fase anterior 
 		if(name == null){
 			this.init = null;
 			this.prev_sat = null;
 			this.prev_v = null;
+			this.vehicle = null;
 			delta_v_calculation();
 			return;
 		};
 		
-		// Hacer
+		// Cambios respecto a la fase anterior
 		this.init = s_time;
 		this.prev_sat = name;
 		this.prev_v = Satellite.get_sat( this.prev_sat ).orbit.v;
+		if(Satellite.get_sat( this.prev_sat ).vehicle){
+			this.vehicle = Satellite.get_sat( this.prev_sat ).vehicle.copy();
+		};
 		this.delta_v_calculation();
 	};
 	end_set(name){
 		
-		// Deshacer 
+		// Sin fase siguiente 
 		if(name == null){
 			this.end = null;
 			this.next_sat = null;
 			return;
 		};
 		
-		// Hacer
+		// Límites de la fase 
 		this.end = s_time;
 		this.next_sat = name;
 	};
@@ -1008,6 +1024,22 @@ class Satellite{
 			this.phase = 0;
 		}else{
 			this.phase = p;
+		};
+	};
+	
+	// Vehículo Asociado
+	set_vehicle(v){
+		this.vehicle = v;
+		this.vehicle.burn( this.delta_v );
+	};
+	burn(){
+		if(this.vehicle != null){
+			this.vehicle.burn( this.delta_v );
+		};
+	};
+	separate_stage(){
+		if(this.vehicle != null){
+			this.vehicle.separate_stage( this.delta_v );
 		};
 	};
 	

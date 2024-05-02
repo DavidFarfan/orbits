@@ -761,6 +761,20 @@ targeting_button.onclick = () => {
 	};
 };
 
+// implementación de un vehículo
+const vehicle_text = document.getElementById("vehicle_text");
+const vehicle_set_button = document.getElementById("vehicle_set");
+vehicle_set_button.onclick = () => {
+	let v = Vehicle.get_vehicle(vehicle_text.value);
+	if(v != null){
+		Satellite.ctrl.set_vehicle(v);
+	};
+};
+const separate_button = document.getElementById("separate");
+separate_button.onclick = () => {
+	Satellite.ctrl.separate_stage();
+};
+
 //-------PROGRAMA PRINCIPAL-----------
 
 // OBJETOS A SIMULAR

@@ -783,6 +783,44 @@ class View{
 			height_p(.3),
 			'WHITE'
 		]);
+		
+		if( Satellite.ctrl.vehicle != null ){
+			
+			// Nombre del vehículo asociado
+			request.push([
+				'print', 
+				"vehicle: " + Satellite.ctrl.vehicle.name,
+				10, 
+				10,
+				'WHITE'
+			]);
+			
+			// Etapas
+			let stages_chain = '';
+			for( let i=0; i<Satellite.ctrl.vehicle.stages.length; i++ ){
+				if(i == 0){
+					stages_chain += Satellite.ctrl.vehicle.stages[i].name;
+				}else{
+					stages_chain += ', ' + Satellite.ctrl.vehicle.stages[i].name;
+				};
+			};
+			request.push([
+				'print', 
+				"stages: (top) => " + stages_chain + ' <= (bottom)',
+				10, 
+				20,
+				'WHITE'
+			]);
+			
+			// Maniobra
+			request.push([
+				'print', 
+				'Maneuver: m0 = ' + Satellite.ctrl.vehicle.total_mass,
+				10, 
+				30,
+				'WHITE'
+			]);
+		};
 	};
 	
 	// Construcción de vista
