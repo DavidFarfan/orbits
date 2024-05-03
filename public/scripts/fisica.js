@@ -1375,3 +1375,25 @@ function ell_min_flight_t(rt1, rt2, u){
 function r_soi(orbiting_a, orbiting_m, orbited_m){
 	return orbiting_a * pow( orbiting_m / orbited_m, 2 / 5 );
 };
+
+//-----------FUEL-----------------------
+
+// PROPELLANT AFTER MANEUVER (Rocket equation)
+function maneuver_mp(m0, dv, I){
+	return m0 * (1 - exp( (-dv) / (I * E_g ) ) );
+};
+
+// MASS FLOW
+function mass_flow(T, I){
+	return T / ( I * E_g );
+};
+
+// BURN TIME
+function burn_time(mp, dm, n){
+	return mp / ( dm * n );
+};
+
+// MAX THRUST
+function max_thrust(T, n){
+	return T * n;
+};

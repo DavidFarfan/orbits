@@ -789,7 +789,7 @@ class View{
 			// Nombre del vehículo asociado
 			request.push([
 				'print', 
-				"vehicle: " + Satellite.ctrl.vehicle.name,
+				"Vehicle: " + Satellite.ctrl.vehicle.name,
 				10, 
 				10,
 				'WHITE'
@@ -806,20 +806,116 @@ class View{
 			};
 			request.push([
 				'print', 
-				"stages: (top) => " + stages_chain + ' <= (bottom)',
+				"Stages: (top) => " + stages_chain + ' <= (bottom)',
 				10, 
 				20,
+				'WHITE'
+			]);
+			
+			// Etapa que hace la maniobra
+			let e_T = Satellite.ctrl.vehicle.last_stage.get_current_engines()[1].T;
+			let e_I = Satellite.ctrl.vehicle.last_stage.get_current_engines()[1].I;
+			let e_name = Satellite.ctrl.vehicle.last_stage.get_current_engines()[1].name;
+			let e_n = Satellite.ctrl.vehicle.last_stage.get_current_engines()[0];
+			request.push([
+				'print', 
+				'Last: ' + 
+					Satellite.ctrl.vehicle.last_stage.name +
+				', engines: ' + 
+					str( e_n ) +
+				' type: ' + 
+					e_name +
+				', I (s) = ' +
+					e_I +
+				', e_T (kN) = ' +
+					e_T +
+				', s_T (kN) = ' +
+					max_thrust( e_T, e_n ),
+				10, 
+				30,
 				'WHITE'
 			]);
 			
 			// Maniobra
 			request.push([
 				'print', 
-				'Maneuver: m0 = ' + Satellite.ctrl.vehicle.total_mass,
+				'Maneuver: ' + 
+				"dv (km/s) = " + 
+					str( significant( norm_vec( Satellite.ctrl.delta_v ), 4 ) ) +
+				', m0 (kg) = ' +
+					str( significant( Satellite.ctrl.vehicle.total_mass, 4 ) ),
 				10, 
-				30,
+				40,
 				'WHITE'
 			]);
+
+			// Costo
+			let m_f = mass_flow(
+				e_T,
+				e_I
+			);
+			let b_t = burn_time(
+				Satellite.ctrl.vehicle.last_stage.mp,
+				m_f,
+				e_n
+			);
+			let s_mp0 = Satellite.ctrl.vehicle.last_stage.mp0;
+			let s_mp = Satellite.ctrl.vehicle.last_stage.mp;
+			request.push([
+				'print', 
+				'Cost: ' +
+				'mp0, mp (kg) = ' +
+					str( significant( s_mp0, 4 ) ) +
+				', (' +
+					str( significant( s_mp, 4 ) ) +
+				'), flow (kg/s) = ' +
+					str( significant( m_f, 4 ) ) +
+				', time (s) = ' +
+					str( significant( b_t, 4 ) ),
+				10, 
+				50,
+				'WHITE'
+			]);
+			
+			// Visual Propellant Consumption
+			request.push([
+				'rectangle', 
+				10,
+				60,
+				50,
+				50,
+				'GREY'
+			]);
+			request.push([
+				'rectangle', 
+				10,
+				60,
+				50,
+				max( 0, 50 * ( s_mp0 - s_mp ) / s_mp0 ),
+				'GREEN'
+			]);
+			let cons = s_mp / s_mp0;
+			if(cons <= 1){
+				request.push([
+					'print', 
+					'Consumption: ' + 
+						str( significant( 100 * cons, 4 ) ) +
+					' %',
+					70, 
+					60,
+					'GREEN'
+				]);
+			}else{
+				request.push([
+					'print', 
+					'Consumption: ' + 
+						str( significant( 100 * cons, 4 ) ) +
+					' % (non-feasible)',
+					70, 
+					60,
+					'RED'
+				]);
+			};
 		};
 	};
 	

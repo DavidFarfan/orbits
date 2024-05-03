@@ -120,13 +120,13 @@ class Stage{
 	// Empty Mass (kg)
 	set_empty_mass(me0){
 		this.me0 = me0;
-		this.me = me0;
+		this.me = 0; // estructura y payload consumidos
 	};
 	
 	// Propellant Mass (kg)
 	set_prop_mass(mp0){
 		this.mp0 = mp0;
-		this.mp = mp0;
+		this.mp = 0; // propelente consumido en maniobra
 	};
 	
 	// Engines
@@ -138,19 +138,27 @@ class Stage{
 	use_set(n){
 		this.engine_set = n;
 	};
+	get_current_engines(){
+		return this.engines[ this.engine_set ];
+	};
 	
 	// Copia de la etapa
-	copy(){
+	copy(continuity){
+		
+		// Mantener continuidad entre maniobras
+		let me_aux = this.me0;
+		let mp_aux = this.mp0;
+		if(continuity){
+			me_aux = this.me0 - this.me;
+			mp_aux = this.mp0 - this.mp;
+		};
+		
 		let copy_stage = new Stage(
 			this.name,
-			this.me0,
-			this.mp0,
+			me_aux,
+			mp_aux,
 			[]
 		);
-		
-		// Copiar masas actuales
-		copy_stage.me = this.me;
-		copy_stage.mp = this.mp;
 		
 		// Copiar cada set de motores
 		let copy_stage_engines = [];
@@ -218,19 +226,26 @@ class Vehicle{
 		// Masa total
 		this.total_mass = 0;
 		for(let i=0; i<this.stages.length; i++){
-			this.total_mass += this.stages[i].me + this.stages[i].mp;
+			this.total_mass += this.stages[i].me0 + this.stages[i].mp0;
 		}; 
 		
-		// Extracción y modificación de la etapa de propulsión
-		let last_stage = this.stages.pop();
+		// Extracción de la etapa que ejecuta la maniobra
+		this.last_stage = this.stages.pop();
 		log( 'stage:' );
-		log( last_stage );
+		log( this.last_stage );
 		
 		// Delta v
 		log('dv = ' + str( norm_vec( dv ) ) );
 		
-		// Retorno de la etapa de propulsión al vehículo
-		this.stages.push( last_stage );
+		// Propelente restante
+		this.last_stage.mp = maneuver_mp(
+			this.total_mass,
+			norm_vec( dv ),
+			this.last_stage.get_current_engines()[1].I
+		);
+		
+		// Consolidar los cambios
+		this.stages.push( this.last_stage );
 	};
 	
 	// Separation
@@ -242,7 +257,7 @@ class Vehicle{
 	};
 	
 	// Copia del vehículo
-	copy(){
+	copy(continuity){
 		let copy_vehicle = new Vehicle(
 			this.name,
 			[]
@@ -251,7 +266,7 @@ class Vehicle{
 		// Copiar cada etapa
 		let copy_vehicle_stages = [];
 		for(let i=0; i<this.stages.length; i++){
-			copy_vehicle_stages.push( this.stages[i].copy() );
+			copy_vehicle_stages.push( this.stages[i].copy(continuity) );
 		};
 		
 		// Agregar etapas

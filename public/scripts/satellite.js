@@ -460,7 +460,7 @@ class Satellite{
 		
 		// Conservar intervalo de vida
 		Satellite.get_sat( sat_name ).init = Satellite.ctrl.init;
-		if(Satellite.ctrl.vehicle){
+		if(Satellite.ctrl.vehicle != null){
 			Satellite.get_sat( sat_name ).vehicle = Satellite.ctrl.vehicle.copy();
 		};
 		Satellite.get_sat( sat_name ).end = Satellite.ctrl.end;
@@ -1000,7 +1000,7 @@ class Satellite{
 		this.prev_sat = name;
 		this.prev_v = Satellite.get_sat( this.prev_sat ).orbit.v;
 		if(Satellite.get_sat( this.prev_sat ).vehicle){
-			this.vehicle = Satellite.get_sat( this.prev_sat ).vehicle.copy();
+			this.vehicle = Satellite.get_sat( this.prev_sat ).vehicle.copy( true );
 		};
 		this.delta_v_calculation();
 	};
