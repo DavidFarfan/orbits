@@ -285,6 +285,14 @@ function add_vel_z(){
 	punctual_changes = vel_z_punctual.value != '';
 };
 
+// Implementar vehiculo en un objeto satélite
+function implement_vehicle(){
+	let v = Vehicle.get_vehicle(vehicle_text.value);
+	if(v != null){
+		Satellite.ctrl.set_vehicle(v);
+	};
+};
+
 // Comandos de uso automático
 function comDate(date){
 	select_date.value = date;
@@ -366,6 +374,15 @@ function comMerge(){
 	Satellite.merge_sats();
 	orbitLoop(true);
 };
+function comVehicle(v){
+	vehicle_text.value = v;
+	implement_vehicle();
+	orbitLoop(true);
+};
+function comSeparate(){
+	Satellite.ctrl.separate_stage();
+	orbitLoop(true);
+};
 function commandResolve(cmd){
 	log(cmd[1]);
 	switch(cmd[0]){
@@ -416,6 +433,12 @@ function commandResolve(cmd){
 			break;
 		case 'merge':
 			comMerge();
+			break;
+		case 'vehicle':
+			comVehicle(cmd[1]);
+			break;
+		case 'separate':
+			comSeparate();
 			break;
 		case 'end':
 			comEnd();
@@ -761,14 +784,36 @@ targeting_button.onclick = () => {
 	};
 };
 
+// Dirección del apsis
+const apsis = document.getElementById("apsis");
+const apsis_vec_x_label = document.getElementById("apsis_vec_x_label");
+const apsis_vec_y_label = document.getElementById("apsis_vec_y_label");
+const apsis_vec_z_label = document.getElementById("apsis_vec_z_label");
+apsis.onclick = () => {
+	let apsis_data = normalize_vec(cof_cross_prod(
+		Satellite.ctrl.orbit.r,
+		Satellite.ctrl.h_vec,
+	));
+		
+	// Ver dirección del apsis
+	apsis_vec_x_label.innerHTML = significant( apsis_data.x, 10 );
+	apsis_vec_y_label.innerHTML = significant( apsis_data.y, 10 );
+	apsis_vec_z_label.innerHTML = significant( apsis_data.z, 10 );
+};
+
+// Aplicar componentes de velocidad del targeting
+const apply_vel = document.getElementById("apply_vel");
+apply_vel.onclick = () => {
+	vel_x_punctual.value = vel_vec_x_label.innerHTML;
+	vel_y_punctual.value = vel_vec_y_label.innerHTML;
+	vel_z_punctual.value = vel_vec_z_label.innerHTML;
+};
+
 // implementación de un vehículo
 const vehicle_text = document.getElementById("vehicle_text");
 const vehicle_set_button = document.getElementById("vehicle_set");
 vehicle_set_button.onclick = () => {
-	let v = Vehicle.get_vehicle(vehicle_text.value);
-	if(v != null){
-		Satellite.ctrl.set_vehicle(v);
-	};
+	implement_vehicle();
 };
 const separate_button = document.getElementById("separate");
 separate_button.onclick = () => {
@@ -942,31 +987,43 @@ commands = [
 	['ctrl', 'earth'],
 	['phi', 28.5],
 	['lambda', -80.5],
-	['ra', -108],
+	['ra', 73],
 	['d', 88],
 	['launch'],
-	['mag', '1.5'],
-	['addtime', '0.001797'],
+	['vehicle', 'SATURN_V'],
+	['mag', '.1297'],
+	['addtime', '0.00015'],
 	['phase'],
-	['mag', '4.4'],
-	['addtime', '0.0009935'],
+	['mag', '2.9'],
+	['addtime', '0.001655'],
 	['phase'],
-	['mag_x', '-6.648940270'],
-	['mag_y', '3.561158574'],
-	['mag_z', '0.7578818935'],
-	['addtime', '0.00138'],
+	['separate'],
+	['mag', '6.81'],
+	['addtime', '0.0047'],
 	['phase'],
-	['mag_x', '-7.314951100501277'],
-	['mag_y', '2.637584335669657'],
-	['mag_z', '0.6037253092682756'],
-	['addtime', '0.08082'],
+	['separate'],
+	['mag_x', '-0.5229073288'],
+	['mag_y', '0.8420810382'],
+	['mag_z', '0.1321644829'],
+	['mag', '-7.8'],
+	['addtime', '0.098993'],
 	['phase'],
-	['mag_x', '0.8079985273'],
-	['mag_y', '-10.92071'],
-	['mag_z', '0.2612537019'],
-	['addtime', '2.29'],
+	['mag', '10.95'],
+	['addtime', '0.073'],
+	['phase'],
+	['vehicle', 'CSM_LM'],
+	['addtime', '0.9361'],
+	['phase'],
+	['mag_x', '1.429985306'],
+	['mag_y', '-0.1897926819'],
+	['mag_z', '-0.005974913849'],
+	['mag', '1.45876'],
+	['addtime', '1.52978'],
 	['phase'],
 	['center', 'moon'],
+	['addtime', '0.52083'],
+	/*
+	['phase'],	
 	['addtime', '0.661'],
 	['phase'],
 	['mag', '1.504'],
@@ -1018,6 +1075,6 @@ commands = [
 	['phase'],
 	['mag', '1e-2'],
 	['addtime', '0.00102'],
-	['end']
+	['end']*/
 ];
 trip();

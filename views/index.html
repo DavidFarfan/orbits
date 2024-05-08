@@ -121,12 +121,12 @@
 					<input type="range" min="-100" max="100" value="0" class="slider" id="s_scale">
 				</div>
 				<div class="slidecontainer">
-					<label>time scale</label>
-					<input type="range" min="-100" max="100" value="0" class="slider" id="t_scale">
-				</div>
-				<div class="slidecontainer">
 					<label>zoom</label>
 					<input type="range" min="1" max="100" value="1" class="slider" id="zoom">
+				</div>
+				<div class="slidecontainer">
+					<label>time scale</label>
+					<input type="range" min="-100" max="100" value="0" class="slider" id="t_scale">
 				</div>
 				<div class="slidecontainer">
 					<label>time sense</label>
@@ -192,6 +192,18 @@
 				</div>
 				<div class="slidecontainer">
 					<input type="button" class="button" value="Dock" id="dock">
+				</div>
+				<div class="slidecontainer">
+					<input type="button" class="button" value="Apsis" id="apsis">
+				</div>
+				<div>
+					vel: [
+					<label id="apsis_vec_x_label"> 0 </label> ,
+					<label id="apsis_vec_y_label"> 0 </label> ,
+					<label id="apsis_vec_z_label"> 0 </label> ]
+				</div>
+				<div class="slidecontainer">
+					<input type="button" class="button" value="Apply" id="apply_vel">
 				</div>
 			</div>
 		</div>

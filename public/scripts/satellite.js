@@ -402,8 +402,10 @@ class Satellite{
 		
 		// Ajuste de centro
 		let center_name = Satellite.ctrl.orbited;
+		let frame_change = false;
 		if(adj_center != null){
 			center_name = adj_center;
+			frame_change = true;
 			
 			// Coordenadas absolutas de los objetos 
 			let absolute_pos_center = Satellite.get_sat( adj_center ).get_absolute_r();
@@ -466,7 +468,7 @@ class Satellite{
 		Satellite.get_sat( sat_name ).end = Satellite.ctrl.end;
 		Satellite.get_sat( sat_name ).prev_sat = Satellite.ctrl.prev_sat;
 		Satellite.get_sat( sat_name ).prev_v = Satellite.ctrl.prev_v;
-		Satellite.get_sat( sat_name ).delta_v_calculation();
+		Satellite.get_sat( sat_name ).delta_v_calculation( frame_change );
 		Satellite.get_sat( sat_name ).next_sat = Satellite.ctrl.next_sat;
 		
 		// Matar los settings actuales
@@ -955,7 +957,7 @@ class Satellite{
 	};
 	
 	// Delta v
-	delta_v_calculation(){
+	delta_v_calculation( disable ){
 		
 		// Sin fase previa
 		if(this.prev_v == null){
@@ -977,6 +979,15 @@ class Satellite{
 			this.prev_v,
 			prod_by_sc( -1, this.vel ),
 		);
+		
+		// Deshabilitar
+		if( disable ){
+			this.delta_v = {
+				x: 0,
+				y: 0,
+				z: 0
+			};
+		};
 		
 		// Cálculo de la propulsión
 		this.burn();

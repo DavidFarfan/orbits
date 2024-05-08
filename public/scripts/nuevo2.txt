@@ -76,3 +76,4 @@ phase										// Amerizaje Oceano Pacifico
 mag: 1e-2
 add time: 0.00102							// (1.4688 m)
 end								
+

@@ -3,9 +3,9 @@ class Engine{
 	
 	// Lista de motores
 	static catalogue = {
-		F1: ['F1', 263, 6770],
+		F1: ['F1', 263, 7000],
 		J2: ['J2', 421, 880],
-		AJ10_137: ['AJ10_137', 314, 91],
+		AJ10_137: ['AJ10_137', 350, 91.19],
 		DPS: ['DPS', 311, 47],
 		APS: ['APS', 311, 16]
 	};
@@ -201,6 +201,15 @@ class Vehicle{
 				Stage.get_stage('S_IVB'),
 				Stage.get_stage('S_II'),
 				Stage.get_stage('S_IC')
+			]
+		],
+		CSM_LM: [
+			'CSM_LM',
+			[
+				Stage.get_stage('LMA'),
+				Stage.get_stage('LMD'),
+				Stage.get_stage('CM'),
+				Stage.get_stage('SM')
 			]
 		]
 	};

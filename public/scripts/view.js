@@ -894,12 +894,15 @@ class View{
 				max( 0, 50 * ( s_mp0 - s_mp ) / s_mp0 ),
 				'GREEN'
 			]);
-			let cons = s_mp / s_mp0;
-			if(cons <= 1){
+			
+			// consumo de combustible
+			let cons = s_mp / s_mp0; // porcentaje del consumo de combustible de la maniobra
+			cons *= 100;
+			if(cons <= 100){
 				request.push([
 					'print', 
-					'Consumption: ' + 
-						str( significant( 100 * cons, 4 ) ) +
+					'Fuel consumption: ' + 
+						str( significant( cons, 4 ) ) +
 					' %',
 					70, 
 					60,
@@ -908,12 +911,28 @@ class View{
 			}else{
 				request.push([
 					'print', 
-					'Consumption: ' + 
-						str( significant( 100 * cons, 4 ) ) +
+					'Fuel consumption: ' + 
+						str( significant( cons, 4 ) ) +
 					' % (non-feasible)',
 					70, 
 					60,
 					'RED'
+				]);
+			};
+			
+			// consumo de Tiempo
+			cons = s_time - Satellite.ctrl.init; 
+			cons /= b_t;
+			cons *= 100;  // porcentaje del consumo de tiempo de la maniobra
+			if(cons <= 100){
+				request.push([
+					'print', 
+					'Maneuver time: ' + 
+						str( significant( cons, 4 ) ) +
+					' %',
+					70, 
+					70,
+					'YELLOW'
 				]);
 			};
 		};
