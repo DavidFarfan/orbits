@@ -5,7 +5,7 @@ class Engine{
 	static catalogue = {
 		F1: ['F1', 263, 7000],
 		J2: ['J2', 421, 880],
-		AJ10_137: ['AJ10_137', 350, 91.19],
+		AJ10_137: ['AJ10_137', 314.5, 91.19],
 		DPS: ['DPS', 311, 47],
 		APS: ['APS', 311, 16]
 	};
@@ -210,6 +210,13 @@ class Vehicle{
 				Stage.get_stage('LMD'),
 				Stage.get_stage('CM'),
 				Stage.get_stage('SM')
+			]
+		],
+		LM: [
+			'LM',
+			[
+				Stage.get_stage('LMA'),
+				Stage.get_stage('LMD')
 			]
 		]
 	};
