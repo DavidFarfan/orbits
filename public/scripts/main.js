@@ -293,6 +293,34 @@ function implement_vehicle(){
 	};
 };
 
+// Impulso continuo (segundos)
+function constant_burn(index, b_time, parts){
+	let dt_2 = b_time / parts;
+	let dv_2 = dv_from_time(
+		Satellite.ctrl.vehicle.last_stage.get_current_engines()[1].I,
+		Satellite.ctrl.vehicle.total_mass,
+		dt_2,
+		Satellite.ctrl.vehicle.last_stage.get_current_engines()[0],
+		Satellite.ctrl.vehicle.last_stage.get_current_engines()[1].T
+	);
+	dt_2 = dt_2 / ( 60 * 60 * 24) ; // a dias
+	let v0 = norm_vec(Satellite.ctrl.orbit.v);
+	log('constant_burn:');
+	log(dv_2);
+	log(v0);
+	let a_rray = [];
+	for(var i=0; i<parts; i++){
+		a_rray.push(['phase']);
+		a_rray.push(['mag', str( v0 )]);
+		a_rray.push(['addtime', str( dt_2 )]);
+		v0 -= dv_2;
+	};
+	commands = commands.slice().splice(0, index + 1)
+		.concat(a_rray)
+		.concat(commands.slice().splice(index + 1, commands.length));
+	log(commands);
+};
+
 // Comandos de uso automático
 function comDate(date){
 	select_date.value = date;
@@ -383,7 +411,11 @@ function comSeparate(){
 	Satellite.ctrl.separate_stage();
 	orbitLoop(true);
 };
-function commandResolve(cmd){
+function comConstBurn(index, b_time, parts){
+	constant_burn(index, b_time, parts);
+	orbitLoop(true);
+};
+function commandResolve(cmd, index){
 	log(cmd[1]);
 	switch(cmd[0]){
 		case 'date':
@@ -440,6 +472,9 @@ function commandResolve(cmd){
 		case 'separate':
 			comSeparate();
 			break;
+		case 'c_burn':
+			comConstBurn(index, cmd[1], cmd[2]);
+			break;
 		case 'end':
 			comEnd();
 			break;
@@ -457,7 +492,7 @@ function trip(index){
 				index = 0;
 			};
 			if(automatic){
-				commandResolve(commands[index]);
+				commandResolve(commands[index], index);
 				automatic = false;
 				trip(index + 1);
 			}else{
@@ -809,6 +844,12 @@ apply_vel.onclick = () => {
 	vel_z_punctual.value = vel_vec_z_label.innerHTML;
 };
 
+// Saltar al epoch
+const epoch_button = document.getElementById("epoch_button");
+epoch_button.onclick = () => {
+	set_time( Satellite.ctrl.orbit.epoch );
+};
+
 // implementación de un vehículo
 const vehicle_text = document.getElementById("vehicle_text");
 const vehicle_set_button = document.getElementById("vehicle_set");
@@ -1036,7 +1077,8 @@ commands = [
 	['vehicle', 'LM'],
 	['addtime', '0.08240'],
 	['phase'],
-	['mag', '1.607'],
+	['mag', '1.62'],
+	['c_burn', 200, 10],
 	/*
 	['addtime', '0.032'],
 	['phase'],

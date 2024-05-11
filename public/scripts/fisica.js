@@ -1397,3 +1397,8 @@ function burn_time(mp, dm, n){
 function max_thrust(T, n){
 	return T * n;
 };
+
+// DELTA V GIVEN BURN TIME
+function dv_from_time(I, m0, t, n, F){
+	return I * E_g * ln( m0 / (m0 - t * n * F / (I * E_g)) );
+};
