@@ -74,7 +74,7 @@ const origin = { // Coordenadas del origen en la pantalla
 };
 
 // Instrucciones para la simulación de una misión
-var time_lapse = 200; // Lapso entre comandos
+var time_lapse = 100; // Lapso entre comandos
 var commands = []; // Comandos
 var automatic = false; // Bandera para uso automático
 
@@ -104,12 +104,12 @@ function height_p(p){
 	return canvas.height * p;
 };
 
-// Converisión: Pixeles a Kilómetros
+// Conversión: Pixeles a Kilómetros
 function to_km(px){
 	return zoom * px;
 };
 
-// Converisión: Kilómetros a Pixeles
+// Conversión: Kilómetros a Pixeles
 function to_px(x){
 	return x / zoom;
 };
@@ -295,26 +295,113 @@ function implement_vehicle(){
 
 // Impulso continuo (segundos)
 function constant_burn(index, b_time, parts){
-	let dt_2 = b_time / parts;
-	let dv_2 = dv_from_time(
-		Satellite.ctrl.vehicle.last_stage.get_current_engines()[1].I,
-		Satellite.ctrl.vehicle.total_mass,
-		dt_2,
-		Satellite.ctrl.vehicle.last_stage.get_current_engines()[0],
-		Satellite.ctrl.vehicle.last_stage.get_current_engines()[1].T
-	);
-	dt_2 = dt_2 / ( 60 * 60 * 24) ; // a dias
-	let v0 = norm_vec(Satellite.ctrl.orbit.v);
-	log('constant_burn:');
-	log(dv_2);
-	log(v0);
-	let a_rray = [];
+	
+	// Variables de la maniobra
+	let dt = b_time / parts; 						// Tiempo entre cada punto (s)
+	let dv = 0; 									// Delta V puntual (m/s)
+	let dp = Satellite.ctrl.vehicle.last_stage.mp;	// Propelente consumido (kg)
+	let a_rray = [];								// Suma de maniobras puntuales
+	let m_t = 0;									// Tiempo real de maniobra puntual (s)
+	let m_t_days = 0;								// Conversión a días
+	let e_T = Satellite.ctrl.vehicle.last_stage.get_current_engines()[1].T;
+	let e_I = Satellite.ctrl.vehicle.last_stage.get_current_engines()[1].I;
+	let e_n = Satellite.ctrl.vehicle.last_stage.get_current_engines()[0];
+	let mass = Satellite.ctrl.vehicle.total_mass;	// Masa del vehículo antes de la maniobra (kg)
+	let vel = norm_vec(Satellite.ctrl.orbit.v);		// Velocidad antes de la maniobra (m/s)
+	let pos_steem = Satellite.ctrl.orbit.r;			// Posición vectorial estimada
+	let vel_steem = Satellite.ctrl.orbit.v;			// Velocidad vectorial estimada
+	let orbit_steem = Satellite.ctrl.orbit;			// Órbita estimada
+	
+	// Maniobras puntuales
 	for(var i=0; i<parts; i++){
+		
+		// Masa antes de la maniobra puntual (kg)
+		mass -= dp;
+		
+		// Delta V requerido, intervalo constante y masa variable (propelente)
+		dv = dv_from_time(
+			e_I,
+			mass,
+			dt,
+			e_n,
+			e_T
+		);
+		
+		// Velocidad a impartir en el punto actual (km/s)
+		vel -= dv;
+		
+		// Terminar si |v| < 0
+		if(vel < 0){
+			break;
+		};
+		
+		// Propelente a consumir
+		dp = maneuver_mp(mass, dv, e_I);
+		
+		// Tiempo estimado de la maniobra puntual	
+		m_t = burn_time(
+			dp,
+			mass_flow( e_T, e_I ),
+			e_n
+		);
+		m_t_days = m_t / ( 60 * 60 * 24 );
+		
+		// Adición de los comandos
 		a_rray.push(['phase']);
-		a_rray.push(['mag', str( v0 )]);
-		a_rray.push(['addtime', str( dt_2 )]);
-		v0 -= dv_2;
+		a_rray.push(['mag', str( vel )]);
+		a_rray.push(['addtime', str( m_t_days )]);
+		
+		// órbita de la maniobra puntual
+		vel_steem = prod_by_sc( vel, normalize_vec( vel_steem ) );
+		orbit_steem = new Orbit(
+			angular_momentum( pos_steem, vel_steem ),
+			orbital_energy(
+				norm_vec( vel_steem ),
+				Satellite.ctrl.get_gravity(),
+				norm_vec( pos_steem )
+			),
+			Satellite.ctrl.get_gravity(),
+			vel_steem,
+			pos_steem,
+			orbit_steem.axial_tilt,
+			{
+				da: 0,
+				de: 0,
+				di: 0,
+				dupper_omega: 0,
+				dp: 0
+			}
+		);
+		
+		// Ajustar tiempo inicial
+		let f0_adj = argument_of_periapse_f(
+			orbit_steem.eccentricity,
+			pos_steem,
+			orbit_steem.upper_omega,
+			orbit_steem.i
+		).f;
+		orbit_steem.set_t0(null, t_from_f(
+										orbit_steem.type,
+										f0_adj,
+										orbit_steem.e, 
+										orbit_steem.a, 
+										orbit_steem.T,
+										Satellite.ctrl.get_gravity()
+									) - s_time
+		);
+		orbit_steem.sim( Satellite.ctrl.get_gravity() );
+		
+		// Velocidad final estimada de la maniobra puntual
+		fic_pos = orbit_steem.fictional_pos(
+			s_time + m_t,
+			orbit_steem.t0,
+			orbit_steem.f0,
+			Satellite.ctrl.get_gravity()
+		).pos;
+		vel = norm_vec( fic_pos.v );
 	};
+	
+	// Poner la suma de maniobras puntuales en la lista de espera
 	commands = commands.slice().splice(0, index + 1)
 		.concat(a_rray)
 		.concat(commands.slice().splice(index + 1, commands.length));
@@ -392,6 +479,7 @@ function comCenter(sat){
 };
 function comClonePhase(){
 	Satellite.clone_phase();
+	Satellite.flight_leg();
 	orbitLoop(true);
 };
 function comEnd(){
@@ -407,8 +495,12 @@ function comVehicle(v){
 	implement_vehicle();
 	orbitLoop(true);
 };
-function comSeparate(){
-	Satellite.ctrl.separate_stage();
+function comJettison(){
+	Satellite.ctrl.jettison();
+	orbitLoop(true);
+};
+function comSeparate(n){
+	Satellite.ctrl.separate_stages(n);
 	orbitLoop(true);
 };
 function comConstBurn(index, b_time, parts){
@@ -469,8 +561,11 @@ function commandResolve(cmd, index){
 		case 'vehicle':
 			comVehicle(cmd[1]);
 			break;
+		case 'jettison':
+			comJettison();
+			break;
 		case 'separate':
-			comSeparate();
+			comSeparate(cmd[1]);
 			break;
 		case 'c_burn':
 			comConstBurn(index, cmd[1], cmd[2]);
@@ -541,7 +636,6 @@ function orbitLoop(auto){
 	};
 	
 	//------------SIMULACIÓN------------
-	
 	// Control manual
 	Satellite.ctrl_routine();
 	Satellite.phase_control();
@@ -858,7 +952,7 @@ vehicle_set_button.onclick = () => {
 };
 const separate_button = document.getElementById("separate");
 separate_button.onclick = () => {
-	Satellite.ctrl.separate_stage();
+	Satellite.ctrl.jettison();
 };
 
 //-------PROGRAMA PRINCIPAL-----------
@@ -1038,11 +1132,11 @@ commands = [
 	['mag', '2.9'],
 	['addtime', '0.001655'],
 	['phase'],
-	['separate'],
+	['jettison'],
 	['mag', '6.81'],
 	['addtime', '0.0047'],
 	['phase'],
-	['separate'],
+	['jettison'],
 	['mag_x', '-0.5229073288'],
 	['mag_y', '0.8420810382'],
 	['mag_z', '0.1321644829'],
@@ -1073,26 +1167,21 @@ commands = [
 	['mag', '1.63'],
 	['addtime', '0.82700'],
 	['clone'],
+	['separate', 2],
 	['ctrl', 'v012345678910'],
 	['vehicle', 'LM'],
 	['addtime', '0.08240'],
 	['phase'],
-	['mag', '1.62'],
-	['c_burn', 200, 10],
-	/*
-	['addtime', '0.032'],
-	['phase'],
-	['mag', '.6'],
-	['addtime', '0.002'],
-	['phase'],
-	['mag', '1e-2'],
-	['addtime', '0.0003'],
+	['mag', '1.607'],
+	['addtime', '0.02823'],
+	['c_burn', 420, 35],
 	['end'],
-	['addtime', '0.826'],
-	['phi', -3.833],
-	['lambda', 23.27],
+	['addtime', '0.89563'],
+	['phi', 0.5],
+	['lambda', 23.47],
 	['ra', 88],
-	['d', 80],
+	['d', 88],
+	/*	
 	['launch'],
 	['mag', '0.245'],
 	['addtime', '0.0017452'],

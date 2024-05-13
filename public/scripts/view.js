@@ -877,7 +877,7 @@ class View{
 				'WHITE'
 			]);
 			
-			// Visual Propellant Consumption
+			// Visual Propellant Consumption (maneuver)
 			request.push([
 				'rectangle', 
 				10,
@@ -935,6 +935,39 @@ class View{
 					'YELLOW'
 				]);
 			};
+			
+			// Visual Propellant Consumption (total)
+			let prop_perc = ( s_mp0 - s_mp ) / Stage.get_stage(
+				Satellite.ctrl.vehicle.last_stage.name
+			).mp0;
+			request.push([
+				'rectangle', 
+				width_p(.7),
+				60,
+				50,
+				50,
+				'GREY'
+			]);
+			request.push([
+				'rectangle', 
+				width_p(.7),
+				60,
+				50,
+				max(
+					0,
+					50 * prop_perc
+				),
+				'BLUE'
+			]);
+			
+			// consumo de combustible
+			request.push([
+				'print', 
+				str( significant( 100 * prop_perc, 4 ) ) + ' %',
+				width_p(.7) + 60, 
+				60,
+				'BLUE'
+			]);
 		};
 	};
 	

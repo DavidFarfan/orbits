@@ -264,11 +264,29 @@ class Vehicle{
 		this.stages.push( this.last_stage );
 	};
 	
-	// Separation
-	separate_stage(dv){
+	// Jettison
+	jettison(dv){
 		let last_stage = this.stages.pop();
-		log( 'stage separated:' );
+		log( 'stage jettisoned:' );
 		log( last_stage );
+		this.burn(dv);
+	};
+	
+	// Separate
+	separate_stages(dv, n){
+		
+		// Suprimir desde el tope
+		let aux = this.stages.slice().reverse();
+		
+		// Extracción de etapas
+		for(var i=0; i<n; i++){
+			let top_stage = aux.pop();
+			log( 'stage separated:' );
+			log( top_stage );
+		};
+		
+		// Revertir cambio de sentido
+		this.stages = aux.reverse();
 		this.burn(dv);
 	};
 	

@@ -1048,9 +1048,14 @@ class Satellite{
 			this.vehicle.burn( this.delta_v );
 		};
 	};
-	separate_stage(){
+	jettison(){
 		if(this.vehicle != null){
-			this.vehicle.separate_stage( this.delta_v );
+			this.vehicle.jettison( this.delta_v );
+		};
+	};
+	separate_stages(n){
+		if(this.vehicle != null){
+			this.vehicle.separate_stages( this.delta_v, n );
 		};
 	};
 	
