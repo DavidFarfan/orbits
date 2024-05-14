@@ -138,18 +138,16 @@
 				</div>
 				<div class="flex-col" align="center">
 					<div class="slidecontainer">
-						<label>simul time</label>
+						Simul time:
 						<input type="text" value="" id="text_time">
+						<label id="label_time_add">From Now</label>
 						<div class="flex-col" align="center">
-							<label>edays past J2000</label>
-							<input type="button" class="button" value="apply time" id="button_time">
-							<label>edays past present</label>
-							<input type="button" class="button" value="add time" id="button_time_add">
 							<form>
-							  <label>
-								simul date
-								<input type="date" name="party" id="select_date" min="1-01-01" max="3000-12-31" />
-							  </label>
+								<input type="button" class="button" value="Specific" id="button_time_add">
+								<label style="visibility:hidden" id="select_label">Day</label>
+								<input style="visibility:hidden" type="date" id="select_date" min="1-01-01" max="3000-12-31"/>
+								<label style="visibility:hidden" id="label_hour">Hour</label>
+								<input style="visibility:hidden" type="time" id="select_hour" step='1' min="00:00" max="23:59"/>
 							</form>
 						</div>
 					</div>

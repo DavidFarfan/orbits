@@ -154,13 +154,15 @@ function view_vec_abs(o, vec, mag, color){
 // Fijar tiempo de simulación
 function apply_time(){
 	
-	// Calcular días transcurridos de la fecha ingresada
-	let date_in = new Date( select_date.value + " 12:00:00 GMT+00:00" );
-	let dif_days = to_eday( ms_to_s( date_in.getTime() - EPOCH_J2000.getTime() ) );
-	
 	// Fecha exacta
 	if(text_time.value == ''){
-		s_base_time = eday_to_s( dif_days );
+		
+		// Calcular tiempo transcurrido hasta la fecha ingresada desde J2000
+		let date_in = new Date(
+			select_date.value + ' ' + select_hour.value + ' GMT+00:00'
+		);
+		let dif_days = ms_to_s( date_in.getTime() - EPOCH_J2000.getTime() );
+		s_base_time = dif_days;
 		
 	// Días desde J2000
 	}else{
@@ -168,7 +170,7 @@ function apply_time(){
 	};
 };
 
-// Adelantar tiempo de simulación
+// Sumar/Restar tiempo de simulación
 function add_time(){
 	s_base_time += eday_to_s( Number( text_time.value ) );
 };
@@ -423,8 +425,9 @@ function constant_burn(index, b_time, parts, add){
 };
 
 // Comandos de uso automático
-function comDate(date){
+function comDate(date, hour){
 	select_date.value = date;
+	select_hour.value = hour;
 	apply_time();
 	orbitLoop(true);
 };
@@ -522,10 +525,10 @@ function comConstBurn(index, b_time, parts, add){
 	orbitLoop(true);
 };
 function commandResolve(cmd, index){
-	log(cmd[1]);
+	log('cmd: ' + cmd[0]);
 	switch(cmd[0]){
 		case 'date':
-			comDate(cmd[1]);
+			comDate(cmd[1], cmd[2]);
 			break;
 		case 'addtime':
 			comAddTime(cmd[1]);
@@ -810,15 +813,49 @@ display_page_button.onclick = () => {
 
 // Captura de tiempo de simulación
 const text_time = document.getElementById("text_time");
+const select_label = document.getElementById("select_label");
 const select_date = document.getElementById("select_date");
-const button_time = document.getElementById("button_time");
-button_time.onclick = () => {
-	apply_time();
-};
-
+const label_hour = document.getElementById("label_hour");
+const select_hour = document.getElementById("select_hour");
+text_time.addEventListener("keypress", function(event){ 
+  if(event.key == "Enter"){
+    if(button_time_add.value[0] == 'S'){
+		add_time();
+	}else if(button_time_add.value[0] == 'A'){
+		apply_time();
+	};
+  };
+  if(event.key == "-"){
+    event.preventDefault();
+	if(text_time.value[0] == '-'){
+		text_time.value = text_time.value.substring( 1 );
+	}else{
+		text_time.value = '-' + text_time.value;
+	};
+  };
+});
+const label_time_add = document.getElementById("label_time_add");
 const button_time_add = document.getElementById("button_time_add");
 button_time_add.onclick = () => {
-	add_time();
+	if(button_time_add.value[0] == 'S'){
+		button_time_add.value = 'Add/Sub';
+		text_time.value = "";
+		select_date.style.visibility = 'visible';
+		select_label.style.visibility = 'visible';
+		select_hour.style.visibility = 'visible';
+		label_hour.style.visibility = 'visible';
+	}else if(button_time_add.value[0] == 'A'){
+		button_time_add.value = 'Specific';
+		select_date.style.visibility = 'hidden';
+		select_label.style.visibility = 'hidden';
+		select_hour.style.visibility = 'hidden';
+		label_hour.style.visibility = 'hidden';
+	};
+	if(label_time_add.innerHTML[0] == 'F'){
+		label_time_add.innerHTML = 'Past J2000';
+	}else if(label_time_add.innerHTML[0] == 'P'){
+		label_time_add.innerHTML = 'From Now';
+	};
 };
 
 // Captura de parámetros de escala de simulación
@@ -1131,8 +1168,8 @@ setInterval( orbitLoop, s_to_ms( 1 / frac ) );
 
 // Comandos de misión simulada
 commands = [
-	['date', '1969-07-16'],
-	['addtime', '0.0637'],
+	['date', '1969-07-16', '13:32:05'],
+	/*
 	['ctrl', 'earth'],
 	['phi', 28.5],
 	['lambda', -80.5],
@@ -1217,17 +1254,6 @@ commands = [
 	['ctrl', 'v012345678911'],
 	['ctrl', 'v11234567891011121314151617181920212223'],
 	['merge'],
-	/*
-	['addtime', '0.28'],
-	['phase'],
-	['mag', '2.58'],
-	['addtime', '0.58'],
-	['phase'],
-	['center', 'earth'],
-	['addtime', '2.2648'],
-	['phase'],
-	['mag', '1e-2'],
-	['addtime', '0.00102'],
-	['end']*/
+	*/
 ];
 trip();
