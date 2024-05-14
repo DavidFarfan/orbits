@@ -164,6 +164,10 @@ class Satellite{
 			Satellite.get_sat( destin ).end_set( vehicle_name );
 			Satellite.ctrl.end_set( vehicle_name );
 			
+			// Unión de las etapas
+			Satellite.get_sat( vehicle_name )
+				.join_stages( Satellite.ctrl.vehicle.copy() );
+			
 			// Ceder el control a los nuevos settings
 			set_center_ctrl( vehicle_name );
 		};
@@ -1058,6 +1062,12 @@ class Satellite{
 			this.vehicle.separate_stages( this.delta_v, n );
 		};
 	};
+	join_stages(v){
+		if(this.vehicle != null){
+			this.vehicle.join_stages( this.delta_v, v );
+		};
+	};
+	
 	
 	// Parámetro gravitatorio al que está sometido
 	get_gravity(){

@@ -290,6 +290,13 @@ class Vehicle{
 		this.burn(dv);
 	};
 	
+	// Join
+	join_stages(dv, v){
+		this.stages = this.stages.slice()
+			.concat( v.stages.slice() );
+		this.burn(dv);
+	};
+	
 	// Copia del vehículo
 	copy(continuity){
 		let copy_vehicle = new Vehicle(

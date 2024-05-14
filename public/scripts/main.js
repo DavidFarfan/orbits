@@ -90,6 +90,7 @@ function set_time(t){
 
 // Poner satélite en el centro y controlarlo
 function set_center_ctrl(name){
+	ctrl_sat.value = name;
 	center_body = Satellite.get_sat( name );
 	Satellite.get_sat( name ).ctrl_set( true );
 };
@@ -963,8 +964,8 @@ const vehicle_set_button = document.getElementById("vehicle_set");
 vehicle_set_button.onclick = () => {
 	implement_vehicle();
 };
-const separate_button = document.getElementById("separate");
-separate_button.onclick = () => {
+const jettison_button = document.getElementById("jettison");
+jettison_button.onclick = () => {
 	Satellite.ctrl.jettison();
 };
 
@@ -1189,7 +1190,7 @@ commands = [
 	['addtime', '0.02823'],
 	['c_burn', 420, 20, false],
 	['end'],
-	['addtime', '0.907'],
+	['addtime', '0.9068'],
 	['phi', 0.5],
 	['lambda', 23.47],
 	['ra', 88],
@@ -1207,23 +1208,16 @@ commands = [
 	['mag_y', '-0.7355881534'],
 	['mag_z', '-0.04551007323'],
 	['mag', '1.638'],
-	/*	
-	['mag', '0.245'],
-	['addtime', '0.0017452'],
+	['addtime', '0.06077'],
 	['phase'],
-	['mag', '1.688'],
-	['addtime', '0.038'],
-	['phase'],
-	['mag', '1.637'],
-	['addtime', '0.1'],
-	['phase'],
-	['mag_x', '-1.012320220'],
-	['mag_y', '-1.216002404'],
-	['mag_z', '-0.4381437895'],
+	['mag_x', '1.204147339'],
+	['mag_y', '1.111137938'],
+	['mag_z', '0.05455444136'],
 	['addtime', '0.036'],
-	['ctrl', 'v012345678'],
-	['ctrl', 'v1123'],
+	['ctrl', 'v012345678911'],
+	['ctrl', 'v11234567891011121314151617181920212223'],
 	['merge'],
+	/*
 	['addtime', '0.28'],
 	['phase'],
 	['mag', '2.58'],
