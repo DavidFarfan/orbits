@@ -294,7 +294,7 @@ function implement_vehicle(){
 };
 
 // Impulso continuo (segundos)
-function constant_burn(index, b_time, parts){
+function constant_burn(index, b_time, parts, add){
 	
 	// Variables de la maniobra
 	let dt = b_time / parts; 						// Tiempo entre cada punto (s)
@@ -311,12 +311,21 @@ function constant_burn(index, b_time, parts){
 	let pos_steem = Satellite.ctrl.orbit.r;			// Posición vectorial estimada
 	let vel_steem = Satellite.ctrl.orbit.v;			// Velocidad vectorial estimada
 	let orbit_steem = Satellite.ctrl.orbit;			// Órbita estimada
+	let available_prop = 							// propelente disponible 
+		Satellite.ctrl.vehicle.last_stage.mp0
+		- Satellite.ctrl.vehicle.last_stage.mp;
 	
 	// Maniobras puntuales
 	for(var i=0; i<parts; i++){
 		
 		// Masa antes de la maniobra puntual (kg)
 		mass -= dp;
+		available_prop -= dp;
+		
+		// Terminar si el propelente no alcanza
+		if(available_prop < 0){
+			break;
+		};
 		
 		// Delta V requerido, intervalo constante y masa variable (propelente)
 		dv = dv_from_time(
@@ -328,7 +337,11 @@ function constant_burn(index, b_time, parts){
 		);
 		
 		// Velocidad a impartir en el punto actual (km/s)
-		vel -= dv;
+		if(add){
+			vel += dv;
+		}else{
+			vel -= dv;
+		};
 		
 		// Terminar si |v| < 0
 		if(vel < 0){
@@ -503,8 +516,8 @@ function comSeparate(n){
 	Satellite.ctrl.separate_stages(n);
 	orbitLoop(true);
 };
-function comConstBurn(index, b_time, parts){
-	constant_burn(index, b_time, parts);
+function comConstBurn(index, b_time, parts, add){
+	constant_burn(index, b_time, parts, add);
 	orbitLoop(true);
 };
 function commandResolve(cmd, index){
@@ -568,7 +581,7 @@ function commandResolve(cmd, index){
 			comSeparate(cmd[1]);
 			break;
 		case 'c_burn':
-			comConstBurn(index, cmd[1], cmd[2]);
+			comConstBurn(index, cmd[1], cmd[2], cmd[3]);
 			break;
 		case 'end':
 			comEnd();
@@ -1174,15 +1187,27 @@ commands = [
 	['phase'],
 	['mag', '1.607'],
 	['addtime', '0.02823'],
-	['c_burn', 420, 35],
+	['c_burn', 420, 20, false],
 	['end'],
-	['addtime', '0.89563'],
+	['addtime', '0.907'],
 	['phi', 0.5],
 	['lambda', 23.47],
 	['ra', 88],
 	['d', 88],
-	/*	
 	['launch'],
+	['vehicle', 'LM'],
+	['jettison'],
+	['c_burn', 94, 20, true],
+	['addtime', '0.00124'],
+	['phase'],
+	['mag', '1.688'],
+	['addtime', '0.03868'],
+	['phase'],
+	['mag_x', '0.6758985884'],
+	['mag_y', '-0.7355881534'],
+	['mag_z', '-0.04551007323'],
+	['mag', '1.638'],
+	/*	
 	['mag', '0.245'],
 	['addtime', '0.0017452'],
 	['phase'],

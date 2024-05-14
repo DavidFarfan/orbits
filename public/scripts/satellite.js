@@ -588,7 +588,7 @@ class Satellite{
 			sight_D,
 			LAMBDA,
 			PHI,
-			6
+			1e-3
 		);
 		
 		// Nombre del vehículo 
