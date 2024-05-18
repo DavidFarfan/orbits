@@ -13,108 +13,80 @@
 	<body>
 	
 	<!-- Contenedor de los gráficos -->
-	<div id='flexrow1' class="flex-container">
-		<div class="flex-row">
+	<div class="flex-row">
+		<div class="flex-col">
 			<canvas id='view' width="400" height="400"></canvas>
-		</div>
-		<div class="flex-row">
 			<div class="flex-col" align="center">
 				<h2>
-					control options
+					vehicle options
 				</h2>
 				<div class="container">
-					<label>ctrl sat</label>
-					<input type="text" value="" id="ctrl_sat">
-					<input type="button" class="button" value="Set Control" id="ctrl_button">
-				</div>
-				<div class="container">
-					<label>adjust center</label>
-					<input type="text" value="" id="adj_center">
-					<input type="button" class="button" value="Adjust center" id="adjust_button">
+					<label> vehicle name </label>
+					<input type="text" value="" id="vehicle_text">
+					<input type="button" class="button" value="Set" id="vehicle_set">
 				</div>
 				<div class="slidecontainer">
-					<label>pos x</label>
-					<input type="text" value="" id="pos_x_punctual">
-					<input type="button" class="button" value="reduce" id="posx_reduce">
-					<input type="button" class="button" value="increase" id="posx_increase">
+					<input type="button" class="button" value="Stage Jettison" id="jettison">
 				</div>
-				<div class="slidecontainer">
-					<label>pos y</label>
-					<input type="text" value="" id="pos_y_punctual">
-					<input type="button" class="button" value="reduce" id="posy_reduce">
-					<input type="button" class="button" value="increase" id="posy_increase">
-				</div>
-				<div class="slidecontainer">
-					<label>pos z</label>
-					<input type="text" value="" id="pos_z_punctual">
-					<input type="button" class="button" value="reduce" id="posz_reduce">
-					<input type="button" class="button" value="increase" id="posz_increase">
-				</div>
-				<div class="slidecontainer">
-					<label>vel x</label>
-					<input type="text" value="" id="vel_x_punctual">
-					<input type="button" class="button" value="reduce" id="velx_reduce">
-					<input type="button" class="button" value="increase" id="velx_increase">
-				</div>
-				<div class="slidecontainer">
-					<label>vel y</label>
-					<input type="text" value="" id="vel_y_punctual">
-					<input type="button" class="button" value="reduce" id="vely_reduce">
-					<input type="button" class="button" value="increase" id="vely_increase">
-				</div>
-				<div class="slidecontainer">
-					<label>vel z</label>
-					<input type="text" value="" id="vel_z_punctual">
-					<input type="button" class="button" value="reduce" id="velz_reduce">
-					<input type="button" class="button" value="increase" id="velz_increase">
-				</div>
-				<div class="slidecontainer">
-					<label>magnitude</label>
-					<input type="text" value="" id="magnitude_punctual">
-					<input type="button" class="button" value="apply" id="magnitude_button">
-				</div>
-				<div class="container">
+			</div>
+		</div>
+		<div class="flex-col">
+			<h2 align="center">control options</h2>
+			<div class="flex-row">
+				<div class="grid_block">
+					ctrl sat
+					<input type="text" style="width:100%" value="" id="ctrl_sat">
+					adjust center
+					<input type="text" style="width:100%" value="" id="adj_center">
+					pos x
+					<input type="text" style="width:100%" value="" id="pos_x_punctual">
+					pos y
+					<input type="text" style="width:100%" value="" id="pos_y_punctual">
+					pos z
+					<input type="text" style="width:100%" value="" id="pos_z_punctual">
+					vel x
+					<input type="text" style="width:100%" value="" id="vel_x_punctual">
+					vel y
+					<input type="text" style="width:100%" value="" id="vel_y_punctual">
+					vel z
+					<input type="text" style="width:100%" value="" id="vel_z_punctual">
+					magnitude
+					<input type="text" style="width:100%" value="" id="magnitude_punctual">
 					<input type="button" class="button" value="Epoch" id="epoch_button">
-				</div>
-				<div class="slidecontainer">
 					<input type="button" class="button" value="End" id="end_sat">
-				</div>
-				<div class="container">
 					<input type="button" class="button" value="Delete" id="delete">
 				</div>
-			</div>
-			<div class="flex-col" align="center">
-				<h2>
-					launch options
-				</h2>
-				<div class="slidecontainer">
-					<label>lat</label>
-					<input type="range" min="-100" max="100" value="0" class="slider" id="lat">
-				</div>
-				<div class="slidecontainer">
-					<label>long</label>
-					<input type="range" min="-100" max="100" value="0" class="slider" id="long">
-				</div>
-				<div class="slidecontainer">
-					<label>ra</label>
-					<input type="range" min="-100" max="100" value="0" class="slider" id="ra">
-				</div>
-				<div class="slidecontainer">
-					<label>d</label>
-					<input type="range" min="0" max="100" value="0" class="slider" id="d">
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Launch" id="launch">
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Phase" id="phase">
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Undock" id="undock">
+				<div class="flex-col">
+					<div class="slidecontainer">
+						<label>lat</label>
+						<input type="range" min="-100" max="100" value="0" class="slider" id="lat">
+					</div>
+					<div class="slidecontainer">
+						<label>long</label>
+						<input type="range" min="-100" max="100" value="0" class="slider" id="long">
+					</div>
+					<div class="slidecontainer">
+						<label>ra</label>
+						<input type="range" min="-100" max="100" value="0" class="slider" id="ra">
+					</div>
+					<div class="slidecontainer">
+						<label>d</label>
+						<input type="range" min="0" max="100" value="0" class="slider" id="d">
+					</div>
+					<div class="slidecontainer">
+						<input type="button" class="button" value="Launch" id="launch">
+					</div>
+					<div class="slidecontainer">
+						<input type="button" class="button" value="Phase" id="phase">
+					</div>
+					<div class="slidecontainer">
+						<input type="button" class="button" value="Undock" id="undock">
+					</div>
 				</div>
 			</div>
+			<h2 align="center">launch options</h2>
 		</div>
-		<div class="flex-row">
+		<div class="flex-col">
 			<div class="flex-col" align="center">
 				<h2>
 					simul options
@@ -143,7 +115,7 @@
 						<label id="label_time_add">From Now</label>
 						<div class="flex-col" align="center">
 							<form>
-								<input type="button" class="button" value="Specific" id="button_time_add">
+								<label id="label_time_add_2">Add/Sub Time</label>
 								<label style="visibility:hidden" id="select_label">Day</label>
 								<input style="visibility:hidden" type="date" id="select_date" min="1-01-01" max="3000-12-31"/>
 								<label style="visibility:hidden" id="label_hour">Hour</label>
@@ -152,9 +124,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Display next page" id="page">
-				</div>
+				<input type="button" class="button" value="Display next page" id="page">
 			</div>
 			<div class="flex-col" align="center">
 				<h2>
@@ -209,21 +179,6 @@
 				<div class="slidecontainer">
 					<input type="button" class="button" value="Apply" id="apply_apsis">
 				</div>
-			</div>
-		</div>
-	</div>
-	<div id='flexrow2' class="flex-container-2">
-		<div class="flex-col" align="center">
-			<h2>
-				vehicle options
-			</h2>
-			<div class="container">
-				<label> vehicle name </label>
-				<input type="text" value="" id="vehicle_text">
-				<input type="button" class="button" value="Set" id="vehicle_set">
-			</div>
-			<div class="slidecontainer">
-				<input type="button" class="button" value="Stage Jettison" id="jettison">
 			</div>
 		</div>
 	</div>

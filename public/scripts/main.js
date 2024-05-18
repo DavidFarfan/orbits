@@ -239,53 +239,53 @@ function adjust_center(){
 };
 
 // Ajustar Posición y Velocidad del satélite controlado
-function sub_pos_x(){
+function sub_pos_x(punctual){
 	Satellite.moved = -1;
-	punctual_changes = pos_x_punctual.value != '';
+	punctual_changes = punctual;
 };
-function add_pos_x(){
+function add_pos_x(punctual){
 	Satellite.moved = 1;
-	punctual_changes = pos_x_punctual.value != '';
+	punctual_changes = punctual;
 };
-function sub_pos_y(){
+function sub_pos_y(punctual){
 	Satellite.moved = -2;
-	punctual_changes = pos_y_punctual.value != '';
+	punctual_changes = punctual;
 };
-function add_pos_y(){
+function add_pos_y(punctual){
 	Satellite.moved = 2;
-	punctual_changes = pos_y_punctual.value != '';
+	punctual_changes = punctual;
 };
-function sub_pos_z(){
+function sub_pos_z(punctual){
 	Satellite.moved = -3;
-	punctual_changes = pos_z_punctual.value != '';
+	punctual_changes = punctual;
 };
-function add_pos_z(){
+function add_pos_z(punctual){
 	Satellite.moved = 3;
-	punctual_changes = pos_z_punctual.value != '';
+	punctual_changes = punctual;
 };
-function sub_vel_x(){
+function sub_vel_x(punctual){
 	Satellite.moved = -4;
-	punctual_changes = vel_x_punctual.value != '';
+	punctual_changes = punctual;
 };
-function add_vel_x(){
+function add_vel_x(punctual){
 	Satellite.moved = 4;
-	punctual_changes = vel_x_punctual.value != '';
+	punctual_changes = punctual;
 };
-function sub_vel_y(){
+function sub_vel_y(punctual){
 	Satellite.moved = -5;
-	punctual_changes = vel_y_punctual.value != '';
+	punctual_changes = punctual;
 };
-function add_vel_y(){
+function add_vel_y(punctual){
 	Satellite.moved = 5;
-	punctual_changes = vel_y_punctual.value != '';
+	punctual_changes = punctual;
 };
-function sub_vel_z(){
+function sub_vel_z(punctual){
 	Satellite.moved = -6;
-	punctual_changes = vel_z_punctual.value != '';
+	punctual_changes = punctual;
 };
-function add_vel_z(){
+function add_vel_z(punctual){
 	Satellite.moved = 6;
-	punctual_changes = vel_z_punctual.value != '';
+	punctual_changes = punctual;
 };
 
 // Implementar vehiculo en un objeto satélite
@@ -711,77 +711,153 @@ canvas.addEventListener('mousemove', evt => {
 
 // CONTROL DEL SATÉLITE
 const pos_x_punctual = document.getElementById("pos_x_punctual");
+pos_x_punctual.addEventListener("keydown", event => {
+	if(event.key == "ArrowDown"){
+		event.preventDefault();
+		sub_pos_x();
+	}else if(event.key == "ArrowUp"){
+		event.preventDefault();
+		add_pos_x();
+	}else if(event.key == "Enter" && pos_x_punctual.value != ''){
+		event.preventDefault();
+		add_pos_x(true);
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(pos_x_punctual.value[0] == '-'){
+			pos_x_punctual.value = pos_x_punctual.value.substring( 1 );
+		}else{
+			pos_x_punctual.value = '-' + pos_x_punctual.value;
+		};
+	};
+});
 const pos_y_punctual = document.getElementById("pos_y_punctual");
+pos_y_punctual.addEventListener("keydown", event => {
+	if(event.key == "ArrowDown"){
+		event.preventDefault();
+		sub_pos_y();
+	}else if(event.key == "ArrowUp"){
+		event.preventDefault();
+		add_pos_y();
+	}else if(event.key == "Enter" && pos_y_punctual.value != ''){
+		event.preventDefault();
+		add_pos_y(true);
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(pos_y_punctual.value[0] == '-'){
+			pos_y_punctual.value = pos_y_punctual.value.substring( 1 );
+		}else{
+			pos_y_punctual.value = '-' + pos_y_punctual.value;
+		};
+	};
+});
 const pos_z_punctual = document.getElementById("pos_z_punctual");
+pos_z_punctual.addEventListener("keydown", event => {
+	if(event.key == "ArrowDown"){
+		event.preventDefault();
+		sub_pos_z();
+	}else if(event.key == "ArrowUp"){
+		event.preventDefault();
+		add_pos_z();
+	}else if(event.key == "Enter" && pos_z_punctual.value != ''){
+		event.preventDefault();
+		add_pos_z(true);
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(pos_z_punctual.value[0] == '-'){
+			pos_z_punctual.value = pos_z_punctual.value.substring( 1 );
+		}else{
+			pos_z_punctual.value = '-' + pos_z_punctual.value;
+		};
+	};
+});
 const vel_x_punctual = document.getElementById("vel_x_punctual");
+vel_x_punctual.addEventListener("keydown", event => {
+	if(event.key == "ArrowDown"){
+		event.preventDefault();
+		sub_vel_x();
+	}else if(event.key == "ArrowUp"){
+		event.preventDefault();
+		add_vel_x();
+	}else if(event.key == "Enter" && vel_x_punctual.value != ''){
+		event.preventDefault();
+		add_vel_x(true);
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(vel_x_punctual.value[0] == '-'){
+			vel_x_punctual.value = vel_x_punctual.value.substring( 1 );
+		}else{
+			vel_x_punctual.value = '-' + vel_x_punctual.value;
+		};
+	};
+});
 const vel_y_punctual = document.getElementById("vel_y_punctual");
+vel_y_punctual.addEventListener("keydown", event => {
+	if(event.key == "ArrowDown"){
+		event.preventDefault();
+		sub_vel_y();
+	}else if(event.key == "ArrowUp"){
+		event.preventDefault();
+		add_vel_y();
+	}else if(event.key == "Enter" && vel_y_punctual.value != ''){
+		event.preventDefault();
+		add_vel_y(true);
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(vel_y_punctual.value[0] == '-'){
+			vel_y_punctual.value = vel_y_punctual.value.substring( 1 );
+		}else{
+			vel_y_punctual.value = '-' + vel_y_punctual.value;
+		};
+	};
+});
 const vel_z_punctual = document.getElementById("vel_z_punctual");
-const posx_reduce = document.getElementById("posx_reduce");
-posx_reduce.onclick = () => {
-	sub_pos_x();
-};
-const posx_increase = document.getElementById("posx_increase");
-posx_increase.onclick = () => {
-	add_pos_x();
-};
-const posy_reduce = document.getElementById("posy_reduce");
-posy_reduce.onclick = () => {
-	sub_pos_y();
-}; 
-const posy_increase = document.getElementById("posy_increase");
-posy_increase.onclick = () => {
-	add_pos_y();
-};
-const posz_reduce = document.getElementById("posz_reduce");
-posz_reduce.onclick = () => {
-	sub_pos_z();
-};
-const posz_increase = document.getElementById("posz_increase");
-posz_increase.onclick = () => {
-	add_pos_z();
-};
-const velx_reduce = document.getElementById("velx_reduce");
-velx_reduce.onclick = () => {
-	sub_vel_x();
-};
-const velx_increase = document.getElementById("velx_increase");
-velx_increase.onclick = () => {
-	add_vel_x();
-};
-const vely_reduce = document.getElementById("vely_reduce");
-vely_reduce.onclick = () => {
-	sub_vel_y();
-};
-const vely_increase = document.getElementById("vely_increase");
-vely_increase.onclick = () => {
-	add_vel_y();
-};
-const velz_reduce = document.getElementById("velz_reduce");
-velz_reduce.onclick = () => {
-	sub_vel_z();
-};
-const velz_increase = document.getElementById("velz_increase");
-velz_increase.onclick = () => {
-	add_vel_z();
-};
+vel_z_punctual.addEventListener("keydown", event => {
+	if(event.key == "ArrowDown"){
+		event.preventDefault();
+		sub_vel_z();
+	}else if(event.key == "ArrowUp"){
+		event.preventDefault();
+		add_vel_z();
+	}else if(event.key == "Enter" && vel_z_punctual.value != ''){
+		event.preventDefault();
+		add_vel_z(true);
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(vel_z_punctual.value[0] == '-'){
+			vel_z_punctual.value = vel_z_punctual.value.substring( 1 );
+		}else{
+			vel_z_punctual.value = '-' + vel_z_punctual.value;
+		};
+	};
+});
 const magnitude_punctual = document.getElementById("magnitude_punctual");
-const magnitude_button = document.getElementById("magnitude_button");
-magnitude_button.onclick = () => {
-	set_magnitude();
-};
-
+magnitude_punctual.addEventListener("keydown", () => {
+	if(event.key == "Enter" && magnitude_punctual.value != ''){
+		set_magnitude();
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(magnitude_punctual.value[0] == '-'){
+			magnitude_punctual.value = magnitude_punctual.value.substring( 1 );
+		}else{
+			magnitude_punctual.value = '-' + magnitude_punctual.value;
+		};
+	};
+});
 const ctrl_sat = document.getElementById("ctrl_sat");
-const ctrl_button = document.getElementById("ctrl_button");
+ctrl_sat.addEventListener("keydown", () => {
+  if(event.key == "Enter"){
+	  select_sat_ctrl();
+  };
+});
+const adj_center = document.getElementById("adj_center");
+adj_center.addEventListener("keydown", () => {
+  if(event.key == "Enter"){
+	  adjust_center();
+  };
+});
 const depart_label = document.getElementById("depart_label");
 const destin_label = document.getElementById("destin_label");
-ctrl_button.onclick = () => {
-	select_sat_ctrl();
-};
-const adj_center = document.getElementById("adj_center");
 const adjust_button = document.getElementById("adjust_button");
-adjust_button.onclick = () => {
-	adjust_center();
-};
 const delete_btn = document.getElementById("delete");
 delete_btn.onclick = () => {
 	Satellite.kill();
@@ -817,46 +893,42 @@ const select_label = document.getElementById("select_label");
 const select_date = document.getElementById("select_date");
 const label_hour = document.getElementById("label_hour");
 const select_hour = document.getElementById("select_hour");
-text_time.addEventListener("keypress", function(event){ 
-  if(event.key == "Enter"){
-    if(button_time_add.value[0] == 'S'){
-		add_time();
-	}else if(button_time_add.value[0] == 'A'){
-		apply_time();
-	};
-  };
-  if(event.key == "-"){
-    event.preventDefault();
-	if(text_time.value[0] == '-'){
-		text_time.value = text_time.value.substring( 1 );
-	}else{
-		text_time.value = '-' + text_time.value;
-	};
-  };
-});
 const label_time_add = document.getElementById("label_time_add");
-const button_time_add = document.getElementById("button_time_add");
-button_time_add.onclick = () => {
-	if(button_time_add.value[0] == 'S'){
-		button_time_add.value = 'Add/Sub';
+const label_time_add_2 = document.getElementById("label_time_add_2");
+text_time.addEventListener("keydown", event => {
+	if(event.key == "Enter"){
+		if(label_time_add_2.innerHTML[0] == 'A'){
+			add_time();
+		}else if(label_time_add_2.innerHTML[0] == 'S'){
+			apply_time();
+		};
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(text_time.value[0] == '-'){
+			text_time.value = text_time.value.substring( 1 );
+		}else{
+			text_time.value = '-' + text_time.value;
+		};
+	}else if(event.key == "ArrowDown"){
+		event.preventDefault();
+		label_time_add.innerHTML = 'Past J2000';
 		text_time.value = "";
 		select_date.style.visibility = 'visible';
 		select_label.style.visibility = 'visible';
 		select_hour.style.visibility = 'visible';
 		label_hour.style.visibility = 'visible';
-	}else if(button_time_add.value[0] == 'A'){
-		button_time_add.value = 'Specific';
+		label_time_add_2.innerHTML = 'Specific Time:';
+	}else if(event.key == "ArrowUp"){
+		event.preventDefault();
+		label_time_add.innerHTML = 'From Now';
+		text_time.value = "";
 		select_date.style.visibility = 'hidden';
 		select_label.style.visibility = 'hidden';
 		select_hour.style.visibility = 'hidden';
 		label_hour.style.visibility = 'hidden';
+		label_time_add_2.innerHTML = 'Add/Sub Time';
 	};
-	if(label_time_add.innerHTML[0] == 'F'){
-		label_time_add.innerHTML = 'Past J2000';
-	}else if(label_time_add.innerHTML[0] == 'P'){
-		label_time_add.innerHTML = 'From Now';
-	};
-};
+});
 
 // Captura de parámetros de escala de simulación
 const s_scale_slider = document.getElementById("s_scale");
