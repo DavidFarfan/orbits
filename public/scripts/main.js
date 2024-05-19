@@ -125,6 +125,17 @@ function to_real_t(st){
 	return st / t_sense;
 };
 
+// Pedir un círculo al animador
+function view_circle(o, r, color){
+	request.push([
+		'circle',
+		to_px( o[c1] ),
+		to_px( o[c2] ),
+		2,
+		color
+	]);
+};
+
 // Pedir un vector escalado al animador
 function view_vec(o, vec, color){
 	request.push([
@@ -1006,7 +1017,6 @@ launch_button.onclick = () => {
 
 // Targeting
 const flight_time = document.getElementById("flight_time");
-const targeting_button = document.getElementById("targeting");
 const vel_vec_x_label = document.getElementById("vel_vec_x_label");
 const vel_vec_y_label = document.getElementById("vel_vec_y_label");
 const vel_vec_z_label = document.getElementById("vel_vec_z_label");
@@ -1016,25 +1026,35 @@ const a_max_label = document.getElementById("a_max_label");
 const t_min_label = document.getElementById("t_min_label");
 const t_des_label = document.getElementById("t_des_label");
 const t_max_label = document.getElementById("t_max_label");
-targeting_button.onclick = () => {
-	if(destin != null & depart != null){
-		let targeting_data = Satellite.get_sat( destin ).elliptic_targeting(
-			Satellite.get_sat( depart ),
-			flight_time.value * EDAY
-		);
-		
-		// Ver info. del targeting
-		vel_vec_x_label.innerHTML = significant( targeting_data.v.x, 10 );
-		vel_vec_y_label.innerHTML = significant( targeting_data.v.y, 10 );
-		vel_vec_z_label.innerHTML = significant( targeting_data.v.z, 10 );
-		a_min_label.innerHTML = significant( targeting_data.a[0], 3 );
-		a_des_label.innerHTML = significant( targeting_data.a[1], 3 );
-		a_max_label.innerHTML = significant( targeting_data.a[2], 3 );
-		t_min_label.innerHTML = significant( to_eday( targeting_data.t[0] ), 3 );
-		t_des_label.innerHTML = significant( to_eday( targeting_data.t[1] ), 3 );
-		t_max_label.innerHTML = significant( to_eday( targeting_data.t[2] ), 3 );
+flight_time.addEventListener("keydown", event => {
+	if(event.key == "Enter"){
+		event.preventDefault();
+		if(destin != null & depart != null){
+			let targeting_data = Satellite.get_sat( destin ).elliptic_targeting(
+				Satellite.get_sat( depart ),
+				flight_time.value * EDAY
+			);
+			
+			// Ver info. del targeting
+			vel_vec_x_label.innerHTML = significant( targeting_data.v.x, 10 );
+			vel_vec_y_label.innerHTML = significant( targeting_data.v.y, 10 );
+			vel_vec_z_label.innerHTML = significant( targeting_data.v.z, 10 );
+			a_min_label.innerHTML = significant( targeting_data.a[0], 3 );
+			a_des_label.innerHTML = significant( targeting_data.a[1], 3 );
+			a_max_label.innerHTML = significant( targeting_data.a[2], 3 );
+			t_min_label.innerHTML = significant( to_eday( targeting_data.t[0] ), 3 );
+			t_des_label.innerHTML = significant( to_eday( targeting_data.t[1] ), 3 );
+			t_max_label.innerHTML = significant( to_eday( targeting_data.t[2] ), 3 );
+		};
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(flight_time.value[0] == '-'){
+			flight_time.value = flight_time.value.substring( 1 );
+		}else{
+			flight_time.value = '-' + flight_time.value;
+		};
 	};
-};
+});
 
 // Dirección del apsis
 const apsis = document.getElementById("apsis");

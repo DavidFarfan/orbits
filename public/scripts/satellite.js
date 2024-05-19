@@ -1415,6 +1415,7 @@ class Satellite{
 		// Visualizar lanzamiento
 		let launch_pos = sum_vec( sum_vec( print_pos, this.orbit.r ), dir_rot.pos );
 		view_vec( launch_pos, dir_rot.vel, 'RED' );
+		view_circle( launch_pos, 2, 'RED');
 		
 		// Aterrizaje
 		if(this.orbited != null){

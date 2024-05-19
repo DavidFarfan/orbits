@@ -21,8 +21,22 @@ body{
 
 .grid_block {
   display: grid;
-  grid-template-columns: 100px 200px;
+  grid-template-columns: 100px 160px;
   gap: 5px;
   grid-auto-rows: minmax(20px, auto);
   justify-items: end;
+}
+
+.grid_row {
+  display: grid;
+  width: 400px;
+  gap: 5px;
+  grid-auto-flow: column;
+}
+
+.grid_column {
+  display: grid;
+  width: 400px;
+  gap: 5px;
+  grid-auto-flow: row;
 }

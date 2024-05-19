@@ -32,108 +32,77 @@
 		</div>
 		<div class="flex-col">
 			<h2 align="center">control options</h2>
-			<div class="flex-row">
-				<div class="grid_block">
-					ctrl sat
-					<input type="text" style="width:100%" value="" id="ctrl_sat">
-					adjust center
-					<input type="text" style="width:100%" value="" id="adj_center">
-					pos x
-					<input type="text" style="width:100%" value="" id="pos_x_punctual">
-					pos y
-					<input type="text" style="width:100%" value="" id="pos_y_punctual">
-					pos z
-					<input type="text" style="width:100%" value="" id="pos_z_punctual">
-					vel x
-					<input type="text" style="width:100%" value="" id="vel_x_punctual">
-					vel y
-					<input type="text" style="width:100%" value="" id="vel_y_punctual">
-					vel z
-					<input type="text" style="width:100%" value="" id="vel_z_punctual">
-					magnitude
-					<input type="text" style="width:100%" value="" id="magnitude_punctual">
-					<input type="button" class="button" value="Epoch" id="epoch_button">
-					<input type="button" class="button" value="End" id="end_sat">
-					<input type="button" class="button" value="Delete" id="delete">
-				</div>
-				<div class="flex-col">
-					<div class="slidecontainer">
-						<label>lat</label>
-						<input type="range" min="-100" max="100" value="0" class="slider" id="lat">
-					</div>
-					<div class="slidecontainer">
-						<label>long</label>
-						<input type="range" min="-100" max="100" value="0" class="slider" id="long">
-					</div>
-					<div class="slidecontainer">
-						<label>ra</label>
-						<input type="range" min="-100" max="100" value="0" class="slider" id="ra">
-					</div>
-					<div class="slidecontainer">
-						<label>d</label>
-						<input type="range" min="0" max="100" value="0" class="slider" id="d">
-					</div>
-					<div class="slidecontainer">
-						<input type="button" class="button" value="Launch" id="launch">
-					</div>
-					<div class="slidecontainer">
-						<input type="button" class="button" value="Phase" id="phase">
-					</div>
-					<div class="slidecontainer">
-						<input type="button" class="button" value="Undock" id="undock">
-					</div>
-				</div>
+			<div class="grid_block">
+				ctrl sat
+				<input type="text" style="width:100%" value="" id="ctrl_sat">
+				adjust center
+				<input type="text" style="width:100%" value="" id="adj_center">
+				pos x
+				<input type="text" style="width:100%" value="" id="pos_x_punctual">
+				pos y
+				<input type="text" style="width:100%" value="" id="pos_y_punctual">
+				pos z
+				<input type="text" style="width:100%" value="" id="pos_z_punctual">
+				vel x
+				<input type="text" style="width:100%" value="" id="vel_x_punctual">
+				vel y
+				<input type="text" style="width:100%" value="" id="vel_y_punctual">
+				vel z
+				<input type="text" style="width:100%" value="" id="vel_z_punctual">
+				magnitude
+				<input type="text" style="width:100%" value="" id="magnitude_punctual">
+				<input type="button" class="button" value="Epoch" id="epoch_button">
+				<input type="button" class="button" value="End" id="end_sat">
+				<input type="button" class="button" value="Delete" id="delete">
 			</div>
 			<h2 align="center">launch options</h2>
+			<div class="grid_block">
+				lat
+				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="lat">
+				long
+				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="long">
+				ra
+				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="ra">
+				d
+				<input type="range" style="width:100%" min="0" max="100" value="0" class="slider" id="d">
+				<input type="button" class="button" value="Launch" id="launch">
+				<input type="button" class="button" value="Phase" id="phase">
+				<input type="button" class="button" value="Undock" id="undock">
+			</div>
 		</div>
 		<div class="flex-col">
-			<div class="flex-col" align="center">
-				<h2>
-					simul options
-				</h2>
-				<div class="slidecontainer">
-					<label>space scale</label>
-					<input type="range" min="-100" max="100" value="0" class="slider" id="s_scale">
-				</div>
-				<div class="slidecontainer">
-					<label>zoom</label>
-					<input type="range" min="1" max="100" value="1" class="slider" id="zoom">
-				</div>
-				<div class="slidecontainer">
-					<label>time scale</label>
-					<input type="range" min="-300" max="300" value="0" class="slider" id="t_scale">
-				</div>
-				<div class="slidecontainer">
-					<label>time sense</label>
-					<input type="range" min="-100" max="100" value="0" class="slider" id="t_sense">
-					<input type="button" class="button" value="Za Warudo" id="stop_button">
-				</div>
-				<div class="flex-col" align="center">
-					<div class="slidecontainer">
-						Simul time:
-						<input type="text" value="" id="text_time">
-						<label id="label_time_add">From Now</label>
-						<div class="flex-col" align="center">
-							<form>
-								<label id="label_time_add_2">Add/Sub Time</label>
-								<label style="visibility:hidden" id="select_label">Day</label>
-								<input style="visibility:hidden" type="date" id="select_date" min="1-01-01" max="3000-12-31"/>
-								<label style="visibility:hidden" id="label_hour">Hour</label>
-								<input style="visibility:hidden" type="time" id="select_hour" step='1' min="00:00" max="23:59"/>
-							</form>
-						</div>
-					</div>
-				</div>
+			<h2 align="center">simul options</h2>
+			<div class="grid_row">
+				Simul time
+				<input type="text" style="width:100%" value="" id="text_time">
+				<label id="label_time_add">From Now</label>
+			</div>
+			<div class="grid_row">
+				<label id="label_time_add_2">Add/Sub Time</label>
+				<label style="visibility:hidden" id="select_label">Day</label>
+				<input style="visibility:hidden" type="date" id="select_date" min="1-01-01" max="3000-12-31"/>
+				<label style="visibility:hidden" id="label_hour">Hour</label>
+				<input style="visibility:hidden" type="time" id="select_hour" step='1' min="00:00" max="23:59"/>
+			</div>
+			<div class="grid_row">
 				<input type="button" class="button" value="Display next page" id="page">
 			</div>
-			<div class="flex-col" align="center">
-				<h2>
-					targeting options
-				</h2>
+			<div class="grid_block">
+				space scale
+				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="s_scale">
+				zoom
+				<input type="range" style="width:100%" min="1" max="100" value="1" class="slider" id="zoom">
+				time scale
+				<input type="range" style="width:100%" min="-300" max="300" value="0" class="slider" id="t_scale">
+				time sense
+				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="t_sense">
+				<input type="button" class="button" value="Za Warudo" id="stop_button">
+			</div>
+			<h2 align="center">targeting options</h2>
+			<div class="grid_column">
 				<div class="container">
-					<label> desired flight time (days) </label>
+					flight time
 					<input type="text" value="" id="flight_time">
-					<input type="button" class="button" value="Elliptic Targeting" id="targeting">
 				</div>
 				<div>
 					departure:
