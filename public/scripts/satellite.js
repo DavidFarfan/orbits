@@ -1,6 +1,9 @@
 //--------SATÉLITE----------
 class Satellite{
 	
+	// Serial de satélites
+	static serial = 0;
+	
 	// Lista de satélites
 	static list = [];
 	
@@ -43,7 +46,7 @@ class Satellite{
 				1e9,
 				0,
 				1e9,
-				deg_to_rad( 45 ),
+				deg_to_rad( 0 ),
 				deg_to_rad( 0 ),
 				deg_to_rad( 0 ),
 				deg_to_rad( 0 )
@@ -121,7 +124,7 @@ class Satellite{
 			
 			// Crear un satélite en el punto de simulación
 			let phase_no = Satellite.get_sat( destin ).phase + 1;
-			let vehicle_name = Satellite.get_sat( destin ).name + str( phase_no );
+			let vehicle_name = 'v' + str( Satellite.serial );
 			new Satellite(
 				vehicle_name, 
 				Satellite.get_sat( destin ).orbited, 
@@ -185,7 +188,7 @@ class Satellite{
 		
 		// Crear un satélite en el punto de simulación
 		let phase_no = Satellite.ctrl.phase + 1;
-		let vehicle_name = Satellite.ctrl.name + str( phase_no );
+		let vehicle_name = 'v' + str( Satellite.serial );
 		new Satellite(
 			vehicle_name, 
 			Satellite.ctrl.orbited, 
@@ -226,8 +229,11 @@ class Satellite{
 		// Modificar intervalo de visibilidad
 		Satellite.get_sat( vehicle_name ).init_set( Satellite.ctrl.name );
 		
-		// Contar desacople como una fase
-		Satellite.ctrl.phase += 1;
+		// Agregar item a la lista de undocked
+		Satellite.ctrl.undocked_list( vehicle_name );
+		
+		// Ceder el control al undocked
+		set_center_ctrl( vehicle_name );
 	};
 	
 	// Flight leg
@@ -242,7 +248,7 @@ class Satellite{
 		
 		// Crear un satélite en el punto de simulación
 		let phase_no = Satellite.ctrl.phase + 1;
-		let vehicle_name = Satellite.ctrl.name + str( phase_no );
+		let vehicle_name = 'v' + str( Satellite.serial );
 		new Satellite(
 			vehicle_name, 
 			Satellite.ctrl.orbited, 
@@ -647,6 +653,7 @@ class Satellite{
 		set_center_ctrl( vehicle_name );
 	};
 	
+	
 	// Control de fases
 	static phase_control(){
 		if(Satellite.ctrl.antelife()){
@@ -664,12 +671,41 @@ class Satellite{
 		
 		// Dejar la fase anterior con validez permanente
 		if(this.prev_sat != null){
-			Satellite.get_sat( this.prev_sat ).end_set();
+			
+			// Evitar que un undocked altere la validez
+			if(Satellite.get_sat( this.prev_sat ).next_sat == this.name){
+				Satellite.get_sat( this.prev_sat ).end_set();
+			};
 		};
 		
-		// Desaparecer
+		// Matar los undocked de la fase
+		if(this.undocked != null){
+			log('deleting childs of: ' + this.name);
+			for(var i=0; i<this.undocked.length; i++){
+				log(this.undocked[i]);
+				Satellite.get_sat( this.undocked[i] ).kill_sat();
+			};
+		};
+		
+		// Matar en cadena las fases siguientes
+		if(this.next_sat != null){
+			Satellite.get_sat( this.next_sat ).kill_sat();
+		};
+		
+		// Matarse a sí mismo
 		this.name_set('dead');
 		this.set_live();
+	};
+	
+	// Lista de undocked
+	undocked_list(name){
+		
+		// Actualizar o crear
+		if(this.undocked == null){
+			this.undocked = [name];
+		}else{
+			this.undocked.push(name);
+		};
 	};
 	
 	// Antevida
@@ -1344,7 +1380,7 @@ class Satellite{
 			draw_radius = 1;
 		};
 		request.push([
-			'circle',
+			'circle_f',
 			to_px( print_pos[c1] + this.orbit.r[c1] ),
 			to_px( print_pos[c2] + this.orbit.r[c2] ),
 			draw_radius,
@@ -1364,22 +1400,30 @@ class Satellite{
 			'RED'
 		]);
 		
-		// Vector r
-		view_vec( print_pos, this.pos, color );
-		
-		// Vector v
-		view_vec_abs( sum_vec( print_pos, this.pos ), this.vel, 0, color );
+		// Epoch
+		if(epoch_checkbox.checked){
+			
+			// Vector r
+			view_vec( print_pos, this.pos, color );
+			
+			// Vector v
+			view_vec_abs( sum_vec( print_pos, this.pos ), this.vel, 0, color );
+		};
 		
 		// Vector h
-		view_vec_abs( print_pos, this.h_vec, -2, 'CYAN' );
+		if(momentum_checkbox.checked){
+			view_vec_abs( print_pos, this.h_vec, -2, 'CYAN' );
+		};
 		
 		// Eje de rotación
-		view_vec_abs(
-			sum_vec( print_pos, this.orbit.r ),
-			this.orbit.perturbation.rot_axis,
-			-3,
-			'PURPLE'
-		);
+		if(rotation_checkbox.checked){
+			view_vec_abs(
+				sum_vec( print_pos, this.orbit.r ),
+				this.orbit.perturbation.rot_axis,
+				-3,
+				'PURPLE'
+			);
+		};
 		
 		// Nombre
 		request.push([ 
@@ -1418,7 +1462,7 @@ class Satellite{
 		view_circle( launch_pos, 2, 'RED');
 		
 		// Aterrizaje
-		if(this.orbited != null){
+		if( orbit_dim_checkbox.checked && this.orbited != null){
 			let land_coords = this.landing_coordinates();
 			request.push([ 
 				'print',
@@ -1432,7 +1476,7 @@ class Satellite{
 			]);
 			
 			// Distancia a la superficie (er)
-			let r_print = norm_vec( Satellite.ctrl.orbit.r ) - Satellite.get_sat(this.orbited).R;
+			let r_print = norm_vec( this.orbit.r ) - Satellite.get_sat( this.orbited ).R;
 			request.push([
 				'print', 
 				"|| r || (er) = "
@@ -1441,11 +1485,11 @@ class Satellite{
 					+ str( significant( to_mile( r_print ), 4 ) ),
 				to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
 				to_px( print_pos[c2] + this.orbit.r[c2] ) + 30,
-				'WHITE'
+				color
 			]);
 			
 			// Distancia mínima a la superficie (er)
-			let rp_print = Satellite.ctrl.orbit.perturbation.rp - Satellite.get_sat(this.orbited).R;
+			let rp_print = this.orbit.perturbation.rp - Satellite.get_sat( this.orbited ).R;
 			request.push([
 				'print', 
 				"|| rp || (er) = "
@@ -1454,11 +1498,11 @@ class Satellite{
 					+ str( significant( to_mile( rp_print ), 4 ) ),
 				to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
 				to_px( print_pos[c2] + this.orbit.r[c2] ) + 40,
-				'WHITE'
+				color
 			]);
 			
 			// Apoapse (er)
-			let ra_print = Satellite.ctrl.orbit.perturbation.ra - Satellite.get_sat(this.orbited).R;
+			let ra_print = this.orbit.perturbation.ra - Satellite.get_sat( this.orbited ).R;
 			request.push([
 				'print', 
 				"|| ra || (er) = "
@@ -1467,13 +1511,14 @@ class Satellite{
 					+ str( significant( to_mile( ra_print ), 4 ) ),
 				to_px( print_pos[c1] + this.orbit.r[c1] ) - 10, 
 				to_px( print_pos[c2] + this.orbit.r[c2] ) + 50,
-				'WHITE'
+				color
 			]);
 		};
 	};
 	
 	// Variables del satélite
 	constructor(name, orbited, R, m, u, pos, vel, rot, dif, ctrl, p){
+		Satellite.serial++;
 		this.set_live();
 		this.name_set(name);
 		this.orbited_set(orbited);

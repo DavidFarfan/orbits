@@ -98,11 +98,11 @@ class View{
 		// Lanzamiento (deg)
 		request.push([
 			'print', 
-			"Launch Settings from " + Satellite.ctrl.name + 
-			" -> RA: " + str( significant( rad_to_deg( sight_RA ), 4 ) ) + 
-			" -> D: " + str( significant( rad_to_deg( sight_D ), 4 ) ) + 
-			" -> lat: " + str( significant( rad_to_deg( PHI ), 4 ) ) + 
-			"° lon: " + str( significant( rad_to_deg( LAMBDA ), 4 ) ) + "°",
+			"Launch from " + Satellite.ctrl.name + 
+			", RA: " + str( significant( rad_to_deg( sight_RA ), 4 ) ) + 
+			", D: " + str( significant( rad_to_deg( sight_D ), 4 ) ) + 
+			", lat: " + str( significant( rad_to_deg( PHI ), 4 ) ) + 
+			"°, lon: " + str( significant( rad_to_deg( LAMBDA ), 4 ) ) + "°",
 			10, 
 			height_p( 1 ) - 20,
 			'WHITE'
@@ -111,7 +111,7 @@ class View{
 		// Tiempo local transcurrido (s)
 		request.push([
 			'print', 
-			"real elapsed (s) = " + str( significant( l_time, 4 ) ),
+			"Real elapsed (s) = " + str( significant( l_time, 4 ) ),
 			10, 
 			height_p( 1 ) - 30,
 			'WHITE'
@@ -120,8 +120,8 @@ class View{
 		// Tiempo de simulación absoluto (eday) y de órbita
 		request.push([
 			'print', 
-			"simul time (eday) = " + str( significant( to_eday( s_time ), 4 ) ) +
-			", orbit sim. time (eday) = " + str( significant( to_eday( Satellite.ctrl.orbit.t ), 4 ) ),
+			"Simul time (eday) = " + str( significant( to_eday( s_time ), 4 ) ) +
+			", Orbit sim. time (eday) = " + str( significant( to_eday( Satellite.ctrl.orbit.t ), 4 ) ),
 			10, 
 			height_p( 1 ) - 40,
 			'WHITE'
@@ -154,7 +154,7 @@ class View{
 		// Posición de la cámara (er)
 		request.push([
 			'print', 
-			"cam_center (er) = [ "
+			"Cam Center (er) = [ "
 				+ str( significant( to_er( center.x ), 4 ) ) + ", " 
 				+ str( significant( to_er( center.y ), 4 ) ) + ", " 
 				+ str( significant( to_er( center.z ), 4 ) ) 

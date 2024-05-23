@@ -15,63 +15,82 @@
 	<!-- Contenedor de los gráficos -->
 	<div class="flex-row">
 		<div class="flex-col">
-			<canvas id='view' width="400" height="400"></canvas>
-			<div class="flex-col" align="center">
-				<h2>
-					vehicle options
-				</h2>
-				<div class="container">
-					<label> vehicle name </label>
-					<input type="text" value="" id="vehicle_text">
-					<input type="button" class="button" value="Set" id="vehicle_set">
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Stage Jettison" id="jettison">
-				</div>
-			</div>
-		</div>
-		<div class="flex-col">
-			<h2 align="center">control options</h2>
+			<h2 align="center">Sat Control Options</h2>
 			<div class="grid_block">
-				ctrl sat
+				Satellite
 				<input type="text" style="width:100%" value="" id="ctrl_sat">
-				adjust center
+				Orbited Body
 				<input type="text" style="width:100%" value="" id="adj_center">
-				pos x
+				Pos x
 				<input type="text" style="width:100%" value="" id="pos_x_punctual">
-				pos y
+				Pos y
 				<input type="text" style="width:100%" value="" id="pos_y_punctual">
-				pos z
+				Pos z
 				<input type="text" style="width:100%" value="" id="pos_z_punctual">
-				vel x
+				Vel x
 				<input type="text" style="width:100%" value="" id="vel_x_punctual">
-				vel y
+				Vel y
 				<input type="text" style="width:100%" value="" id="vel_y_punctual">
-				vel z
+				Vel z
 				<input type="text" style="width:100%" value="" id="vel_z_punctual">
-				magnitude
+				Magnitude
 				<input type="text" style="width:100%" value="" id="magnitude_punctual">
-				<input type="button" class="button" value="Epoch" id="epoch_button">
-				<input type="button" class="button" value="End" id="end_sat">
-				<input type="button" class="button" value="Delete" id="delete">
 			</div>
-			<h2 align="center">launch options</h2>
+			<div class="grid_block_3">	
+				Lat
+				<input type="text" style="width:100%" value="" id="lat_punctual">
+				<input type="range" style="width:100%" min="-180" max="180" value="0" class="slider" id="lat">
+				Lon
+				<input type="text" style="width:100%" value="" id="long_punctual">
+				<input type="range" style="width:100%" min="-180" max="180" value="0" class="slider" id="long">
+				RA
+				<input type="text" style="width:100%" value="" id="ra_punctual">
+				<input type="range" style="width:100%" min="-180" max="180" value="0" class="slider" id="ra">
+				D
+				<input type="text" style="width:100%" value="" id="d_punctual">
+				<input type="range" style="width:100%" min="0" max="180" value="0" class="slider" id="d">
+			</div>
+			<h2 align="center">vehicle options</h2>
 			<div class="grid_block">
-				lat
-				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="lat">
-				long
-				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="long">
-				ra
-				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="ra">
-				d
-				<input type="range" style="width:100%" min="0" max="100" value="0" class="slider" id="d">
-				<input type="button" class="button" value="Launch" id="launch">
-				<input type="button" class="button" value="Phase" id="phase">
-				<input type="button" class="button" value="Undock" id="undock">
+				<label> vehicle name </label>
+				<input type="text" style="width:100%" value="" id="vehicle_text">
+			</div>
+			<input type="button" style="width:68%" class="button" value="Launch" id="launch">
+			<input type="button" style="width:68%" class="button" value="Phase" id="phase">
+			<input type="button" style="width:68%" class="button" value="Stage Jettison" id="jettison">
+			<input type="button" style="width:68%" class="button" value="Dock" id="dock">
+			<input type="button" style="width:68%" class="button" value="Undock" id="undock">
+			<input type="button" style="width:68%" class="button" value="End" id="end_sat">
+			<input type="button" style="width:68%" class="button" value="Delete" id="delete">
+		</div>
+		<div class="flex-col">
+			<canvas id='view' width="400" height="400"></canvas>
+			zoom
+			<input type="range" style="width:100%" min="1" max="100" value="1" class="slider" id="zoom">
+			space scale
+			<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="s_scale">
+			<div class="grid_row">
+				<label style="color: #55DD55;"> Ascending Node </label>
+				<input type="checkbox" id="asc_node_checkbox">
+				<label style="color: #DD5555;"> Periapse </label>
+				<input type="checkbox" id="periapse_checkbox">
+				<label style="color: #AAAAFF;"> Semi-latus Rectum </label>
+				<input type="checkbox" id="semi_lat_checkbox">
+				<label style="color: #55DDDD;"> Momentum </label>
+				<input type="checkbox" id="momentum_checkbox">
+				<label style="color: #AA88FF;"> Rotation Axis </label>
+				<input type="checkbox" id="rotation_checkbox">
+			</div>
+			<div class="grid_row">
+				<label> Epoch </label>
+				<input type="checkbox" id="epoch_checkbox">
+				<label> Orbit Dimensions </label>
+				<input type="checkbox" id="orbit_dim_checkbox">
+				<input type="button" class="button" value="Status Next Page" id="page">
 			</div>
 		</div>
 		<div class="flex-col">
-			<h2 align="center">simul options</h2>
+			<h2 align="center">Time options</h2>
 			<div class="grid_row">
 				Simul time
 				<input type="text" style="width:100%" value="" id="text_time">
@@ -84,71 +103,44 @@
 				<label style="visibility:hidden" id="label_hour">Hour</label>
 				<input style="visibility:hidden" type="time" id="select_hour" step='1' min="00:00" max="23:59"/>
 			</div>
-			<div class="grid_row">
-				<input type="button" class="button" value="Display next page" id="page">
-			</div>
+			<input type="button" style="width:100%" class="button" value="Stop" id="stop_button">
+			<input type="button" style="width:100%" class="button" value="Epoch" id="epoch_button">
 			<div class="grid_block">
-				space scale
-				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="s_scale">
-				zoom
-				<input type="range" style="width:100%" min="1" max="100" value="1" class="slider" id="zoom">
 				time scale
 				<input type="range" style="width:100%" min="-300" max="300" value="0" class="slider" id="t_scale">
 				time sense
 				<input type="range" style="width:100%" min="-100" max="100" value="0" class="slider" id="t_sense">
-				<input type="button" class="button" value="Za Warudo" id="stop_button">
-			</div>
-			<h2 align="center">targeting options</h2>
-			<div class="grid_column">
-				<div class="container">
-					flight time
-					<input type="text" value="" id="flight_time">
+			</div>			
+			<h2 style="width:68%" align="center">targeting options</h2>
+			<div class="grid_block">
+				flight time
+				<input type="text" style="width:100%" value="" id="flight_time">
+				departure:
+				<label id="depart_label"> - </label>
+				destination:
+				<label id="destin_label"> - </label>
+				targeting vel:
+				<div class="grid_column">
+					<label id="vel_vec_x_label"> 0 </label>
+					<label id="vel_vec_y_label"> 0 </label>
+					<label id="vel_vec_z_label"> 0 </label>
 				</div>
-				<div>
-					departure:
-					<label id="depart_label"> - </label>
+				targeting t:
+				<div class="grid_column">
+					<label id="t_min_label"> 0 </label>
+					<label id="t_des_label"> 0 </label>
+					<label id="t_max_label"> 0 </label>
 				</div>
-				<div>
-					destination:
-					<label id="destin_label"> - </label>
-				</div>
-				<div>
-					vel: [
-					<label id="vel_vec_x_label"> 0 </label> ,
-					<label id="vel_vec_y_label"> 0 </label> ,
-					<label id="vel_vec_z_label"> 0 </label> ]
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Apply" id="apply_vel">
-				</div>
-				<div>
-					a: [
-					<label id="a_min_label"> 0 </label> ,
-					<label id="a_des_label"> 0 </label> ,
-					<label id="a_max_label"> 0 </label> ]
-				</div>
-				<div>
-					t: [
-					<label id="t_min_label"> 0 </label> ,
-					<label id="t_des_label"> 0 </label> ,
-					<label id="t_max_label"> 0 </label> ]
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Dock" id="dock">
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Apsis" id="apsis">
-				</div>
-				<div>
-					vel: [
-					<label id="apsis_vec_x_label"> 0 </label> ,
-					<label id="apsis_vec_y_label"> 0 </label> ,
-					<label id="apsis_vec_z_label"> 0 </label> ]
-				</div>
-				<div class="slidecontainer">
-					<input type="button" class="button" value="Apply" id="apply_apsis">
+				apsis vel:
+				<div class="grid_column">
+					<label id="apsis_vec_x_label"> 0 </label>
+					<label id="apsis_vec_y_label"> 0 </label>
+					<label id="apsis_vec_z_label"> 0 </label>
 				</div>
 			</div>
+			<input type="button" style="width:68%" class="button" value="Apply vel" id="apply_vel">
+			<input type="button" style="width:68%" class="button" value="Apsis" id="apsis">
+			<input type="button" style="width:68%" class="button" value="Apply apsis" id="apply_apsis">
 		</div>
 	</div>
 	

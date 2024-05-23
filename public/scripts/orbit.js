@@ -332,13 +332,19 @@ class Orbit{
 		if(print_elem){
 			
 			// Nodo ascendente
-			view_vec( orbited_pos, this.perturbation.ascending_node, 'GREEN' );
+			if(asc_node_checkbox.checked){
+				view_vec( orbited_pos, this.perturbation.ascending_node, 'GREEN' );
+			};
 			
 			// Peripasis
-			view_vec( orbited_pos, this.perturbation.periapse, 'RED' );
+			if(periapse_checkbox.checked){
+				view_vec( orbited_pos, this.perturbation.periapse, 'RED' );
+			};
 			
 			// Semi-altura recta
-			view_vec( orbited_pos, this.perturbation.semi_latus_rectum, 'BLUE' );
+			if(semi_lat_checkbox.checked){
+				view_vec( orbited_pos, this.perturbation.semi_latus_rectum, 'BLUE' );
+			};
 		};
 		
 		// Curva de la órbita

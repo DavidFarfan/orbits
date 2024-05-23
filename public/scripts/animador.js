@@ -89,6 +89,18 @@ function ellipse(cx, cy, rx, ry, c){
 	ctx.stroke();
 }
 
+// Elipse Filled
+function ellipse_filled(cx, cy, rx, ry, c){
+	ctx.strokeStyle = colors[c];
+	ctx.fillStyle = colors[c];
+	ctx.beginPath();
+	ctx.ellipse(cx, cy, rx, ry, 0, 0, 2 * Math.PI);
+	ctx.stroke();
+	ctx.globalAlpha = 0.15;
+	ctx.fill();
+	ctx.globalAlpha = 1;
+}
+
 // Texto
 function print(txt, x, y, c){
 	
@@ -170,6 +182,9 @@ function solve(req){
 			break;
 		case 'circle':
 			ellipse(req[1], req[2], req[3], req[3], req[4]);
+			break;
+		case 'circle_f':
+			ellipse_filled(req[1], req[2], req[3], req[3], req[4]);
 			break;
 		case 'ellipse':
 			ellipse(req[1], req[2], req[3], req[4], req[5]);

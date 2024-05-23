@@ -7,6 +7,7 @@ body{
 
 #view{
 	cursor: crosshair;
+	width: 500;
 }
 
 .flex-row{
@@ -21,7 +22,15 @@ body{
 
 .grid_block {
   display: grid;
-  grid-template-columns: 100px 160px;
+  grid-template-columns: 130px 130px;
+  gap: 5px;
+  grid-auto-rows: minmax(20px, auto);
+  justify-items: end;
+}
+
+.grid_block_3 {
+  display: grid;
+  grid-template-columns: 60px 60px 140px;
   gap: 5px;
   grid-auto-rows: minmax(20px, auto);
   justify-items: end;
@@ -29,14 +38,12 @@ body{
 
 .grid_row {
   display: grid;
-  width: 400px;
   gap: 5px;
   grid-auto-flow: column;
 }
 
 .grid_column {
   display: grid;
-  width: 400px;
   gap: 5px;
   grid-auto-flow: row;
 }

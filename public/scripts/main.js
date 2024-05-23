@@ -875,6 +875,62 @@ delete_btn.onclick = () => {
 };
 
 // Captura de parámetros del punto sobre la superficie del satélite controlado
+const lat_punctual = document.getElementById("lat_punctual");
+lat_punctual.addEventListener("keydown", event => {
+	if(event.key == "Enter"){
+		PHI = deg_to_rad( lat_punctual.value );
+		slider_lat_set();
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(lat_punctual.value[0] == '-'){
+			lat_punctual.value = lat_punctual.value.substring( 1 );
+		}else{
+			lat_punctual.value = '-' + lat_punctual.value;
+		};
+	};
+});
+const long_punctual = document.getElementById("long_punctual");
+long_punctual.addEventListener("keydown", event => {
+	if(event.key == "Enter"){
+		LAMBDA = deg_to_rad( long_punctual.value );
+		slider_long_set();
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(long_punctual.value[0] == '-'){
+			long_punctual.value = long_punctual.value.substring( 1 );
+		}else{
+			long_punctual.value = '-' + long_punctual.value;
+		};
+	};
+});
+const ra_punctual = document.getElementById("ra_punctual");
+ra_punctual.addEventListener("keydown", event => {
+	if(event.key == "Enter"){
+		sight_RA = deg_to_rad( ra_punctual.value );
+		slider_RA_set();
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(ra_punctual.value[0] == '-'){
+			ra_punctual.value = ra_punctual.value.substring( 1 );
+		}else{
+			ra_punctual.value = '-' + ra_punctual.value;
+		};
+	};
+});
+const d_punctual = document.getElementById("d_punctual");
+d_punctual.addEventListener("keydown", event => {
+	if(event.key == "Enter"){
+		sight_D = deg_to_rad( d_punctual.value );
+		slider_D_set();
+	}else if(event.key == "-"){
+		event.preventDefault();
+		if(d_punctual.value[0] == '-'){
+			d_punctual.value = d_punctual.value.substring( 1 );
+		}else{
+			d_punctual.value = '-' + d_punctual.value;
+		};
+	};
+});
 const lat_slider = document.getElementById("lat");
 lat_slider.oninput = () => {
 	lat_set();
@@ -1015,14 +1071,22 @@ launch_button.onclick = () => {
 	Satellite.launch();
 };
 
+// Vectores fundamentales de la órbita
+const asc_node_checkbox = document.getElementById("asc_node_checkbox");
+const periapse_checkbox = document.getElementById("periapse_checkbox");
+const semi_lat_checkbox = document.getElementById("semi_lat_checkbox");
+const momentum_checkbox = document.getElementById("momentum_checkbox");
+const rotation_checkbox = document.getElementById("rotation_checkbox");
+
+// Otra información de la órbita
+const epoch_checkbox = document.getElementById("epoch_checkbox");
+const orbit_dim_checkbox = document.getElementById("orbit_dim_checkbox");
+
 // Targeting
 const flight_time = document.getElementById("flight_time");
 const vel_vec_x_label = document.getElementById("vel_vec_x_label");
 const vel_vec_y_label = document.getElementById("vel_vec_y_label");
 const vel_vec_z_label = document.getElementById("vel_vec_z_label");
-const a_min_label = document.getElementById("a_min_label");
-const a_des_label = document.getElementById("a_des_label");
-const a_max_label = document.getElementById("a_max_label");
 const t_min_label = document.getElementById("t_min_label");
 const t_des_label = document.getElementById("t_des_label");
 const t_max_label = document.getElementById("t_max_label");
@@ -1039,12 +1103,9 @@ flight_time.addEventListener("keydown", event => {
 			vel_vec_x_label.innerHTML = significant( targeting_data.v.x, 10 );
 			vel_vec_y_label.innerHTML = significant( targeting_data.v.y, 10 );
 			vel_vec_z_label.innerHTML = significant( targeting_data.v.z, 10 );
-			a_min_label.innerHTML = significant( targeting_data.a[0], 3 );
-			a_des_label.innerHTML = significant( targeting_data.a[1], 3 );
-			a_max_label.innerHTML = significant( targeting_data.a[2], 3 );
-			t_min_label.innerHTML = significant( to_eday( targeting_data.t[0] ), 3 );
-			t_des_label.innerHTML = significant( to_eday( targeting_data.t[1] ), 3 );
-			t_max_label.innerHTML = significant( to_eday( targeting_data.t[2] ), 3 );
+			t_min_label.innerHTML = significant( to_eday( targeting_data.t[0] ), 10 );
+			t_des_label.innerHTML = significant( to_eday( targeting_data.t[1] ), 10 );
+			t_max_label.innerHTML = significant( to_eday( targeting_data.t[2] ), 10 );
 		};
 	}else if(event.key == "-"){
 		event.preventDefault();
@@ -1073,6 +1134,14 @@ apsis.onclick = () => {
 	apsis_vec_z_label.innerHTML = significant( apsis_data.z, 10 );
 };
 
+// Aplicar componentes de velocidad del apsis
+const apply_apsis = document.getElementById("apply_apsis");
+apply_apsis.onclick = () => {
+	vel_x_punctual.value = apsis_vec_x_label.innerHTML;
+	vel_y_punctual.value = apsis_vec_y_label.innerHTML;
+	vel_z_punctual.value = apsis_vec_z_label.innerHTML;
+};
+
 // Aplicar componentes de velocidad del targeting
 const apply_vel = document.getElementById("apply_vel");
 apply_vel.onclick = () => {
@@ -1089,10 +1158,12 @@ epoch_button.onclick = () => {
 
 // implementación de un vehículo
 const vehicle_text = document.getElementById("vehicle_text");
-const vehicle_set_button = document.getElementById("vehicle_set");
-vehicle_set_button.onclick = () => {
-	implement_vehicle();
-};
+vehicle_text.addEventListener("keydown", event => {
+	if(event.key == "Enter"){
+		event.preventDefault();
+		implement_vehicle();
+	};
+});
 const jettison_button = document.getElementById("jettison");
 jettison_button.onclick = () => {
 	Satellite.ctrl.jettison();
@@ -1260,8 +1331,8 @@ setInterval( orbitLoop, s_to_ms( 1 / frac ) );
 
 // Comandos de misión simulada
 commands = [
-	['date', '1969-07-16', '13:32:05'],
 	/*
+	['date', '1969-07-16', '13:32:05'],
 	['ctrl', 'earth'],
 	['phi', 28.5],
 	['lambda', -80.5],
